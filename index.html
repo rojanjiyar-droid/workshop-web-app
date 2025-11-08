@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حسابداری کارگاه تولیدی</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+        
+        .nav {
+            display: flex;
+            background: #34495e;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .nav button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .nav button.active {
+            background: #e74c3c;
+        }
+        
+        .nav button:hover {
+            background: #3498db;
+        }
+        
+        .content {
+            padding: 20px;
+            min-height: 400px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-right: 4px solid #3498db;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .alert {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏭 حسابداری کارگاه</h1>
+            <p>برنامه مدیریت مالی کارگاه تولیدی</p>
+        </div>
+        
+        <div class="nav">
+            <button class="nav-btn active" onclick="showTab('dashboard')">📊 داشبورد</button>
+            <button class="nav-btn" onclick="showTab('invoices')">🧾 فاکتور</button>
+            <button class="nav-btn" onclick="showTab('workers')">👥 پرسنل</button>
+            <button class="nav-btn" onclick="showTab('reports')">📈 گزارش</button>
+        </div>
+        
+        <div class="content">
+            <!-- تب داشبورد -->
+            <div id="dashboard" class="tab-content active">
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value">۱۲,۵۰۰,۰۰۰</div>
+                        <div class="stat-label">درآمد ماه</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">۸,۲۰۰,۰۰۰</div>
+                        <div class="stat-label">هزینه ماه</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">۴,۳۰۰,۰۰۰</div>
+                        <div class="stat-label">سود خالص</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">۸</div>
+                        <div class="stat-label">کارگران فعال</div>
+                    </div>
+                </div>
+                
+                <div class="alert">
+                    ⚠️ ۳ چک تا ۳ روز دیگر سررسید می‌شوند
+                </div>
+                
+                <button class="btn" onclick="showTab('invoices')">
+                    ➕ فاکتور جدید
+                </button>
+                <button class="btn btn-success" onclick="showTab('workers')">
+                    👥 مدیریت پرسنل
+                </button>
+            </div>
+            
+            <!-- تب فاکتور -->
+            <div id="invoices" class="tab-content">
+                <h3>🧾 فاکتور جدید</h3>
+                <input type="text" id="customerName" placeholder="نام مشتری">
+                <input type="number" id="invoiceAmount" placeholder="مبلغ (تومان)">
+                <select id="invoiceStatus">
+                    <option value="pending">در انتظار</option>
+                    <option value="delivered">تحویل شده</option>
+                </select>
+                <textarea id="invoiceNotes" placeholder="توضیحات" rows="3"></textarea>
+                
+                <button class="btn btn-success" onclick="addInvoice()">
+                    💾 ثبت فاکتور
+                </button>
+                
+                <div id="invoicesList" style="margin-top: 20px;">
+                    <!-- لیست فاکتورها اینجا نمایش داده می‌شه -->
+                </div>
+            </div>
+            
+            <!-- تب پرسنل -->
+            <div id="workers" class="tab-content">
+                <h3>👥 مدیریت کارگران</h3>
+                <input type="text" id="workerName" placeholder="نام کارگر">
+                <input type="tel" id="workerPhone" placeholder="شماره تلفن">
+                <input type="number" id="workerSalary" placeholder="حقوق ماهانه">
+                
+                <button class="btn btn-success" onclick="addWorker()">
+                    ➕ اضافه کردن کارگر
+                </button>
+                
+                <div id="workersList" style="margin-top: 20px;">
+                    <!-- لیست کارگران اینجا نمایش داده می‌شه -->
+                </div>
+            </div>
+            
+            <!-- تب گزارش -->
+            <div id="reports" class="tab-content">
+                <h3>📈 گزارش‌های مالی</h3>
+                <button class="btn" onclick="generateReport('daily')">
+                    📊 گزارش روزانه
+                </button>
+                <button class="btn" onclick="generateReport('monthly')">
+                    📈 گزارش ماهانه
+                </button>
+                <button class="btn" onclick="exportToExcel()">
+                    📁 خروجی اکسل
+                </button>
+                <button class="btn btn-success" onclick="sendSMSReport()">
+                    📱 ارسال پیامک
+                </button>
+                
+                <div id="reportResult" style="margin-top: 20px;">
+                    <!-- نتیجه گزارش اینجا نمایش داده می‌شه -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // داده‌های نمونه
+        let invoices = [];
+        let workers = [];
+        
+        // نمایش تب‌ها
+        function showTab(tabName) {
+            // مخفی کردن همه تب‌ها
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // غیرفعال کردن همه دکمه‌ها
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // نمایش تب انتخاب شده
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // اگر تب لیست بود، داده‌ها رو refresh کن
+            if (tabName === 'invoices') {
+                displayInvoices();
+            } else if (tabName === 'workers') {
+                displayWorkers();
+            }
+        }
+        
+        // اضافه کردن فاکتور
+        function addInvoice() {
+            const customerName = document.getElementById('customerName').value;
+            const amount = document.getElementById('invoiceAmount').value;
+            const status = document.getElementById('invoiceStatus').value;
+            const notes = document.getElementById('invoiceNotes').value;
+            
+            if (customerName && amount) {
+                const invoice = {
+                    id: invoices.length + 1,
+                    customerName: customerName,
+                    amount: parseInt(amount),
+                    status: status,
+                    notes: notes,
+                    date: new Date().toLocaleDateString('fa-IR')
+                };
+                
+                invoices.push(invoice);
+                
+                // پاک کردن فرم
+                document.getElementById('customerName').value = '';
+                document.getElementById('invoiceAmount').value = '';
+                document.getElementById('invoiceNotes').value = '';
+                
+                // نمایش پیام موفقیت
+                alert('فاکتور با موفقیت ثبت شد!');
+                
+                // نمایش لیست فاکتورها
+                displayInvoices();
+            } else {
+                alert('لطفاً نام مشتری و مبلغ را وارد کنید!');
+            }
+        }
+        
+        // نمایش لیست فاکتورها
+        function displayInvoices() {
+            const invoicesList = document.getElementById('invoicesList');
+            invoicesList.innerHTML = '';
+            
+            invoices.forEach(invoice => {
+                const invoiceDiv = document.createElement('div');
+                invoiceDiv.className = 'card';
+                invoiceDiv.innerHTML = `
+                    <strong>مشتری: ${invoice.customerName}</strong>
+                    <div>مبلغ: ${invoice.amount.toLocaleString()} تومان</div>
+                    <div>وضعیت: ${invoice.status === 'pending' ? 'در انتظار' : 'تحویل شده'}</div>
+                    <div>تاریخ: ${invoice.date}</div>
+                    <small>${invoice.notes}</small>
+                `;
+                invoicesList.appendChild(invoiceDiv);
+            });
+        }
+        
+        // اضافه کردن کارگر
+        function addWorker() {
+            const name = document.getElementById('workerName').value;
+            const phone = document.getElementById('workerPhone').value;
+            const salary = document.getElementById('workerSalary').value;
+            
+            if (name && salary) {
+                const worker = {
+                    id: workers.length + 1,
+                    name: name,
+                    phone: phone,
+                    salary: parseInt(salary),
+                    startDate: new Date().toLocaleDateString('fa-IR')
+                };
+                
+                workers.push(worker);
+                
+                // پاک کردن فرم
+                document.getElementById('workerName').value = '';
+                document.getElementById('workerPhone').value = '';
+                document.getElementById('workerSalary').value = '';
+                
+                alert('کارگر با موفقیت اضافه شد!');
+                displayWorkers();
+            } else {
+                alert('لطفاً نام و حقوق کارگر را وارد کنید!');
+            }
+        }
+        
+        // نمایش لیست کارگران
+        function displayWorkers() {
+            const workersList = document.getElementById('workersList');
+            workersList.innerHTML = '';
+            
+            workers.forEach(worker => {
+                const workerDiv = document.createElement('div');
+                workerDiv.className = 'card';
+                workerDiv.innerHTML = `
+                    <strong>${worker.name}</strong>
+                    <div>تلفن: ${worker.phone}</div>
+                    <div>حقوق: ${worker.salary.toLocaleString()} تومان</div>
+                    <div>تاریخ شروع: ${worker.startDate}</div>
+                `;
+                workersList.appendChild(workerDiv);
+            });
+        }
+        
+        // تولید گزارش
+        function generateReport(type) {
+            const reportResult = document.getElementById('reportResult');
+            let reportHTML = '';
+            
+            if (type === 'daily') {
+                reportHTML = `
+                    <div class="card">
+                        <h4>گزارش روزانه</h4>
+                        <div>تعداد فاکتورها: ${invoices.length}</div>
+                        <div>مجموع درآمد: ${invoices.reduce((sum, inv) => sum + inv.amount, 0).toLocaleString()} تومان</div>
+                        <div>کارگران فعال: ${workers.length} نفر</div>
+                    </div>
+                `;
+            } else {
+                reportHTML = `
+                    <div class="card">
+                        <h4>گزارش ماهانه</h4>
+                        <div>درآمد ماه: ۱۲,۵۰۰,۰۰۰ تومان</div>
+                        <div>هزینه ماه: ۸,۲۰۰,۰۰۰ تومان</div>
+                        <div>سود خالص: ۴,۳۰۰,۰۰۰ تومان</div>
+                        <div>میانگین فاکتور روزانه: ${Math.round(invoices.reduce((sum, inv) => sum + inv.amount, 0) / (invoices.length || 1)).toLocaleString()} تومان</div>
+                    </div>
+                `;
+            }
+            
+            reportResult.innerHTML = reportHTML;
+        }
+        
+        // ارسال پیامک
+        function sendSMSReport() {
+            const phoneNumber = prompt('شماره تلفن برای ارسال گزارش:');
+            if (phoneNumber) {
+                const totalAmount = invoices.reduce((sum, inv) => sum + inv.amount, 0);
+                const message = `گزارش کارگاه: ${invoices.length} فاکتور - مجموع: ${totalAmount.toLocaleString()} تومان - ${workers.length} کارگر فعال`;
+                
+                // باز کردن برنامه پیامک
+                window.open(`sms:${phoneNumber}?body=${encodeURIComponent(message)}`, '_blank');
+                alert('پیامک آماده ارسال است!');
+            }
+        }
+        
+        // خروجی اکسل
+        function exportToExcel() {
+            alert('در نسخه بعدی اضافه خواهد شد!');
+        }
+        
+        // بارگذاری اولیه
+        window.onload = function() {
+            // اضافه کردن داده‌های نمونه
+            invoices = [
+                {id: 1, customerName: "شرکت ایران خودرو", amount: 5000000, status: "delivered", date: "1402/10/15", notes: "تحویل قطعات"},
+                {id: 2, customerName: "کارخانه سایپا", amount: 3000000, status: "pending", date: "1402/10/16", notes: "پیش فاکتور"}
+            ];
+            
+            workers = [
+                {id: 1, name: "علی محمدی", phone: "09123456789", salary: 4500000, startDate: "1402/09/01"},
+                {id: 2, name: "رضا کریمی", phone: "09129876543", salary: 4200000, startDate: "1402/08/15"}
+            ];
+        };
+    </script>
+</body>
+</html>
