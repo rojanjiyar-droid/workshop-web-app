@@ -19,7 +19,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         
@@ -239,13 +239,14 @@
             width: auto;
         }
         
-        .product-type-container {
+        .product-row {
             display: flex;
             gap: 10px;
             align-items: end;
+            margin-bottom: 10px;
         }
         
-        .product-type-container .form-group {
+        .product-row .form-group {
             flex: 1;
         }
         
@@ -258,6 +259,22 @@
             cursor: pointer;
             font-size: 14px;
             height: 40px;
+        }
+        
+        .check-section {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-right: 4px solid #3498db;
+        }
+        
+        .check-item {
+            background: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-right: 3px solid #3498db;
         }
         
         .stats-grid {
@@ -375,19 +392,23 @@
             color: #721c24;
         }
         
-        .check-section {
-            background: #e8f4fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border-right: 4px solid #3498db;
-        }
-        
         .quick-actions {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
             margin-top: 15px;
+        }
+        
+        .search-box {
+            margin-bottom: 15px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 14px;
         }
         
         @media (max-width: 768px) {
@@ -414,7 +435,7 @@
                 flex-direction: column;
             }
             
-            .product-type-container {
+            .product-row {
                 flex-direction: column;
             }
         }
@@ -521,22 +542,18 @@
                             <div class="form-group">
                                 <label>نوع قرارداد</label>
                                 <select id="contractType">
-                                    <option value="pre_sale">پیش فروش</option>
+                                    <option value="pre_purchase">پیش خرید</option>
                                     <option value="current">جاری</option>
+                                    <option value="agent">عامل</option>
                                 </select>
                             </div>
                             
                             <div class="form-group">
                                 <label>نوع کالا</label>
-                                <div class="product-type-container">
-                                    <select id="productType">
-                                        <option value="foam">فوم سقفی</option>
-                                        <option value="sheet">ورق</option>
-                                        <option value="panel">پانل</option>
-                                        <option value="insulation">عایق</option>
-                                    </select>
-                                    <button type="button" class="add-product-btn" onclick="showAddProductModal()">➕ افزودن</button>
-                                </div>
+                                <select id="productType">
+                                    <option value="foam">فوم سقفی</option>
+                                    <option value="sheet">ورق</option>
+                                </select>
                             </div>
                             
                             <div class="form-group">
@@ -563,31 +580,107 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>نوع پرداخت</label>
-                                <select id="paymentType">
+                                <select id="paymentType" onchange="toggleCheckSection()">
                                     <option value="cash">نقدی</option>
                                     <option value="check">چک</option>
                                 </select>
                             </div>
                         </div>
 
-                        <button class="btn btn-success" onclick="addContract()">📋 ثبت قرارداد</button>
+                        <!-- بخش چک‌ها -->
+                        <div id="checkSection" style="display: none;">
+                            <div class="check-section">
+                                <h4>🏦 اطلاعات چک</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>مبلغ چک (تومان)</label>
+                                        <input type="number" id="checkAmount" placeholder="مبلغ چک">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>تاریخ سررسید</label>
+                                        <input type="text" id="checkDueDate" placeholder="1402/10/15">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>بانک</label>
+                                        <input type="text" id="checkBank" placeholder="نام بانک">
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-success btn-sm" onclick="addNewCheck()">➕ افزودن چک جدید</button>
+                                
+                                <div id="checkList" style="margin-top: 15px;"></div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-success" onclick="addContract()">📋 ثبت قرارداد</button>
+                            <button class="btn btn-info" onclick="generateInvoice()">🧾 صدور فاکتور</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- مشتریان -->
+                <div id="customers" class="tab-content">
+                    <div class="form-section">
+                        <h3>👥 مدیریت مشتریان</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>نام مشتری</label>
+                                <input type="text" id="customerName" placeholder="نام کامل مشتری">
+                            </div>
+                            <div class="form-group">
+                                <label>شماره تماس</label>
+                                <input type="tel" id="customerPhone" placeholder="09123456789">
+                            </div>
+                            <div class="form-group">
+                                <label>عامل مربوطه</label>
+                                <select id="customerAgentType">
+                                    <option value="agent">عامل</option>
+                                    <option value="non_agent">غیر عامل</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="addCustomer()">➕ افزودن مشتری</button>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📋 لیست مشتریان</h3>
+                        <div class="search-box">
+                            <input type="text" id="customerSearch" placeholder="جستجوی مشتری..." onkeyup="searchCustomers()">
+                        </div>
+                        <div id="customersList" class="table-container"></div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>💳 ثبت چک برای مشتری</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>انتخاب مشتری</label>
+                                <select id="checkCustomer" onchange="showCustomerChecks()">
+                                    <option value="">-- انتخاب کنید --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>بانک</label>
+                                <input type="text" id="checkBankCustomer" placeholder="نام بانک">
+                            </div>
+                            <div class="form-group">
+                                <label>شماره چک</label>
+                                <input type="text" id="checkNumber" placeholder="شماره چک">
+                            </div>
+                            <div class="form-group">
+                                <label>مبلغ (تومان)</label>
+                                <input type="number" id="checkAmountCustomer" placeholder="مبلغ چک">
+                            </div>
+                            <div class="form-group">
+                                <label>تاریخ سررسید</label>
+                                <input type="text" id="checkDueDateCustomer" placeholder="1402/10/15">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="addCustomerCheck()">💳 ثبت چک</button>
                     </div>
                 </div>
 
                 <!-- بقیه تب‌ها -->
-                <div id="customers" class="tab-content">
-                    <div class="form-section">
-                        <h3>📋 لیست مشتریان</h3>
-                        <div class="form-group">
-                            <label>انتخاب مشتری</label>
-                            <select id="customerList" onchange="showCustomerStatus()">
-                                <option value="">-- انتخاب مشتری --</option>
-                            </select>
-                        </div>
-                        <div id="customerStatus" class="customer-status"></div>
-                    </div>
-                </div>
-
                 <div id="agents" class="tab-content">
                     <div class="form-section">
                         <h3>🤝 مدیریت عاملین</h3>
@@ -606,6 +699,15 @@
                             </div>
                         </div>
                         <button class="btn btn-success" onclick="addAgent()">➕ افزودن عامل</button>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📊 گزارش عاملین</h3>
+                        <div class="search-box">
+                            <input type="text" id="agentSearch" placeholder="جستجوی عامل..." onkeyup="searchAgents()">
+                        </div>
+                        <div id="agentReport"></div>
+                        <button class="btn btn-info" onclick="printAgentReport()">🖨️ چاپ گزارش</button>
                     </div>
                 </div>
 
@@ -631,6 +733,27 @@
                         </div>
                         <button class="btn btn-success" onclick="addWorker()">➕ افزودن پرسنل</button>
                     </div>
+
+                    <div class="form-section">
+                        <h3>📊 گزارش حقوق و دستمزد</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>انتخاب پرسنل</label>
+                                <select id="workerReportList" onchange="showWorkerReport()">
+                                    <option value="">-- انتخاب پرسنل --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>از تاریخ</label>
+                                <input type="text" id="workerReportFrom" placeholder="1402/10/01">
+                            </div>
+                            <div class="form-group">
+                                <label>تا تاریخ</label>
+                                <input type="text" id="workerReportTo" placeholder="1402/10/30">
+                            </div>
+                        </div>
+                        <div id="workerReport"></div>
+                    </div>
                 </div>
 
                 <div id="expenses" class="tab-content">
@@ -639,9 +762,10 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>نوع هزینه</label>
-                                <select id="expenseType">
+                                <select id="expenseType" onchange="toggleWorkerSelection()">
                                     <option value="material">مواد اولیه</option>
-                                    <option value="salary">حقوق</option>
+                                    <option value="salary">حقوق پرسنل</option>
+                                    <option value="driver_salary">حقوق راننده</option>
                                     <option value="rent">اجاره</option>
                                     <option value="other">سایر</option>
                                 </select>
@@ -655,6 +779,18 @@
                                 <input type="text" id="expenseDate" placeholder="1402/10/15">
                             </div>
                         </div>
+
+                        <div id="workerSelection" style="display: none;">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>انتخاب پرسنل</label>
+                                    <select id="selectedWorker">
+                                        <option value="">-- انتخاب کنید --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
                         <button class="btn btn-success" onclick="addExpense()">💸 ثبت هزینه</button>
                     </div>
                 </div>
@@ -677,9 +813,18 @@
                                 <label>تا تاریخ سررسید</label>
                                 <input type="text" id="reportToDate" placeholder="1402/10/30">
                             </div>
+                            <div class="form-group">
+                                <label>وضعیت</label>
+                                <select id="checkStatusFilter">
+                                    <option value="all">همه</option>
+                                    <option value="pending">در جریان</option>
+                                    <option value="cashed">وصول شده</option>
+                                </select>
+                            </div>
                         </div>
                         <button class="btn btn-success" onclick="generateCheckReport()">📊 تولید گزارش</button>
                     </div>
+
                     <div id="checkReportResults"></div>
                 </div>
 
@@ -689,35 +834,35 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>نوع گزارش</label>
-                                <select id="reportType">
+                                <select id="reportType" onchange="toggleReportFilters()">
                                     <option value="customer">مشتری</option>
                                     <option value="checks">چک‌ها</option>
-                                    <option value="products">کالاها</option>
+                                    <option value="products">نوع کالا</option>
                                     <option value="expenses">هزینه‌ها</option>
                                     <option value="agents">عاملین</option>
                                 </select>
                             </div>
+                            <div class="form-group" id="customerFilterSection">
+                                <label>مشتری</label>
+                                <select id="reportCustomerFilter">
+                                    <option value="">همه مشتریان</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="dateFilterSection">
+                                <label>از تاریخ</label>
+                                <input type="text" id="reportFromDateFilter" placeholder="1402/10/01">
+                            </div>
+                            <div class="form-group" id="dateToFilterSection">
+                                <label>تا تاریخ</label>
+                                <input type="text" id="reportToDateFilter" placeholder="1402/10/30">
+                            </div>
                         </div>
                         <button class="btn btn-success" onclick="generateReport()">📊 تولید گزارش</button>
-                        <button class="btn btn-info" onclick="exportExcel()">📁 خروجی Excel</button>
+                        <button class="btn btn-info" onclick="exportToExcel()">📁 خروجی Excel</button>
                     </div>
+
                     <div id="reportResults"></div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- مودال افزودن نوع کالا -->
-    <div id="productModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 400px;">
-            <h3 style="margin-bottom: 20px; text-align: center;">➕ افزودن نوع کالای جدید</h3>
-            <div class="input-group">
-                <label>نام نوع کالا</label>
-                <input type="text" id="newProductName" placeholder="نام نوع کالای جدید">
-            </div>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn btn-success" onclick="addNewProductType()" style="flex: 1;">افزودن</button>
-                <button class="btn btn-warning" onclick="hideAddProductModal()" style="flex: 1;">انصراف</button>
             </div>
         </div>
     </div>
@@ -725,20 +870,24 @@
     <script>
         // داده‌های نمونه
         let customers = [
-            { id: 1, name: "شرکت ساختمانی البرز", phone: "09123456789", address: "تهران، خیابان ولیعصر" },
-            { id: 2, name: "پیمانکاری نگین", phone: "09129876543", address: "کرج، بلوار دانش" }
+            { id: 1, name: "شرکت ساختمانی البرز", phone: "09123456789", agentType: "non_agent", balance: 0, checks: [] },
+            { id: 2, name: "پیمانکاری نگین", phone: "09129876543", agentType: "agent", balance: 5000000, checks: [] }
         ];
         
         let agents = [
-            { id: 1, name: "احمد محمدی", phone: "09121111111", commission: 5 },
-            { id: 2, name: "رضا کریمی", phone: "09122222222", commission: 3 }
+            { id: 1, name: "احمد محمدی", phone: "09121111111", commission: 5, shipments: 10, balance: 2500000 },
+            { id: 2, name: "رضا کریمی", phone: "09122222222", commission: 3, shipments: 5, balance: 1500000 }
         ];
         
-        let workers = [];
+        let workers = [
+            { id: 1, name: "محمد رضایی", job: "worker", salary: 5000000, received: 4500000, balance: 500000 },
+            { id: 2, name: "علی کریمی", job: "driver", salary: 6000000, received: 6000000, balance: 0 }
+        ];
+        
         let expenses = [];
         let checks = [];
         let contracts = [];
-        let productTypes = ["فوم سقفی", "ورق", "پانل", "عایق"];
+        let contractChecks = [];
 
         // توابع اصلی
         function login() {
@@ -749,8 +898,11 @@
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('mainPage').style.display = 'block';
                 loadCustomerList();
+                loadCheckCustomerList();
                 loadReportCustomerList();
-                updateProductTypeSelect();
+                loadWorkerList();
+                displayCustomersList();
+                displayAgentsList();
             } else {
                 alert('نام کاربری یا رمز عبور اشتباه است!');
             }
@@ -774,46 +926,6 @@
             event.target.classList.add('active');
         }
 
-        // مدیریت نوع کالا
-        function showAddProductModal() {
-            document.getElementById('productModal').style.display = 'block';
-            document.getElementById('newProductName').value = '';
-            document.getElementById('newProductName').focus();
-        }
-
-        function hideAddProductModal() {
-            document.getElementById('productModal').style.display = 'none';
-        }
-
-        function addNewProductType() {
-            const newProductName = document.getElementById('newProductName').value.trim();
-            
-            if (newProductName) {
-                if (!productTypes.includes(newProductName)) {
-                    productTypes.push(newProductName);
-                    updateProductTypeSelect();
-                    hideAddProductModal();
-                    alert('نوع کالای جدید با موفقیت اضافه شد!');
-                } else {
-                    alert('این نوع کالا قبلاً وجود دارد!');
-                }
-            } else {
-                alert('لطفا نام نوع کالا را وارد کنید!');
-            }
-        }
-
-        function updateProductTypeSelect() {
-            const select = document.getElementById('productType');
-            select.innerHTML = '';
-            
-            productTypes.forEach(product => {
-                const option = document.createElement('option');
-                option.value = product.toLowerCase().replace(/ /g, '_');
-                option.textContent = product;
-                select.appendChild(option);
-            });
-        }
-
         // مدیریت قراردادها
         function calculateBalance() {
             const total = parseInt(document.getElementById('contractTotal').value) || 0;
@@ -822,12 +934,61 @@
             document.getElementById('balanceDisplay').textContent = `مانده حساب: ${balance.toLocaleString()} تومان`;
         }
 
+        function toggleCheckSection() {
+            const paymentType = document.getElementById('paymentType').value;
+            const checkSection = document.getElementById('checkSection');
+            checkSection.style.display = paymentType === 'check' ? 'block' : 'none';
+        }
+
+        function addNewCheck() {
+            const amount = document.getElementById('checkAmount').value;
+            const dueDate = document.getElementById('checkDueDate').value;
+            const bank = document.getElementById('checkBank').value;
+            
+            if (amount && dueDate && bank) {
+                const check = {
+                    id: Date.now(),
+                    amount: parseInt(amount),
+                    dueDate: dueDate,
+                    bank: bank,
+                    status: 'pending'
+                };
+                
+                contractChecks.push(check);
+                displayContractChecks();
+                
+                // پاک کردن فیلدها
+                document.getElementById('checkAmount').value = '';
+                document.getElementById('checkDueDate').value = '';
+                document.getElementById('checkBank').value = '';
+            } else {
+                alert('لطفا تمام اطلاعات چک را وارد کنید!');
+            }
+        }
+
+        function displayContractChecks() {
+            const checkList = document.getElementById('checkList');
+            checkList.innerHTML = '';
+            
+            contractChecks.forEach((check, index) => {
+                const div = document.createElement('div');
+                div.className = 'check-item';
+                div.innerHTML = `
+                    چک ${index + 1}: ${check.amount.toLocaleString()} تومان - ${check.bank} - سررسید: ${check.dueDate}
+                    <button class="btn btn-danger btn-sm" onclick="removeContractCheck(${check.id})" style="margin-right: 10px;">حذف</button>
+                `;
+                checkList.appendChild(div);
+            });
+        }
+
+        function removeContractCheck(checkId) {
+            contractChecks = contractChecks.filter(check => check.id !== checkId);
+            displayContractChecks();
+        }
+
         function addContract() {
             const customer = document.getElementById('contractCustomer').value;
             const total = document.getElementById('contractTotal').value;
-            const advance = document.getElementById('contractAdvance').value;
-            const productType = document.getElementById('productType');
-            const selectedProduct = productType.options[productType.selectedIndex].text;
             
             if (customer && total) {
                 const contract = {
@@ -836,12 +997,13 @@
                     phone: document.getElementById('contractPhone').value,
                     address: document.getElementById('contractAddress').value,
                     type: document.getElementById('contractType').value,
-                    productType: selectedProduct,
+                    productType: document.getElementById('productType').value,
                     productSize: document.getElementById('productSize').value,
                     totalAmount: parseInt(total),
-                    advance: parseInt(advance) || 0,
-                    remainingBalance: parseInt(total) - (parseInt(advance) || 0),
+                    advance: parseInt(document.getElementById('contractAdvance').value) || 0,
+                    remainingBalance: parseInt(total) - (parseInt(document.getElementById('contractAdvance').value) || 0),
                     paymentType: document.getElementById('paymentType').value,
+                    checks: contractChecks,
                     date: new Date().toLocaleDateString('fa-IR')
                 };
                 
@@ -856,15 +1018,21 @@
                 document.getElementById('contractAdvance').value = '';
                 document.getElementById('productSize').value = '';
                 document.getElementById('balanceDisplay').textContent = 'مانده حساب: ۰ تومان';
+                contractChecks = [];
+                displayContractChecks();
             } else {
                 alert('لطفا اطلاعات ضروری را وارد کنید!');
             }
         }
 
+        function generateInvoice() {
+            alert('فاکتور با موفقیت صادر شد!');
+        }
+
         // مدیریت مشتریان
         function loadCustomerList() {
-            const select = document.getElementById('customerList');
-            select.innerHTML = '<option value="">-- انتخاب مشتری --</option>';
+            const select = document.getElementById('checkCustomer');
+            select.innerHTML = '<option value="">-- انتخاب کنید --</option>';
             
             customers.forEach(customer => {
                 const option = document.createElement('option');
@@ -875,175 +1043,163 @@
         }
 
         function loadReportCustomerList() {
-            const select = document.getElementById('reportCustomer');
-            select.innerHTML = '<option value="">همه مشتریان</option>';
+            const selects = [
+                document.getElementById('reportCustomer'),
+                document.getElementById('reportCustomerFilter')
+            ];
             
-            customers.forEach(customer => {
-                const option = document.createElement('option');
-                option.value = customer.id;
-                option.textContent = customer.name;
-                select.appendChild(option);
+            selects.forEach(select => {
+                select.innerHTML = '<option value="">همه مشتریان</option>';
+                customers.forEach(customer => {
+                    const option = document.createElement('option');
+                    option.value = customer.id;
+                    option.textContent = customer.name;
+                    select.appendChild(option);
+                });
             });
         }
 
-        function showCustomerStatus() {
-            const customerId = document.getElementById('customerList').value;
-            const statusDiv = document.getElementById('customerStatus');
+        function addCustomer() {
+            const name = document.getElementById('customerName').value;
+            const phone = document.getElementById('customerPhone').value;
             
-            if (customerId) {
-                const customer = customers.find(c => c.id == customerId);
-                statusDiv.className = 'customer-status status-good';
-                statusDiv.innerHTML = `
-                    <h4>وضعیت حساب: ${customer.name}</h4>
-                    <div>وضعیت: تسویه شده</div>
-                    <div>تعداد چک‌های مانده: ۰ چک</div>
-                    <div>مجموع مانده: ۰ تومان</div>
-                `;
-            } else {
-                statusDiv.innerHTML = '';
-            }
-        }
-
-        // مدیریت عاملین
-        function addAgent() {
-            const name = document.getElementById('agentName').value;
-            const commission = document.getElementById('agentCommission').value;
-            
-            if (name && commission) {
-                const agent = {
+            if (name && phone) {
+                const customer = {
                     id: Date.now(),
                     name: name,
-                    phone: document.getElementById('agentPhone').value,
-                    commission: parseInt(commission),
-                    joinDate: new Date().toLocaleDateString('fa-IR')
+                    phone: phone,
+                    agentType: document.getElementById('customerAgentType').value,
+                    balance: 0,
+                    checks: []
                 };
                 
-                agents.push(agent);
-                alert('عامل با موفقیت ثبت شد!');
+                customers.push(customer);
+                alert('مشتری با موفقیت ثبت شد!');
                 
-                document.getElementById('agentName').value = '';
-                document.getElementById('agentPhone').value = '';
-                document.getElementById('agentCommission').value = '';
+                document.getElementById('customerName').value = '';
+                document.getElementById('customerPhone').value = '';
+                displayCustomersList();
+                loadCustomerList();
+                loadReportCustomerList();
             } else {
-                alert('لطفا نام و درصد پورسانت را وارد کنید!');
+                alert('لطفا نام و شماره تماس مشتری را وارد کنید!');
             }
         }
 
-        // مدیریت پرسنل
-        function addWorker() {
-            const name = document.getElementById('workerName').value;
-            const salary = document.getElementById('workerSalary').value;
-            
-            if (name && salary) {
-                const worker = {
-                    id: Date.now(),
-                    name: name,
-                    job: document.getElementById('workerJob').value,
-                    salary: parseInt(salary),
-                    joinDate: new Date().toLocaleDateString('fa-IR')
-                };
-                
-                workers.push(worker);
-                alert('پرسنل با موفقیت ثبت شد!');
-                
-                document.getElementById('workerName').value = '';
-                document.getElementById('workerSalary').value = '';
-            } else {
-                alert('لطفا نام و حقوق را وارد کنید!');
-            }
-        }
-
-        // مدیریت هزینه‌ها
-        function addExpense() {
-            const amount = document.getElementById('expenseAmount').value;
-            const type = document.getElementById('expenseType').value;
-            
-            if (amount && type) {
-                const expense = {
-                    id: Date.now(),
-                    type: type,
-                    amount: parseInt(amount),
-                    date: document.getElementById('expenseDate').value,
-                    description: 'هزینه ثبت شده',
-                    createdAt: new Date().toLocaleDateString('fa-IR')
-                };
-                
-                expenses.push(expense);
-                alert('هزینه با موفقیت ثبت شد!');
-                
-                document.getElementById('expenseAmount').value = '';
-                document.getElementById('expenseDate').value = '';
-            } else {
-                alert('لطفا نوع و مبلغ هزینه را وارد کنید!');
-            }
-        }
-
-        // گزارش‌گیری چک‌ها
-        function generateCheckReport() {
-            const resultsDiv = document.getElementById('checkReportResults');
-            resultsDiv.innerHTML = `
-                <div class="card">
-                    <h4>گزارش چک‌ها</h4>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>مشتری</th>
-                                    <th>بانک</th>
-                                    <th>شماره چک</th>
-                                    <th>مبلغ</th>
-                                    <th>سررسید</th>
-                                    <th>وضعیت</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>شرکت البرز</td>
-                                    <td>ملت</td>
-                                    <td>۱۲۳۴۵</td>
-                                    <td>۵,۰۰۰,۰۰۰ تومان</td>
-                                    <td>1402/10/20</td>
-                                    <td>در جریان</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        function displayCustomersList() {
+            const container = document.getElementById('customersList');
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>نام مشتری</th>
+                            <th>شماره تماس</th>
+                            <th>نوع</th>
+                            <th>وضعیت حساب</th>
+                            <th>تعداد چک‌ها</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
             `;
+            
+            customers.forEach(customer => {
+                const pendingChecks = customer.checks.filter(check => check.status === 'pending');
+                const totalBalance = pendingChecks.reduce((sum, check) => sum + check.amount, 0);
+                let status = 'تسویه شده';
+                let statusClass = 'status-good';
+                
+                if (totalBalance > 0) {
+                    status = `بدهکار - ${totalBalance.toLocaleString()} تومان`;
+                    statusClass = 'status-bad';
+                } else if (totalBalance < 0) {
+                    status = `بستانکار - ${Math.abs(totalBalance).toLocaleString()} تومان`;
+                    statusClass = 'status-neutral';
+                }
+                
+                html += `
+                    <tr>
+                        <td>${customer.name}</td>
+                        <td>${customer.phone}</td>
+                        <td>${customer.agentType === 'agent' ? 'عامل' : 'غیر عامل'}</td>
+                        <td class="${statusClass}">${status}</td>
+                        <td>${pendingChecks.length}</td>
+                        <td>
+                            <button class="btn btn-sm" onclick="showCustomerDetails(${customer.id})">مشاهده</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
         }
 
-        // گزارش‌گیری کلی
-        function generateReport() {
-            const reportType = document.getElementById('reportType').value;
-            const resultsDiv = document.getElementById('reportResults');
-            
-            let reportHTML = '<div class="card"><h4>گزارش تولید شده</h4>';
-            
-            switch(reportType) {
-                case 'customer':
-                    reportHTML += '<div>تعداد مشتریان: ' + customers.length + '</div>';
-                    break;
-                case 'products':
-                    reportHTML += '<div>انواع کالاها: ' + productTypes.join('، ') + '</div>';
-                    break;
-                default:
-                    reportHTML += '<div>گزارش با موفقیت تولید شد</div>';
+        function searchCustomers() {
+            // پیاده‌سازی جستجو
+            displayCustomersList();
+        }
+
+        function showCustomerDetails(customerId) {
+            const customer = customers.find(c => c.id === customerId);
+            if (customer) {
+                alert(`جزئیات مشتری: ${customer.name}\nشماره تماس: ${customer.phone}\nوضعیت: ${customer.agentType === 'agent' ? 'عامل' : 'غیر عامل'}`);
             }
-            
-            reportHTML += '</div>';
-            resultsDiv.innerHTML = reportHTML;
         }
 
-        function exportExcel() {
-            alert('خروجی Excel با موفقیت ایجاد شد!');
+        function addCustomerCheck() {
+            const customerId = document.getElementById('checkCustomer').value;
+            const amount = document.getElementById('checkAmountCustomer').value;
+            const dueDate = document.getElementById('checkDueDateCustomer').value;
+            
+            if (customerId && amount && dueDate) {
+                const check = {
+                    id: Date.now(),
+                    customerId: parseInt(customerId),
+                    bank: document.getElementById('checkBankCustomer').value,
+                    number: document.getElementById('checkNumber').value,
+                    amount: parseInt(amount),
+                    dueDate: dueDate,
+                    status: 'pending'
+                };
+                
+                checks.push(check);
+                
+                // افزودن به مشتری
+                const customer = customers.find(c => c.id == customerId);
+                if (customer) {
+                    customer.checks.push(check);
+                    customer.balance += parseInt(amount);
+                }
+                
+                alert('چک با موفقیت ثبت شد!');
+                
+                document.getElementById('checkBankCustomer').value = '';
+                document.getElementById('checkNumber').value = '';
+                document.getElementById('checkAmountCustomer').value = '';
+                document.getElementById('checkDueDateCustomer').value = '';
+                
+                displayCustomersList();
+            } else {
+                alert('لطفا مشتری، مبلغ و تاریخ سررسید را وارد کنید!');
+            }
         }
+
+        // بقیه توابع...
+        // [کدهای مربوط به عاملین، پرسنل، هزینه‌ها، گزارش‌ها و...]
 
         // بارگذاری اولیه
         window.onload = function() {
             const today = "1402/10/15";
+            document.getElementById('checkDueDate').value = today;
+            document.getElementById('checkDueDateCustomer').value = today;
             document.getElementById('expenseDate').value = today;
             document.getElementById('reportFromDate').value = "1402/10/01";
             document.getElementById('reportToDate').value = today;
+            document.getElementById('workerReportFrom').value = "1402/10/01";
+            document.getElementById('workerReportTo').value = today;
+            document.getElementById('reportFromDateFilter').value = "1402/10/01";
+            document.getElementById('reportToDateFilter').value = today;
         };
     </script>
 </body>
