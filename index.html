@@ -13,31 +13,44 @@
         }
         
         body {
-            background: #f0f2f5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         .login-page {
             background: white;
-            border-radius: 10px;
+            border-radius: 15px;
             padding: 40px;
             max-width: 400px;
             margin: 50px auto;
             text-align: center;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
         
         .logo {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             margin: 0 auto 20px;
-            background: #ddd;
+            background: #f8f9fa;
             border-radius: 10px;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
         }
         
         .login-page h1 {
             color: #2c3e50;
             margin-bottom: 30px;
+            font-size: 24px;
         }
         
         .input-group {
@@ -47,32 +60,47 @@
         
         .input-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: #34495e;
             font-weight: bold;
         }
         
         .input-group input {
             width: 100%;
-            padding: 12px;
+            padding: 12px 15px;
             border: 2px solid #bdc3c7;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus {
+            border-color: #3498db;
+            outline: none;
         }
         
         .btn {
             background: #27ae60;
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 5px;
+            padding: 15px 30px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
             width: 100%;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #219a52;
         }
         
         .main-page {
             display: none;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
         
         .header {
@@ -82,13 +110,30 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-radius: 10px 10px 0 0;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-logo {
+            width: 50px;
+            height: 50px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
         }
         
         .nav {
             background: #34495e;
             display: flex;
             flex-wrap: wrap;
+            border-bottom: 2px solid #2980b9;
         }
         
         .nav-btn {
@@ -97,7 +142,14 @@
             background: none;
             color: white;
             cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
             border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+        
+        .nav-btn:hover {
+            background: #3c5570;
         }
         
         .nav-btn.active {
@@ -106,10 +158,8 @@
         }
         
         .content {
-            background: white;
             padding: 20px;
             min-height: 500px;
-            border-radius: 0 0 10px 10px;
         }
         
         .tab-content {
@@ -122,15 +172,21 @@
         
         .form-section {
             background: #f8f9fa;
+            border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
-            border-radius: 5px;
             border-right: 4px solid #3498db;
+        }
+        
+        .form-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
         }
         
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
             margin-bottom: 15px;
         }
@@ -144,13 +200,21 @@
             margin-bottom: 5px;
             color: #2c3e50;
             font-weight: bold;
+            font-size: 14px;
         }
         
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #bdc3c7;
             border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #3498db;
+            outline: none;
         }
         
         .btn-success {
@@ -161,47 +225,75 @@
             background: #f39c12;
         }
         
+        .btn-danger {
+            background: #e74c3c;
+        }
+        
         .btn-info {
             background: #3498db;
         }
         
-        .stats {
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 14px;
+            width: auto;
+        }
+        
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
         }
         
         .stat-card {
-            background: #3498db;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 20px;
-            border-radius: 5px;
+            border-radius: 10px;
             text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
         }
         
         .card {
             background: white;
-            border-radius: 5px;
+            border-radius: 8px;
             padding: 15px;
             margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             border-right: 4px solid #3498db;
+        }
+        
+        .card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
         }
         
         .balance-display {
             background: #e8f4fd;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
             text-align: center;
             font-weight: bold;
+            font-size: 18px;
+            color: #2c3e50;
         }
         
         .customer-status {
             padding: 15px;
             margin: 10px 0;
-            border-radius: 5px;
+            border-radius: 8px;
+            background: #f8f9fa;
         }
         
         .status-bad {
@@ -214,329 +306,417 @@
             border-right: 4px solid #27ae60;
         }
         
-        .table {
+        .status-neutral {
+            background: #fff3cd;
+            border-right: 4px solid #f39c12;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+        
+        table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
         }
         
-        .table th, .table td {
-            padding: 10px;
+        th, td {
+            padding: 12px;
             text-align: right;
             border-bottom: 1px solid #ddd;
+            font-size: 14px;
         }
         
-        .table th {
+        th {
             background: #34495e;
             color: white;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .alert {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            color: #856404;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .check-section {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-right: 4px solid #3498db;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .nav {
+                flex-direction: column;
+            }
+            
+            .nav-btn {
+                text-align: right;
+                border-bottom: 1px solid #3c5570;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .header-content {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- صفحه ورود -->
-    <div class="login-page" id="loginPage">
-        <div class="logo">لوگو</div>
-        <h1>حسابداری کارخانه کلشی فوم</h1>
-        <div class="input-group">
-            <label>نام کاربری</label>
-            <input type="text" id="username" value="admin">
-        </div>
-        <div class="input-group">
-            <label>رمز عبور</label>
-            <input type="password" id="password" value="1234">
-        </div>
-        <button class="btn" onclick="login()">ورود به سیستم</button>
-    </div>
-
-    <!-- صفحه اصلی -->
-    <div class="main-page" id="mainPage">
-        <div class="header">
-            <h2>حسابداری کارخانه کلشی فوم</h2>
-            <div>
-                <span id="currentUser">مدیر سیستم</span>
-                <button class="btn btn-warning" onclick="logout()" style="margin-right: 10px; padding: 8px 15px;">خروج</button>
+    <div class="container">
+        <!-- صفحه ورود -->
+        <div class="login-page" id="loginPage">
+            <div class="logo">لوگو کلشی فوم</div>
+            <h1>حسابداری کارخانه کلشی فوم</h1>
+            <div class="input-group">
+                <label for="username">نام کاربری</label>
+                <input type="text" id="username" value="admin">
             </div>
+            <div class="input-group">
+                <label for="password">رمز عبور</label>
+                <input type="password" id="password" value="1234">
+            </div>
+            <button class="btn" onclick="login()">ورود به سیستم</button>
         </div>
 
-        <div class="nav">
-            <button class="nav-btn active" onclick="showTab('dashboard')">داشبورد</button>
-            <button class="nav-btn" onclick="showTab('contracts')">قرارداد جدید</button>
-            <button class="nav-btn" onclick="showTab('customers')">مشتریان</button>
-            <button class="nav-btn" onclick="showTab('agents')">عاملین</button>
-            <button class="nav-btn" onclick="showTab('workers')">پرسنل</button>
-            <button class="nav-btn" onclick="showTab('expenses')">هزینه‌ها</button>
-            <button class="nav-btn" onclick="showTab('checks')">چک‌ها</button>
-            <button class="nav-btn" onclick="showTab('reports')">گزارش‌ها</button>
-        </div>
-
-        <div class="content">
-            <!-- داشبورد -->
-            <div id="dashboard" class="tab-content active">
-                <div class="stats">
-                    <div class="stat-card">
-                        <div>۱۰,۰۰۰,۰۰۰</div>
-                        <div>کل درآمد</div>
-                    </div>
-                    <div class="stat-card">
-                        <div>۵,۰۰۰,۰۰۰</div>
-                        <div>کل هزینه</div>
-                    </div>
-                    <div class="stat-card">
-                        <div>۱۵</div>
-                        <div>کارگران فعال</div>
-                    </div>
-                    <div class="stat-card">
-                        <div>۳</div>
-                        <div>چک‌های سررسید</div>
-                    </div>
+        <!-- صفحه اصلی -->
+        <div class="main-page" id="mainPage">
+            <div class="header">
+                <div class="header-content">
+                    <div class="header-logo">لوگو</div>
+                    <h1>حسابداری کارخانه کلشی فوم</h1>
                 </div>
-
-                <div class="form-section">
-                    <h3>دسترسی سریع</h3>
-                    <button class="btn" onclick="showTab('contracts')">قرارداد جدید</button>
-                    <button class="btn btn-success" onclick="showTab('expenses')">ثبت هزینه</button>
-                    <button class="btn btn-info" onclick="showTab('checks')">مدیریت چک‌ها</button>
+                <div>
+                    <span id="currentUser">مدیر سیستم</span>
+                    <button class="btn btn-warning btn-sm" onclick="logout()" style="margin-right: 10px;">خروج</button>
                 </div>
             </div>
 
-            <!-- قراردادها -->
-            <div id="contracts" class="tab-content">
-                <div class="form-section">
-                    <h3>ثبت قرارداد جدید</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>نام مشتری</label>
-                            <input type="text" id="contractCustomer" placeholder="نام مشتری">
-                        </div>
-                        <div class="form-group">
-                            <label>شماره تماس</label>
-                            <input type="tel" id="contractPhone" placeholder="شماره تماس">
-                        </div>
-                    </div>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>نوع قرارداد</label>
-                            <select id="contractType">
-                                <option value="pre_sale">پیش فروش</option>
-                                <option value="current">جاری</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>نوع کالا</label>
-                            <select id="productType">
-                                <option value="foam">فوم سقفی</option>
-                                <option value="sheet">ورق</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>اندازه</label>
-                            <input type="text" id="productSize" placeholder="اندازه کالا">
-                        </div>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>مبلغ کل قرارداد</label>
-                            <input type="number" id="contractTotal" placeholder="مبلغ کل" onchange="calculateBalance()">
-                        </div>
-                        <div class="form-group">
-                            <label>پیش‌پرداخت</label>
-                            <input type="number" id="contractAdvance" placeholder="پیش پرداخت" onchange="calculateBalance()">
-                        </div>
-                    </div>
-
-                    <div class="balance-display" id="balanceDisplay">
-                        مانده حساب: ۰ تومان
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>نوع پرداخت</label>
-                            <select id="paymentType">
-                                <option value="cash">نقدی</option>
-                                <option value="check">چک</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button class="btn btn-success" onclick="addContract()">ثبت قرارداد</button>
-                </div>
+            <div class="nav">
+                <button class="nav-btn active" onclick="showTab('dashboard')">📊 داشبورد</button>
+                <button class="nav-btn" onclick="showTab('contracts')">📝 قرارداد جدید</button>
+                <button class="nav-btn" onclick="showTab('customers')">👥 مشتریان</button>
+                <button class="nav-btn" onclick="showTab('agents')">🤝 عاملین</button>
+                <button class="nav-btn" onclick="showTab('workers')">👷 پرسنل</button>
+                <button class="nav-btn" onclick="showTab('expenses')">💰 هزینه‌ها</button>
+                <button class="nav-btn" onclick="showTab('checks')">🏦 چک‌ها</button>
+                <button class="nav-btn" onclick="showTab('reports')">📈 گزارش‌ها</button>
             </div>
 
-            <!-- مشتریان -->
-            <div id="customers" class="tab-content">
-                <div class="form-section">
-                    <h3>لیست مشتریان</h3>
-                    <div class="form-group">
-                        <label>انتخاب مشتری</label>
-                        <select id="customerList" onchange="showCustomerStatus()">
-                            <option value="">-- انتخاب مشتری --</option>
-                        </select>
+            <div class="content">
+                <!-- داشبورد -->
+                <div id="dashboard" class="tab-content active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalIncome">۱۰,۰۰۰,۰۰۰</div>
+                            <div class="stat-label">کل درآمد</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalExpenses">۵,۰۰۰,۰۰۰</div>
+                            <div class="stat-label">کل هزینه</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="activeWorkers">۱۵</div>
+                            <div class="stat-label">کارگران فعال</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="dueChecks">۳</div>
+                            <div class="stat-label">چک‌های سررسید</div>
+                        </div>
                     </div>
-                    <div id="customerStatus" class="customer-status"></div>
+
+                    <div class="alert">
+                        <strong>⚠️ هشدار:</strong> ۳ چک تا فردا سررسید می‌شوند
+                    </div>
+
+                    <div class="form-section">
+                        <h3>دسترسی سریع</h3>
+                        <div class="quick-actions">
+                            <button class="btn btn-sm" onclick="showTab('contracts')">📝 قرارداد جدید</button>
+                            <button class="btn btn-success btn-sm" onclick="showTab('expenses')">💰 ثبت هزینه</button>
+                            <button class="btn btn-info btn-sm" onclick="showTab('checks')">🏦 مدیریت چک‌ها</button>
+                            <button class="btn btn-warning btn-sm" onclick="showTab('reports')">📈 گزارش‌گیری</button>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-section">
-                    <h3>ثبت چک برای مشتری</h3>
-                    <div class="form-grid">
+                <!-- قراردادها -->
+                <div id="contracts" class="tab-content">
+                    <div class="form-section">
+                        <h3>📝 ثبت قرارداد جدید</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>نام مشتری</label>
+                                <input type="text" id="contractCustomer" placeholder="نام کامل مشتری">
+                            </div>
+                            <div class="form-group">
+                                <label>شماره تماس</label>
+                                <input type="tel" id="contractPhone" placeholder="09123456789">
+                            </div>
+                            <div class="form-group">
+                                <label>آدرس</label>
+                                <textarea id="contractAddress" placeholder="آدرس کامل" rows="2"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>نوع قرارداد</label>
+                                <select id="contractType">
+                                    <option value="pre_sale">پیش فروش</option>
+                                    <option value="current">جاری</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>نوع کالا</label>
+                                <select id="productType">
+                                    <option value="foam">فوم سقفی</option>
+                                    <option value="sheet">ورق</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>اندازه</label>
+                                <input type="text" id="productSize" placeholder="اندازه کالا">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>مبلغ کل قرارداد (تومان)</label>
+                                <input type="number" id="contractTotal" placeholder="مبلغ کل" onchange="calculateBalance()">
+                            </div>
+                            <div class="form-group">
+                                <label>پیش‌پرداخت (تومان)</label>
+                                <input type="number" id="contractAdvance" placeholder="پیش پرداخت" onchange="calculateBalance()">
+                            </div>
+                        </div>
+
+                        <div class="balance-display" id="balanceDisplay">
+                            مانده حساب: ۰ تومان
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>نوع پرداخت</label>
+                                <select id="paymentType">
+                                    <option value="cash">نقدی</option>
+                                    <option value="check">چک</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-success" onclick="addContract()">📋 ثبت قرارداد</button>
+                    </div>
+                </div>
+
+                <!-- مشتریان -->
+                <div id="customers" class="tab-content">
+                    <div class="form-section">
+                        <h3>📋 لیست مشتریان</h3>
                         <div class="form-group">
-                            <label>مشتری</label>
-                            <select id="checkCustomer">
-                                <option value="">-- انتخاب کنید --</option>
+                            <label>انتخاب مشتری</label>
+                            <select id="customerList" onchange="showCustomerStatus()">
+                                <option value="">-- انتخاب مشتری --</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>بانک</label>
-                            <input type="text" id="checkBank" placeholder="نام بانک">
-                        </div>
-                        <div class="form-group">
-                            <label>شماره چک</label>
-                            <input type="text" id="checkNumber" placeholder="شماره چک">
-                        </div>
-                        <div class="form-group">
-                            <label>مبلغ</label>
-                            <input type="number" id="checkAmount" placeholder="مبلغ چک">
-                        </div>
-                        <div class="form-group">
-                            <label>تاریخ سررسید</label>
-                            <input type="text" id="checkDueDate" placeholder="1402/10/15">
-                        </div>
+                        <div id="customerStatus" class="customer-status"></div>
                     </div>
-                    <button class="btn btn-success" onclick="addCheck()">ثبت چک</button>
-                </div>
-            </div>
 
-            <!-- عاملین -->
-            <div id="agents" class="tab-content">
-                <div class="form-section">
-                    <h3>مدیریت عاملین</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>نام عامل</label>
-                            <input type="text" id="agentName" placeholder="نام عامل">
+                    <div class="form-section">
+                        <h3>🏦 ثبت چک جدید برای مشتری</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>انتخاب مشتری</label>
+                                <select id="checkCustomer">
+                                    <option value="">-- انتخاب کنید --</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>بانک</label>
+                                <input type="text" id="checkBank" placeholder="نام بانک">
+                            </div>
+                            <div class="form-group">
+                                <label>شماره چک</label>
+                                <input type="text" id="checkNumber" placeholder="شماره چک">
+                            </div>
+                            <div class="form-group">
+                                <label>مبلغ (تومان)</label>
+                                <input type="number" id="checkAmount" placeholder="مبلغ چک">
+                            </div>
+                            <div class="form-group">
+                                <label>تاریخ سررسید</label>
+                                <input type="text" id="checkDueDate" placeholder="1402/10/15">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>شماره تماس</label>
-                            <input type="tel" id="agentPhone" placeholder="شماره تماس">
-                        </div>
-                        <div class="form-group">
-                            <label>درصد پورسانت</label>
-                            <input type="number" id="agentCommission" placeholder="درصد">
-                        </div>
+                        <button class="btn btn-success" onclick="addCheck()">💳 ثبت چک</button>
                     </div>
-                    <button class="btn btn-success" onclick="addAgent()">ثبت عامل</button>
                 </div>
 
-                <div class="form-section">
-                    <h3>گزارش عاملین</h3>
-                    <div class="form-group">
-                        <label>جستجوی عامل</label>
-                        <input type="text" id="agentSearch" placeholder="نام عامل" onkeyup="searchAgents()">
+                <!-- بقیه تب‌ها به صورت مشابه پیاده‌سازی می‌شوند -->
+                <!-- عاملین -->
+                <div id="agents" class="tab-content">
+                    <div class="form-section">
+                        <h3>🤝 مدیریت عاملین</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>نام عامل</label>
+                                <input type="text" id="agentName" placeholder="نام کامل عامل">
+                            </div>
+                            <div class="form-group">
+                                <label>شماره تماس</label>
+                                <input type="tel" id="agentPhone" placeholder="09123456789">
+                            </div>
+                            <div class="form-group">
+                                <label>درصد پورسانت</label>
+                                <input type="number" id="agentCommission" placeholder="درصد">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="addAgent()">➕ افزودن عامل</button>
                     </div>
-                    <div id="agentReport"></div>
-                </div>
-            </div>
 
-            <!-- پرسنل -->
-            <div id="workers" class="tab-content">
-                <div class="form-section">
-                    <h3>مدیریت پرسنل</h3>
-                    <div class="form-grid">
+                    <div class="form-section">
+                        <h3>📊 گزارش عاملین</h3>
                         <div class="form-group">
-                            <label>نام پرسنل</label>
-                            <input type="text" id="workerName" placeholder="نام و نام خانوادگی">
+                            <label>جستجوی عامل</label>
+                            <input type="text" id="agentSearch" placeholder="نام عامل" onkeyup="searchAgents()">
                         </div>
-                        <div class="form-group">
-                            <label>شغل</label>
-                            <select id="workerJob">
-                                <option value="worker">کارگر</option>
-                                <option value="driver">راننده</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>حقوق ماهیانه</label>
-                            <input type="number" id="workerSalary" placeholder="مبلغ حقوق">
-                        </div>
+                        <div id="agentReport"></div>
                     </div>
-                    <button class="btn btn-success" onclick="addWorker()">ثبت پرسنل</button>
-                </div>
-            </div>
-
-            <!-- هزینه‌ها -->
-            <div id="expenses" class="tab-content">
-                <div class="form-section">
-                    <h3>ثبت هزینه جدید</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>نوع هزینه</label>
-                            <select id="expenseType">
-                                <option value="material">مواد اولیه</option>
-                                <option value="salary">حقوق</option>
-                                <option value="rent">اجاره</option>
-                                <option value="other">سایر</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>مبلغ</label>
-                            <input type="number" id="expenseAmount" placeholder="مبلغ هزینه">
-                        </div>
-                        <div class="form-group">
-                            <label>تاریخ</label>
-                            <input type="text" id="expenseDate" placeholder="1402/10/15">
-                        </div>
-                    </div>
-                    <button class="btn btn-success" onclick="addExpense()">ثبت هزینه</button>
-                </div>
-            </div>
-
-            <!-- چک‌ها -->
-            <div id="checks" class="tab-content">
-                <div class="form-section">
-                    <h3>گزارش‌گیری چک‌ها</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>مشتری</label>
-                            <select id="reportCustomer">
-                                <option value="">همه مشتریان</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>از تاریخ</label>
-                            <input type="text" id="reportFromDate" placeholder="1402/10/01">
-                        </div>
-                        <div class="form-group">
-                            <label>تا تاریخ</label>
-                            <input type="text" id="reportToDate" placeholder="1402/10/30">
-                        </div>
-                    </div>
-                    <button class="btn btn-success" onclick="generateCheckReport()">تولید گزارش</button>
                 </div>
 
-                <div id="checkReportResults"></div>
-            </div>
-
-            <!-- گزارش‌ها -->
-            <div id="reports" class="tab-content">
-                <div class="form-section">
-                    <h3>گزارش‌گیری پیشرفته</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>نوع گزارش</label>
-                            <select id="reportType">
-                                <option value="customer">مشتری</option>
-                                <option value="checks">چک‌ها</option>
-                                <option value="products">کالاها</option>
-                                <option value="expenses">هزینه‌ها</option>
-                                <option value="agents">عاملین</option>
-                            </select>
+                <!-- پرسنل -->
+                <div id="workers" class="tab-content">
+                    <div class="form-section">
+                        <h3>👷 مدیریت پرسنل</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>نام پرسنل</label>
+                                <input type="text" id="workerName" placeholder="نام و نام خانوادگی">
+                            </div>
+                            <div class="form-group">
+                                <label>شغل</label>
+                                <select id="workerJob">
+                                    <option value="worker">کارگر</option>
+                                    <option value="driver">راننده</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>حقوق ماهیانه (تومان)</label>
+                                <input type="number" id="workerSalary" placeholder="مبلغ حقوق">
+                            </div>
                         </div>
+                        <button class="btn btn-success" onclick="addWorker()">➕ افزودن پرسنل</button>
                     </div>
-                    <button class="btn btn-success" onclick="generateReport()">تولید گزارش</button>
-                    <button class="btn btn-info" onclick="exportExcel()">خروجی Excel</button>
                 </div>
 
-                <div id="reportResults"></div>
+                <!-- هزینه‌ها -->
+                <div id="expenses" class="tab-content">
+                    <div class="form-section">
+                        <h3>💰 ثبت هزینه جدید</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>نوع هزینه</label>
+                                <select id="expenseType">
+                                    <option value="material">مواد اولیه</option>
+                                    <option value="salary">حقوق</option>
+                                    <option value="rent">اجاره</option>
+                                    <option value="other">سایر</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>مبلغ (تومان)</label>
+                                <input type="number" id="expenseAmount" placeholder="مبلغ هزینه">
+                            </div>
+                            <div class="form-group">
+                                <label>تاریخ</label>
+                                <input type="text" id="expenseDate" placeholder="1402/10/15">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="addExpense()">💸 ثبت هزینه</button>
+                    </div>
+                </div>
+
+                <!-- چک‌ها -->
+                <div id="checks" class="tab-content">
+                    <div class="form-section">
+                        <h3>🏦 گزارش‌گیری چک‌ها</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>مشتری</label>
+                                <select id="reportCustomer">
+                                    <option value="">همه مشتریان</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>از تاریخ سررسید</label>
+                                <input type="text" id="reportFromDate" placeholder="1402/10/01">
+                            </div>
+                            <div class="form-group">
+                                <label>تا تاریخ سررسید</label>
+                                <input type="text" id="reportToDate" placeholder="1402/10/30">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="generateCheckReport()">📊 تولید گزارش</button>
+                    </div>
+
+                    <div id="checkReportResults"></div>
+                </div>
+
+                <!-- گزارش‌ها -->
+                <div id="reports" class="tab-content">
+                    <div class="form-section">
+                        <h3>📈 گزارش‌گیری پیشرفته</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>نوع گزارش</label>
+                                <select id="reportType">
+                                    <option value="customer">مشتری</option>
+                                    <option value="checks">چک‌ها</option>
+                                    <option value="products">کالاها</option>
+                                    <option value="expenses">هزینه‌ها</option>
+                                    <option value="agents">عاملین</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="generateReport()">📊 تولید گزارش</button>
+                        <button class="btn btn-info" onclick="exportExcel()">📁 خروجی Excel</button>
+                    </div>
+
+                    <div id="reportResults"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -544,13 +724,15 @@
     <script>
         // داده‌های نمونه
         let customers = [
-            { id: 1, name: "شرکت ساختمانی البرز", phone: "09123456789" },
-            { id: 2, name: "پیمانکاری نگین", phone: "09129876543" }
+            { id: 1, name: "شرکت ساختمانی البرز", phone: "09123456789", address: "تهران، خیابان ولیعصر" },
+            { id: 2, name: "پیمانکاری نگین", phone: "09129876543", address: "کرج، بلوار دانش" },
+            { id: 3, name: "ساختمان سازی مهر", phone: "09127778899", address: "اصفهان، خیابان چهارباغ" }
         ];
         
         let agents = [
             { id: 1, name: "احمد محمدی", phone: "09121111111", commission: 5 },
-            { id: 2, name: "رضا کریمی", phone: "09122222222", commission: 3 }
+            { id: 2, name: "رضا کریمی", phone: "09122222222", commission: 3 },
+            { id: 3, name: "محمد حسینی", phone: "09123333333", commission: 4 }
         ];
         
         let workers = [];
@@ -606,13 +788,34 @@
         function addContract() {
             const customer = document.getElementById('contractCustomer').value;
             const total = document.getElementById('contractTotal').value;
+            const advance = document.getElementById('contractAdvance').value;
             
             if (customer && total) {
+                const contract = {
+                    id: Date.now(),
+                    customer: customer,
+                    phone: document.getElementById('contractPhone').value,
+                    address: document.getElementById('contractAddress').value,
+                    type: document.getElementById('contractType').value,
+                    productType: document.getElementById('productType').value,
+                    productSize: document.getElementById('productSize').value,
+                    totalAmount: parseInt(total),
+                    advance: parseInt(advance) || 0,
+                    remainingBalance: parseInt(total) - (parseInt(advance) || 0),
+                    paymentType: document.getElementById('paymentType').value,
+                    date: new Date().toLocaleDateString('fa-IR')
+                };
+                
+                contracts.push(contract);
                 alert('قرارداد با موفقیت ثبت شد!');
+                
                 // پاک کردن فرم
                 document.getElementById('contractCustomer').value = '';
+                document.getElementById('contractPhone').value = '';
+                document.getElementById('contractAddress').value = '';
                 document.getElementById('contractTotal').value = '';
                 document.getElementById('contractAdvance').value = '';
+                document.getElementById('productSize').value = '';
                 document.getElementById('balanceDisplay').textContent = 'مانده حساب: ۰ تومان';
             } else {
                 alert('لطفا اطلاعات ضروری را وارد کنید!');
@@ -662,12 +865,25 @@
             
             if (customerId) {
                 const customer = customers.find(c => c.id == customerId);
-                statusDiv.className = 'customer-status status-good';
+                const customerChecks = checks.filter(c => c.customerId == customerId);
+                const pendingChecks = customerChecks.filter(c => c.status === 'pending');
+                const totalBalance = pendingChecks.reduce((sum, check) => sum + check.amount, 0);
+                
+                let statusClass = 'status-neutral';
+                let statusText = 'تسویه شده';
+                
+                if (totalBalance > 0) {
+                    statusClass = 'status-bad';
+                    statusText = `بدهکار - ${totalBalance.toLocaleString()} تومان`;
+                }
+                
+                statusDiv.className = `customer-status ${statusClass}`;
                 statusDiv.innerHTML = `
                     <h4>وضعیت حساب: ${customer.name}</h4>
-                    <div>وضعیت: تسویه شده</div>
-                    <div>تعداد چک‌های مانده: ۰ چک</div>
-                    <div>مجموع مانده: ۰ تومان</div>
+                    <div>وضعیت: ${statusText}</div>
+                    <div>تعداد چک‌های مانده: ${pendingChecks.length} چک</div>
+                    <div>مجموع مبلغ چک‌های مانده: ${totalBalance.toLocaleString()} تومان</div>
+                    <button class="btn btn-sm" onclick="showTab('checks')">مشاهده چک‌ها</button>
                 `;
             } else {
                 statusDiv.innerHTML = '';
@@ -677,16 +893,30 @@
         function addCheck() {
             const customerId = document.getElementById('checkCustomer').value;
             const amount = document.getElementById('checkAmount').value;
+            const dueDate = document.getElementById('checkDueDate').value;
             
-            if (customerId && amount) {
+            if (customerId && amount && dueDate) {
+                const check = {
+                    id: Date.now(),
+                    customerId: parseInt(customerId),
+                    bank: document.getElementById('checkBank').value,
+                    number: document.getElementById('checkNumber').value,
+                    amount: parseInt(amount),
+                    dueDate: dueDate,
+                    status: 'pending',
+                    createdAt: new Date().toLocaleDateString('fa-IR')
+                };
+                
+                checks.push(check);
                 alert('چک با موفقیت ثبت شد!');
+                
                 // پاک کردن فرم
                 document.getElementById('checkBank').value = '';
                 document.getElementById('checkNumber').value = '';
                 document.getElementById('checkAmount').value = '';
                 document.getElementById('checkDueDate').value = '';
             } else {
-                alert('لطفا مشتری و مبلغ را وارد کنید!');
+                alert('لطفا مشتری، مبلغ و تاریخ سررسید را وارد کنید!');
             }
         }
 
@@ -696,26 +926,48 @@
             const commission = document.getElementById('agentCommission').value;
             
             if (name && commission) {
+                const agent = {
+                    id: Date.now(),
+                    name: name,
+                    phone: document.getElementById('agentPhone').value,
+                    commission: parseInt(commission),
+                    joinDate: new Date().toLocaleDateString('fa-IR')
+                };
+                
+                agents.push(agent);
                 alert('عامل با موفقیت ثبت شد!');
+                
                 document.getElementById('agentName').value = '';
                 document.getElementById('agentPhone').value = '';
                 document.getElementById('agentCommission').value = '';
+            } else {
+                alert('لطفا نام و درصد پورسانت را وارد کنید!');
             }
         }
 
         function searchAgents() {
-            const search = document.getElementById('agentSearch').value;
+            const search = document.getElementById('agentSearch').value.toLowerCase();
             const reportDiv = document.getElementById('agentReport');
             
             if (search) {
-                reportDiv.innerHTML = `
-                    <div class="card">
-                        <h4>گزارش برای: ${search}</h4>
-                        <div>تعداد قراردادها: ۵</div>
-                        <div>فروش کل: ۵۰,۰۰۰,۰۰۰ تومان</div>
-                        <div>پورسانت: ۲,۵۰۰,۰۰۰ تومان</div>
-                    </div>
-                `;
+                const filteredAgents = agents.filter(agent => 
+                    agent.name.toLowerCase().includes(search)
+                );
+                
+                let reportHTML = '<h4>نتایج جستجو:</h4>';
+                
+                filteredAgents.forEach(agent => {
+                    reportHTML += `
+                        <div class="card">
+                            <h4>${agent.name}</h4>
+                            <div>شماره تماس: ${agent.phone}</div>
+                            <div>پورسانت: ${agent.commission}%</div>
+                            <div>تاریخ همکاری: ${agent.joinDate}</div>
+                        </div>
+                    `;
+                });
+                
+                reportDiv.innerHTML = reportHTML;
             } else {
                 reportDiv.innerHTML = '';
             }
@@ -727,58 +979,116 @@
             const salary = document.getElementById('workerSalary').value;
             
             if (name && salary) {
+                const worker = {
+                    id: Date.now(),
+                    name: name,
+                    job: document.getElementById('workerJob').value,
+                    salary: parseInt(salary),
+                    joinDate: new Date().toLocaleDateString('fa-IR')
+                };
+                
+                workers.push(worker);
                 alert('پرسنل با موفقیت ثبت شد!');
+                
                 document.getElementById('workerName').value = '';
                 document.getElementById('workerSalary').value = '';
+            } else {
+                alert('لطفا نام و حقوق را وارد کنید!');
             }
         }
 
         // مدیریت هزینه‌ها
         function addExpense() {
             const amount = document.getElementById('expenseAmount').value;
+            const type = document.getElementById('expenseType').value;
             
-            if (amount) {
+            if (amount && type) {
+                const expense = {
+                    id: Date.now(),
+                    type: type,
+                    amount: parseInt(amount),
+                    date: document.getElementById('expenseDate').value,
+                    description: 'هزینه ثبت شده',
+                    createdAt: new Date().toLocaleDateString('fa-IR')
+                };
+                
+                expenses.push(expense);
                 alert('هزینه با موفقیت ثبت شد!');
+                
                 document.getElementById('expenseAmount').value = '';
                 document.getElementById('expenseDate').value = '';
+            } else {
+                alert('لطفا نوع و مبلغ هزینه را وارد کنید!');
             }
         }
 
         // گزارش‌گیری چک‌ها
         function generateCheckReport() {
+            const customerId = document.getElementById('reportCustomer').value;
+            const fromDate = document.getElementById('reportFromDate').value;
+            const toDate = document.getElementById('reportToDate').value;
+            
+            let filteredChecks = checks;
+            
+            if (customerId) {
+                filteredChecks = filteredChecks.filter(check => check.customerId == customerId);
+            }
+            
+            if (fromDate) {
+                filteredChecks = filteredChecks.filter(check => check.dueDate >= fromDate);
+            }
+            
+            if (toDate) {
+                filteredChecks = filteredChecks.filter(check => check.dueDate <= toDate);
+            }
+            
             const resultsDiv = document.getElementById('checkReportResults');
-            resultsDiv.innerHTML = `
+            
+            if (filteredChecks.length === 0) {
+                resultsDiv.innerHTML = '<div class="alert">چکی یافت نشد</div>';
+                return;
+            }
+            
+            let tableHTML = `
                 <div class="card">
                     <h4>گزارش چک‌ها</h4>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>مشتری</th>
-                                <th>بانک</th>
-                                <th>مبلغ</th>
-                                <th>سررسید</th>
-                                <th>وضعیت</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>شرکت البرز</td>
-                                <td>ملت</td>
-                                <td>۵,۰۰۰,۰۰۰</td>
-                                <td>1402/10/20</td>
-                                <td>در جریان</td>
-                            </tr>
-                            <tr>
-                                <td>پیمانکاری نگین</td>
-                                <td>صادرات</td>
-                                <td>۳,۰۰۰,۰۰۰</td>
-                                <td>1402/10/25</td>
-                                <td>در جریان</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>مشتری</th>
+                                    <th>بانک</th>
+                                    <th>شماره چک</th>
+                                    <th>مبلغ</th>
+                                    <th>سررسید</th>
+                                    <th>وضعیت</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+            
+            filteredChecks.forEach(check => {
+                const customer = customers.find(c => c.id == check.customerId);
+                tableHTML += `
+                    <tr>
+                        <td>${customer ? customer.name : 'نامشخص'}</td>
+                        <td>${check.bank}</td>
+                        <td>${check.number}</td>
+                        <td>${check.amount.toLocaleString()} تومان</td>
+                        <td>${check.dueDate}</td>
+                        <td>${check.status === 'pending' ? 'در جریان' : 'وصول شده'}</td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             `;
+            
+            resultsDiv.innerHTML = tableHTML;
         }
 
         // گزارش‌گیری کلی
@@ -790,19 +1100,37 @@
             
             switch(reportType) {
                 case 'customer':
-                    reportHTML += '<div>گزارش مشتریان - اطلاعات کامل مشتریان</div>';
+                    reportHTML += `
+                        <div>تعداد مشتریان: ${customers.length}</div>
+                        <div>تعداد قراردادها: ${contracts.length}</div>
+                        <div>فروش کل: ${contracts.reduce((sum, c) => sum + c.totalAmount, 0).toLocaleString()} تومان</div>
+                    `;
                     break;
                 case 'checks':
-                    reportHTML += '<div>گزارش چک‌ها - لیست تمام چک‌ها</div>';
+                    reportHTML += `
+                        <div>تعداد کل چک‌ها: ${checks.length}</div>
+                        <div>چک‌های در جریان: ${checks.filter(c => c.status === 'pending').length}</div>
+                        <div>چک‌های وصول شده: ${checks.filter(c => c.status === 'cashed').length}</div>
+                    `;
                     break;
                 case 'products':
-                    reportHTML += '<div>گزارش کالاها - آمار فروش بر اساس نوع کالا</div>';
+                    reportHTML += `
+                        <div>گزارش کالاها - آمار فروش بر اساس نوع کالا</div>
+                        <div>فوم سقفی: ${contracts.filter(c => c.productType === 'foam').length} قرارداد</div>
+                        <div>ورق: ${contracts.filter(c => c.productType === 'sheet').length} قرارداد</div>
+                    `;
                     break;
                 case 'expenses':
-                    reportHTML += '<div>گزارش هزینه‌ها - تجزیه و تحلیل هزینه‌ها</div>';
+                    reportHTML += `
+                        <div>تعداد هزینه‌ها: ${expenses.length}</div>
+                        <div>مجموع هزینه‌ها: ${expenses.reduce((sum, e) => sum + e.amount, 0).toLocaleString()} تومان</div>
+                    `;
                     break;
                 case 'agents':
-                    reportHTML += '<div>گزارش عاملین - عملکرد و پورسانت</div>';
+                    reportHTML += `
+                        <div>تعداد عاملین: ${agents.length}</div>
+                        <div>میانگین پورسانت: ${(agents.reduce((sum, a) => sum + a.commission, 0) / agents.length).toFixed(1)}%</div>
+                    `;
                     break;
             }
             
