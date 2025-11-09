@@ -969,4 +969,432 @@
                 const option = document.createElement('option');
                 option.value = type;
                 option.textContent = type;
-               
+                select.appendChild(option);
+            });
+        }
+
+        function addNewCheck() {
+            const check = {
+                amount: parseInt(document.getElementById('checkAmount').value),
+                dueDate: document.getElementById('checkDueDate').value,
+                bank: document.getElementById('checkBank').value
+            };
+            
+            if (check.amount && check.dueDate) {
+                contractChecks.push(check);
+                alert('چک جدید به لیست اضافه شد!');
+                // پاک کردن فیلدها برای ورود بعدی
+                document.getElementById('checkAmount').value = '';
+                document.getElementById('checkDueDate').value = '';
+                document.getElementById('checkBank').value = '';
+            } else {
+                alert('لطفا مبلغ و تاریخ سررسید را وارد کنید!');
+            }
+        }
+
+        function addContract() {
+            const totalAmount = parseInt(document.getElementById('contractTotalAmount').value) || 0;
+            const advance = parseInt(document.getElementById('contractAdvance').value) || 0;
+            const remainingBalance = totalAmount - advance;
+            
+            const contract = {
+                id: Date.now(),
+                customer: document.getElementById('contractCustomer').value,
+                phone: document.getElementById('contractPhone').value,
+                address: document.getElementById('contractAddress').value,
+                type: document.getElementById('contractType').value,
+                productType: document.getElementById('productType').value,
+                productSize: document.getElementById('productSize').value,
+                deliveryDate: document.getElementById('contractDeliveryDate').value,
+                totalAmount: totalAmount,
+                advance: advance,
+                remainingBalance: remainingBalance,
+                paymentType: document.getElementById('paymentType').value,
+                checks: contractChecks,
+                date: getCurrentPersianDate()
+            };
+            
+            if (contract.customer && contract.totalAmount) {
+                contracts.push(contract);
+                saveAllData();
+                contractChecks = []; // پاک کردن لیست چک‌ها برای قرارداد بعدی
+                alert('قرارداد با موفقیت ثبت شد!');
+            }
+        }
+
+        // مدیریت مشتریان - توابع جدید
+        function loadCustomerList() {
+            const select = document.getElementById('customerList');
+            const checkSelect = document.getElementById('checkCustomer');
+            
+            select.innerHTML = '<option value="">-- انتخاب مشتری --</option>';
+            checkSelect.innerHTML = '<option value="">-- انتخاب کنید --</option>';
+            
+            customers.forEach(customer => {
+                const option1 = document.createElement('option');
+                option1.value = customer.id;
+                option1.textContent = customer.name;
+                select.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = customer.id;
+                option2.textContent = customer.name;
+                checkSelect.appendChild(option2);
+            });
+        }
+
+        function showCustomerStatus() {
+            const customerId = document.getElementById('customerList').value;
+            const customer = customers.find(c => c.id == customerId);
+            const statusDiv = document.getElementById('customerStatus');
+            
+            if (customer) {
+                // محاسبات وضعیت حساب مشتری
+                const customerChecks = checks.filter(c => c.customerId == customerId);
+                const pendingChecks = customerChecks.filter(c => c.status === 'pending');
+                const totalBalance = pendingChecks.reduce((sum, check) => sum + check.amount, 0);
+                
+                let statusClass = 'status-neutral';
+                let statusText = 'تسویه شده';
+                
+                if (totalBalance > 0) {
+                    statusClass = 'status-bad';
+                    statusText = `بدهکار - ${totalBalance.toLocaleString()} تومان`;
+                } else if (totalBalance < 0) {
+                    statusClass = 'status-good';
+                    statusText = `بستانکار - ${Math.abs(totalBalance).toLocaleString()} تومان`;
+                }
+                
+                statusDiv.className = `customer-status ${statusClass}`;
+                statusDiv.innerHTML = `
+                    <h4>وضعیت حساب: ${customer.name}</h4>
+                    <div>وضعیت: ${statusText}</div>
+                    <div>تعداد چک‌های مانده: ${pendingChecks.length} چک</div>
+                    <div>مجموع مبلغ چک‌های مانده: ${totalBalance.toLocaleString()} تومان</div>
+                    <button class="btn" onclick="showTab('checks')">مشاهده چک‌ها</button>
+                `;
+            } else {
+                statusDiv.innerHTML = '';
+            }
+        }
+
+        // مدیریت عاملین - توابع جدید
+        function loadAgentList() {
+            const select = document.getElementById('agentList');
+            select.innerHTML = '<option value="">-- انتخاب عاملین --</option>';
+            
+            agents.forEach(agent => {
+                const option = document.createElement('option');
+                option.value = agent.id;
+                option.textContent = agent.name;
+                select.appendChild(option);
+            });
+        }
+
+        function searchAgents() {
+            const searchTerm = document.getElementById('agentSearch').value.toLowerCase();
+            const reportDiv = document.getElementById('agentReport');
+            
+            let reportHTML = '<h4>گزارش عاملین:</h4>';
+            
+            agents.filter(agent => 
+                agent.name.toLowerCase().includes(searchTerm) || 
+                agent.type.toLowerCase().includes(searchTerm)
+            ).forEach(agent => {
+                // محاسبات برای هر عامل
+                const agentContracts = contracts.filter(c => 
+                    customers.find(cust => cust.id == c.customerId && cust.agentId == agent.id)
+                );
+                const totalSales = agentContracts.reduce((sum, contract) => sum + contract.totalAmount, 0);
+                const totalCommission = (totalSales * agent.commission) / 100;
+                
+                reportHTML += `
+                    <div class="card">
+                        <strong>${agent.name}</strong>
+                        <div>نوع فعالیت: ${agent.type}</div>
+                        <div>پورسانت: ${agent.commission}%</div>
+                        <div>تعداد قراردادها: ${agentContracts.length}</div>
+                        <div>فروش کل: ${totalSales.toLocaleString()} تومان</div>
+                        <div>پورسانت تعلق گرفته: ${totalCommission.toLocaleString()} تومان</div>
+                        <div>وضعیت حساب: ${totalCommission > 0 ? 'بستانکار' : 'تسویه شده'}</div>
+                    </div>
+                `;
+            });
+            
+            reportDiv.innerHTML = reportHTML;
+        }
+
+        function printAgentReport() {
+            window.print();
+        }
+
+        // مدیریت چک‌ها - توابع جدید
+        function loadCheckReportCustomers() {
+            const select = document.getElementById('checkReportCustomer');
+            select.innerHTML = '<option value="">همه مشتریان</option>';
+            
+            customers.forEach(customer => {
+                const option = document.createElement('option');
+                option.value = customer.id;
+                option.textContent = customer.name;
+                select.appendChild(option);
+            });
+        }
+
+        function generateCheckReport() {
+            const customerId = document.getElementById('checkReportCustomer').value;
+            const fromDate = document.getElementById('checkReportFromDate').value;
+            const toDate = document.getElementById('checkReportToDate').value;
+            const status = document.getElementById('checkReportStatus').value;
+            
+            let filteredChecks = checks;
+            
+            // فیلتر بر اساس مشتری
+            if (customerId) {
+                filteredChecks = filteredChecks.filter(check => check.customerId == customerId);
+            }
+            
+            // فیلتر بر اساس تاریخ سررسید
+            if (fromDate) {
+                filteredChecks = filteredChecks.filter(check => check.dueDate >= fromDate);
+            }
+            if (toDate) {
+                filteredChecks = filteredChecks.filter(check => check.dueDate <= toDate);
+            }
+            
+            // فیلتر بر اساس وضعیت
+            if (status !== 'all') {
+                filteredChecks = filteredChecks.filter(check => check.status === status);
+            }
+            
+            // مرتب‌سازی بر اساس تاریخ سررسید
+            filteredChecks.sort((a, b) => {
+                const dateA = new PersianDate(a.dueDate).valueOf();
+                const dateB = new PersianDate(b.dueDate).valueOf();
+                return dateA - dateB;
+            });
+            
+            displayCheckReport(filteredChecks);
+        }
+
+        function displayCheckReport(checksList) {
+            const container = document.getElementById('checkReportResults');
+            let html = '<h3>📋 گزارش چک‌ها</h3>';
+            
+            if (checksList.length === 0) {
+                html += '<div class="alert">چکی یافت نشد</div>';
+                container.innerHTML = html;
+                return;
+            }
+            
+            html += `
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>مشتری</th>
+                                <th>بانک</th>
+                                <th>شماره چک</th>
+                                <th>مبلغ</th>
+                                <th>تاریخ سررسید</th>
+                                <th>وضعیت</th>
+                                <th>هشدار</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            const today = new PersianDate();
+            const tomorrow = new PersianDate(today.valueOf() + 86400000);
+            
+            checksList.forEach(check => {
+                const customer = customers.find(c => c.id == check.customerId);
+                const dueDate = parsePersianDate(check.dueDate);
+                const isDueSoon = dueDate.valueOf() <= tomorrow.valueOf() && dueDate.valueOf() >= today.valueOf();
+                const isOverdue = dueDate.valueOf() < today.valueOf();
+                
+                let warning = '';
+                if (isDueSoon) {
+                    warning = '⚠️ فردا سررسید';
+                } else if (isOverdue) {
+                    warning = '❌ معوق';
+                }
+                
+                html += `
+                    <tr>
+                        <td>${customer ? customer.name : 'نامشخص'}</td>
+                        <td>${check.bank}</td>
+                        <td>${check.number}</td>
+                        <td>${check.amount.toLocaleString()} تومان</td>
+                        <td>${check.dueDate}</td>
+                        <td>${check.status === 'pending' ? 'در جریان' : 'وصول شده'}</td>
+                        <td>${warning}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function exportChecksToExcel() {
+            alert('امکان خروجی Excel در نسخه بعدی اضافه خواهد شد');
+        }
+
+        // گزارش‌گیری پیشرفته
+        function loadReportCustomers() {
+            const select = document.getElementById('reportCustomer');
+            select.innerHTML = '<option value="">همه مشتریان</option>';
+            
+            customers.forEach(customer => {
+                const option = document.createElement('option');
+                option.value = customer.id;
+                option.textContent = customer.name;
+                select.appendChild(option);
+            });
+        }
+
+        function loadReportProducts() {
+            const select = document.getElementById('reportProduct');
+            select.innerHTML = '<option value="">همه کالاها</option>';
+            
+            productTypes.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product;
+                option.textContent = product;
+                select.appendChild(option);
+            });
+        }
+
+        function loadReportAgents() {
+            const select = document.getElementById('reportAgent');
+            select.innerHTML = '<option value="">همه عاملین</option>';
+            
+            agents.forEach(agent => {
+                const option = document.createElement('option');
+                option.value = agent.id;
+                option.textContent = agent.name;
+                select.appendChild(option);
+            });
+        }
+
+        function toggleReportFilters() {
+            const reportType = document.getElementById('reportType').value;
+            
+            // مخفی کردن همه بخش‌ها
+            document.getElementById('customerReportSection').style.display = 'none';
+            document.getElementById('productReportSection').style.display = 'none';
+            document.getElementById('agentReportSection').style.display = 'none';
+            document.getElementById('dateFilterSection').style.display = 'none';
+            document.getElementById('dateToFilterSection').style.display = 'none';
+            
+            // نمایش بخش‌های مربوطه
+            if (reportType === 'customer') {
+                document.getElementById('customerReportSection').style.display = 'block';
+                document.getElementById('dateFilterSection').style.display = 'block';
+                document.getElementById('dateToFilterSection').style.display = 'block';
+            } else if (reportType === 'products') {
+                document.getElementById('productReportSection').style.display = 'block';
+                document.getElementById('dateFilterSection').style.display = 'block';
+                document.getElementById('dateToFilterSection').style.display = 'block';
+            } else if (reportType === 'agents') {
+                document.getElementById('agentReportSection').style.display = 'block';
+                document.getElementById('dateFilterSection').style.display = 'block';
+                document.getElementById('dateToFilterSection').style.display = 'block';
+            } else if (reportType === 'expenses') {
+                document.getElementById('dateFilterSection').style.display = 'block';
+                document.getElementById('dateToFilterSection').style.display = 'block';
+            } else if (reportType === 'checks') {
+                document.getElementById('customerReportSection').style.display = 'block';
+                document.getElementById('dateFilterSection').style.display = 'block';
+                document.getElementById('dateToFilterSection').style.display = 'block';
+            }
+        }
+
+        function generateAdvancedReport() {
+            const reportType = document.getElementById('reportType').value;
+            const fromDate = document.getElementById('reportFromDate').value;
+            const toDate = document.getElementById('reportToDate').value;
+            
+            let reportHTML = '<div class="card"><h4>📊 گزارش پیشرفته</h4>';
+            
+            switch (reportType) {
+                case 'customer':
+                    const customerId = document.getElementById('reportCustomer').value;
+                    reportHTML += generateCustomerReport(customerId, fromDate, toDate);
+                    break;
+                case 'checks':
+                    const checkCustomerId = document.getElementById('reportCustomer').value;
+                    reportHTML += generateChecksReport(checkCustomerId, fromDate, toDate);
+                    break;
+                case 'products':
+                    const productType = document.getElementById('reportProduct').value;
+                    reportHTML += generateProductsReport(productType, fromDate, toDate);
+                    break;
+                case 'expenses':
+                    reportHTML += generateExpensesReport(fromDate, toDate);
+                    break;
+                case 'agents':
+                    const agentId = document.getElementById('reportAgent').value;
+                    reportHTML += generateAgentsReport(agentId, fromDate, toDate);
+                    break;
+            }
+            
+            reportHTML += '</div>';
+            document.getElementById('advancedReportResults').innerHTML = reportHTML;
+        }
+
+        function generateCustomerReport(customerId, fromDate, toDate) {
+            let filteredContracts = contracts;
+            
+            if (customerId) {
+                filteredContracts = filteredContracts.filter(contract => {
+                    const customer = customers.find(c => c.id == customerId);
+                    return customer && contract.customer === customer.name;
+                });
+            }
+            
+            if (fromDate) {
+                filteredContracts = filteredContracts.filter(contract => contract.date >= fromDate);
+            }
+            if (toDate) {
+                filteredContracts = filteredContracts.filter(contract => contract.date <= toDate);
+            }
+            
+            const totalSales = filteredContracts.reduce((sum, contract) => sum + contract.totalAmount, 0);
+            const totalAdvance = filteredContracts.reduce((sum, contract) => sum + contract.advance, 0);
+            const totalRemaining = filteredContracts.reduce((sum, contract) => sum + contract.remainingBalance, 0);
+            
+            return `
+                <div>تعداد قراردادها: ${filteredContracts.length}</div>
+                <div>فروش کل: ${totalSales.toLocaleString()} تومان</div>
+                <div>پیش‌پرداخت: ${totalAdvance.toLocaleString()} تومان</div>
+                <div>مانده حساب: ${totalRemaining.toLocaleString()} تومان</div>
+            `;
+        }
+
+        function exportToExcel() {
+            alert('امکان خروجی Excel در نسخه بعدی اضافه خواهد شد');
+        }
+
+        // بقیه توابع...
+        // [کدهای قبلی مربوط به مدیریت پرسنل، هزینه‌ها، و دیگر بخش‌ها حفظ شده]
+
+        // بارگذاری اولیه
+        window.onload = function() {
+            const today = getCurrentPersianDate();
+            document.querySelectorAll('.pdate').forEach(input => {
+                if (!input.value) {
+                    input.value = today;
+                }
+            });
+            updateProductTypeSelect();
+        };
+    </script>
+</body>
+</html>
