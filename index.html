@@ -37,14 +37,8 @@
             width: 120px;
             height: 120px;
             margin: 0 auto 20px;
-            background: #f8f9fa;
             border-radius: 10px;
-            border: 2px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: #666;
+            object-fit: cover;
         }
         
         .login-page h1 {
@@ -121,12 +115,8 @@
         .header-logo {
             width: 50px;
             height: 50px;
-            background: #f8f9fa;
             border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
+            object-fit: cover;
         }
         
         .nav {
@@ -428,6 +418,96 @@
             border-radius: 5px;
             font-size: 14px;
         }
+
+        /* استایل‌های فاکتور */
+        .invoice-container {
+            background: white;
+            padding: 30px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 20px auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+
+        .invoice-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+        }
+
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .invoice-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .signature-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 50px;
+        }
+
+        .signature-box {
+            border: 1px solid #333;
+            padding: 20px;
+            text-align: center;
+            height: 120px;
+        }
+
+        .factory-stamp {
+            border: 2px dashed #333;
+            padding: 30px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .invoice-container, .invoice-container * {
+                visibility: visible;
+            }
+            .invoice-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+                border: none;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
         
         @media (max-width: 768px) {
             .nav {
@@ -460,6 +540,14 @@
             .watermark {
                 font-size: 40px;
             }
+
+            .invoice-details {
+                grid-template-columns: 1fr;
+            }
+
+            .signature-section {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -467,7 +555,7 @@
     <div class="container">
         <!-- صفحه ورود -->
         <div class="login-page" id="loginPage">
-           <img src="logo.jpg" alt="لوگو کلشی فوم" class="logo">
+            <img src="logo.jpg" alt="لوگو کلشی فوم" class="logo">
             <h1>حسابداری کارخانه یونولیت کلشی فوم</h1>
             <div class="input-group">
                 <label for="username">نام کاربری</label>
@@ -484,7 +572,7 @@
         <div class="main-page" id="mainPage">
             <div class="header">
                 <div class="header-content">
-                   <img src="logo.jpg" alt="لوگو کلشی فوم" class="header-logo">
+                    <img src="logo.jpg" alt="لوگو کلشی فوم" class="header-logo">
                     <h1>حسابداری کارخانه یونولیت کلشی فوم</h1>
                 </div>
                 <div>
@@ -502,6 +590,7 @@
                 <button class="nav-btn" onclick="showTab('expenses')">💰 هزینه‌ها</button>
                 <button class="nav-btn" onclick="showTab('checks')">🏦 چک‌ها</button>
                 <button class="nav-btn" onclick="showTab('reports')">📈 گزارش‌ها</button>
+                <button class="nav-btn" onclick="showTab('invoices')">🧾 فاکتورها</button>
             </div>
 
             <div class="content">
@@ -540,6 +629,7 @@
                             <button class="btn btn-success btn-sm" onclick="showTab('expenses')">💰 ثبت هزینه</button>
                             <button class="btn btn-info btn-sm" onclick="showTab('checks')">🏦 مدیریت چک‌ها</button>
                             <button class="btn btn-warning btn-sm" onclick="showTab('reports')">📈 گزارش‌گیری</button>
+                            <button class="btn btn-sm" onclick="showTab('invoices')">🧾 فاکتورها</button>
                         </div>
                     </div>
                 </div>
@@ -641,8 +731,30 @@
 
                         <div style="display: flex; gap: 10px; margin-top: 20px;">
                             <button class="btn btn-success" onclick="addContract()">📋 ثبت قرارداد</button>
-                            <button class="btn btn-info" onclick="generateInvoice()">🧾 صدور فاکتور</button>
+                            <button class="btn btn-info" onclick="generateInvoiceFromContract()">🧾 صدور فاکتور</button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- فاکتورها -->
+                <div id="invoices" class="tab-content">
+                    <div class="form-section">
+                        <h3>🧾 مدیریت فاکتورها</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>انتخاب قرارداد</label>
+                                <select id="invoiceContract">
+                                    <option value="">-- انتخاب قرارداد --</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="generateInvoice()">🧾 ایجاد فاکتور</button>
+                        <button class="btn btn-info" onclick="printInvoice()">🖨️ چاپ فاکتور</button>
+                        <button class="btn btn-warning" onclick="saveAsPDF()">📁 ذخیره PDF</button>
+                    </div>
+
+                    <div id="invoicePreview" class="invoice-container" style="display: none;">
+                        <!-- محتوای فاکتور اینجا نمایش داده می‌شود -->
                     </div>
                 </div>
 
@@ -808,6 +920,7 @@
         let contractChecks = [];
         let productTypes = ["فوم سقفی", "ورق"];
         let productSizes = ["50x50", "100x100", "200x100"];
+        let invoices = [];
 
         // توابع اصلی
         function login() {
@@ -817,6 +930,7 @@
             if (username === 'admin' && password === '1234') {
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('mainPage').style.display = 'block';
+                loadContractsForInvoice();
             } else {
                 alert('نام کاربری یا رمز عبور اشتباه است!');
             }
@@ -838,6 +952,10 @@
             
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
+
+            if (tabName === 'invoices') {
+                loadContractsForInvoice();
+            }
         }
 
         // مدیریت قراردادها
@@ -971,8 +1089,151 @@
             displayContractChecks();
         }
 
-        function generateInvoice() {
-            alert('فاکتور با موفقیت صادر شد!');
+        // مدیریت فاکتورها
+        function loadContractsForInvoice() {
+            const select = document.getElementById('invoiceContract');
+            select.innerHTML = '<option value="">-- انتخاب قرارداد --</option>';
+            
+            contracts.forEach(contract => {
+                const option = document.createElement('option');
+                option.value = contract.id;
+                option.textContent = `${contract.customer} - ${contract.totalAmount.toLocaleString()} تومان`;
+                select.appendChild(option);
+            });
+        }
+
+        function generateInvoiceFromContract() {
+            const customer = document.getElementById('contractCustomer').value;
+            if (customer) {
+                generateInvoice(true);
+            } else {
+                alert('لطفا ابتدا قرارداد را ثبت کنید!');
+            }
+        }
+
+        function generateInvoice(fromContract = false) {
+            let contract;
+            
+            if (fromContract) {
+                // استفاده از داده‌های فرم قرارداد
+                contract = {
+                    customer: document.getElementById('contractCustomer').value,
+                    phone: document.getElementById('contractPhone').value,
+                    address: document.getElementById('contractAddress').value,
+                    productType: document.getElementById('productType').value,
+                    productSize: document.getElementById('productSize').value,
+                    totalAmount: parseInt(document.getElementById('contractTotal').value) || 0,
+                    advance: parseInt(document.getElementById('contractAdvance').value) || 0,
+                    remainingBalance: parseInt(document.getElementById('contractTotal').value) - (parseInt(document.getElementById('contractAdvance').value) || 0)
+                };
+            } else {
+                // استفاده از قرارداد انتخاب شده
+                const contractId = document.getElementById('invoiceContract').value;
+                if (!contractId) {
+                    alert('لطفا یک قرارداد انتخاب کنید!');
+                    return;
+                }
+                contract = contracts.find(c => c.id == contractId);
+            }
+
+            if (!contract) {
+                alert('قرارداد یافت نشد!');
+                return;
+            }
+
+            const invoiceHTML = `
+                <div class="invoice-header">
+                    <img src="logo.jpg" alt="لوگو" class="invoice-logo">
+                    <h1>کارخانه یونولیت کلشی فوم</h1>
+                    <h2>فاکتور فروش</h2>
+                    <p>تاریخ: ${new Date().toLocaleDateString('fa-IR')} | شماره فاکتور: ${Date.now()}</p>
+                </div>
+
+                <div class="invoice-details">
+                    <div>
+                        <h3>مشخصات مشتری:</h3>
+                        <p><strong>نام:</strong> ${contract.customer}</p>
+                        <p><strong>تلفن:</strong> ${contract.phone}</p>
+                        <p><strong>آدرس:</strong> ${contract.address}</p>
+                    </div>
+                    <div>
+                        <h3>مشخصات مالی:</h3>
+                        <p><strong>مبلغ کل:</strong> ${contract.totalAmount.toLocaleString()} تومان</p>
+                        <p><strong>پیش پرداخت:</strong> ${contract.advance.toLocaleString()} تومان</p>
+                        <p><strong>مانده:</strong> ${contract.remainingBalance.toLocaleString()} تومان</p>
+                    </div>
+                </div>
+
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>ردیف</th>
+                            <th>نوع کالا</th>
+                            <th>اندازه</th>
+                            <th>تعداد</th>
+                            <th>مبلغ واحد</th>
+                            <th>مبلغ کل</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>۱</td>
+                            <td>${contract.productType}</td>
+                            <td>${contract.productSize}</td>
+                            <td>۱</td>
+                            <td>${contract.totalAmount.toLocaleString()}</td>
+                            <td>${contract.totalAmount.toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" style="text-align: left; font-weight: bold;">جمع کل:</td>
+                            <td style="font-weight: bold;">${contract.totalAmount.toLocaleString()} تومان</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="signature-section">
+                    <div class="signature-box">
+                        <p>محل مهر و امضای کارخانه</p>
+                        <div class="factory-stamp">
+                            مهر کارخانه<br>کلشی فوم
+                        </div>
+                    </div>
+                    <div class="signature-box">
+                        <p>راننده</p>
+                        <div style="margin-top: 40px;">نام و امضا: ___________</div>
+                    </div>
+                    <div class="signature-box">
+                        <p>تحویل گیرنده</p>
+                        <div style="margin-top: 40px;">نام و امضا: ___________</div>
+                    </div>
+                </div>
+            `;
+
+            const invoicePreview = document.getElementById('invoicePreview');
+            invoicePreview.innerHTML = invoiceHTML;
+            invoicePreview.style.display = 'block';
+
+            // ذخیره فاکتور
+            const invoice = {
+                id: Date.now(),
+                contractId: contract.id,
+                customer: contract.customer,
+                amount: contract.totalAmount,
+                date: new Date().toLocaleDateString('fa-IR'),
+                html: invoiceHTML
+            };
+            invoices.push(invoice);
+
+            alert('فاکتور با موفقیت ایجاد شد!');
+        }
+
+        function printInvoice() {
+            window.print();
+        }
+
+        function saveAsPDF() {
+            alert('امکان ذخیره PDF در نسخه بعدی اضافه خواهد شد');
+            // در اینجا می‌توان از کتابخانه‌هایی مانند jsPDF استفاده کرد
         }
 
         // مدیریت هزینه‌ها
