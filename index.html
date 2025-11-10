@@ -1,43 +1,105 @@
-const users = [
-    { username: 'admin', password: '1234', role: 'admin', name: 'مدیر سیستم' },
-    { username: 'accountant', password: '5678', role: 'accountant', name: 'حسابدار' },
-    { username: 'operator', password: '91011', role: 'operator', name: 'اپراتور' }
-];
-
-let currentUser = null;
-
-function login() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+function addExpense() {
+    const type = document.getElementById('expenseType').value;
+    const amount = parseFloat(document.getElementById('expenseAmount').value) || 0;
+    const date = document.getElementById('expenseDate').value || getCurrentPersianDate();
+    const description = document.getElementById('expenseDescription')?.value || '';
     
-    const user = users.find(u => u.username === username && u.password === password);
+    if (!amount || amount <= 0) {
+        showAlert('لطفا مبلغ هزینه را وارد کنید', 'error');
+        return;
+    }
     
-    if (user) {
-        currentUser = user;
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('mainPage').style.display = 'block';
-        document.getElementById('currentUser').textContent = user.name;
-        
-        // تنظیم دسترسی‌ها بر اساس نقش
-        setUserPermissions(user.role);
-        
-        loadAllData();
-        initDatePickers();
-        updateDashboard();
-        showAlert(`خوش آمدید ${user.name}`, 'success');
-    } else {
-        showAlert('نام کاربری یا رمز عبور اشتباه است!', 'error');
+    const expense = {
+        id: 'EXP' + Date.now(),
+        type: type,
+        amount: amount,
+        date: date,
+        description: description,
+        createdBy: document.getElementById('currentUser').textContent
+    };
+    
+    expenses.push(expense);
+    saveAllData();
+    updateDashboard();
+    
+    // ثبت در تاریخچه
+    addToHistory('هزینه جدید', `هزینه ${getExpenseTypeName(type)} به مبلغ ${amount.toLocaleString('fa-IR')} تومان ثبت شد`);
+    
+    showAlert('هزینه با موفقیت ثبت شد', 'success');
+    document.getElementById('expenseAmount').value = '';
+    if (document.getElementById('expenseDescription')) {
+        document.getElementById('expenseDescription').value = '';
     }
 }
 
-function setUserPermissions(role) {
-    const adminOnlyButtons = document.querySelectorAll('.admin-only');
-    const accountantButtons = document.querySelectorAll('.accountant-only');
+function getExpenseTypeName(type) {
+    const types = {
+        'material': 'مواد اولیه',
+        'crane': 'جرثقیل',
+        'repairs': 'تعمیرات',
+        'salary': 'حقوق پرسنل',
+        'transport': 'کرایه حمل',
+        'driver': 'کرایه راننده',
+        'rent': 'اجاره',
+        'water': 'فیش آب',
+        'electricity': 'فیش برق',
+        'gas': 'فیش گاز',
+        'other': 'سایر'
+    };
+    return types[type] || type;
+}
+
+function updateDashboard() {
+    // محاسبات مالی
+    const totalIncome = contracts.reduce((sum, contract) => sum + contract.totalAmount, 0);
+    const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const netProfit = totalIncome - totalExpenses;
     
-    if (role === 'operator') {
-        adminOnlyButtons.forEach(btn => btn.style.display = 'none');
-        accountantButtons.forEach(btn => btn.style.display = 'none');
-    } else if (role === 'accountant') {
-        adminOnlyButtons.forEach(btn => btn.style.display = 'none');
+    // آمار پرسنل
+    const activeWorkers = workers.filter(worker => worker.status === 'active').length;
+    const totalWorkers = workers.length;
+    
+    // مدیریت چک‌ها
+    const today = new PersianDate();
+    const dueChecks = checks.filter(check => {
+        if (check.status !== 'pending') return false;
+        const checkDate = new PersianDate(check.dueDate);
+        return checkDate <= today;
+    });
+    
+    const upcomingChecks = checks.filter(check => {
+        if (check.status !== 'pending') return false;
+        const checkDate = new PersianDate(check.dueDate);
+        const diffDays = checkDate.diff(today, 'days');
+        return diffDays > 0 && diffDays <= 7;
+    });
+    
+    // آپدیت مقادیر
+    document.getElementById('totalIncome').textContent = totalIncome.toLocaleString('fa-IR');
+    document.getElementById('totalExpenses').textContent = totalExpenses.toLocaleString('fa-IR');
+    document.getElementById('activeWorkers').textContent = `${activeWorkers}/${totalWorkers}`;
+    document.getElementById('dueChecks').textContent = dueChecks.length;
+    
+    // هشدارهای چک
+    const checkAlerts = document.getElementById('checkAlerts');
+    if (dueChecks.length > 0 || upcomingChecks.length > 0) {
+        checkAlerts.style.display = 'block';
+        let alertHTML = '';
+        
+        if (dueChecks.length > 0) {
+            alertHTML += `⚠️ <strong>${dueChecks.length} چک سررسید شده</strong> دارید! `;
+        }
+        
+        if (upcomingChecks.length > 0) {
+            alertHTML += `🔔 <strong>${upcomingChecks.length} چک</strong> در ۷ روز آینده سررسید می‌شوند.`;
+        }
+        
+        checkAlerts.innerHTML = alertHTML;
+        checkAlerts.className = dueChecks.length > 0 ? 'alert alert-danger' : 'alert alert-warning';
+    } else {
+        checkAlerts.style.display = 'none';
     }
+    
+    // آپدیت نمودارها (اگر وجود داشته باشند)
+    updateCharts();
 }
