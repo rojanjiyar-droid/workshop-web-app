@@ -424,6 +424,7 @@
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 12px;
+            cursor: pointer;
         }
         
         .worker-status-inactive {
@@ -432,6 +433,96 @@
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 12px;
+            cursor: pointer;
+        }
+
+        .invoice-container {
+            background: white;
+            padding: 30px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 20px auto;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .invoice-table th, .invoice-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .invoice-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .signature-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 50px;
+        }
+
+        .signature-box {
+            border: 1px solid #333;
+            padding: 20px;
+            text-align: center;
+            height: 120px;
+        }
+
+        .factory-stamp {
+            border: 2px dashed #333;
+            padding: 30px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .total-row {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .invoice-container, .invoice-container * {
+                visibility: visible;
+            }
+            .invoice-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+                border: none;
+            }
+            .no-print {
+                display: none !important;
+            }
         }
         
         @media (max-width: 768px) {
@@ -467,6 +558,14 @@
             }
             
             .search-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .invoice-details {
+                grid-template-columns: 1fr;
+            }
+
+            .signature-section {
                 grid-template-columns: 1fr;
             }
         }
@@ -568,7 +667,6 @@
 
                 <!-- قراردادها -->
                 <div id="contracts" class="tab-content">
-                    <!-- محتوای قراردادها بدون تغییر -->
                     <div class="form-section">
                         <h3>📝 ثبت قرارداد جدید</h3>
                         <div class="form-grid">
@@ -686,9 +784,13 @@
 
                         <div style="display: flex; gap: 10px; margin-top: 20px;">
                             <button class="btn btn-success" onclick="addContract()">📋 ثبت قرارداد</button>
+                            <button class="btn btn-info" onclick="generateInvoice()">🧾 صدور فاکتور</button>
                             <button class="btn btn-warning" onclick="resetContractForm()">🔄 پاک کردن فرم</button>
                         </div>
                     </div>
+
+                    <!-- پیش نمایش فاکتور -->
+                    <div id="invoicePreview" class="invoice-container"></div>
                 </div>
 
                 <!-- مشتریان -->
@@ -774,8 +876,11 @@
 
                         <div class="form-grid">
                             <div class="form-group">
-                                <label>آدرس</label>
-                                <textarea id="workerAddress" placeholder="آدرس کامل" rows="2"></textarea>
+                                <label>نوع شغل</label>
+                                <select id="workerJobType">
+                                    <option value="worker">کارگر</option>
+                                    <option value="driver">راننده</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label>تاریخ شروع فعالیت *</label>
@@ -785,6 +890,11 @@
                                 <label>تاریخ پایان فعالیت</label>
                                 <input type="text" id="workerEndDate" placeholder="1402/10/15">
                             </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>آدرس</label>
+                            <textarea id="workerAddress" placeholder="آدرس کامل" rows="2"></textarea>
                         </div>
 
                         <div class="form-group">
@@ -808,7 +918,7 @@
                                         <th>ردیف</th>
                                         <th>نام و نام خانوادگی</th>
                                         <th>شماره تماس</th>
-                                        <th>آدرس</th>
+                                        <th>نوع شغل</th>
                                         <th>شروع فعالیت</th>
                                         <th>پایان فعالیت</th>
                                         <th>وضعیت</th>
@@ -832,8 +942,15 @@
                                 <label>نوع هزینه</label>
                                 <select id="expenseType">
                                     <option value="material">مواد اولیه</option>
+                                    <option value="driver">کرایه راننده</option>
+                                    <option value="crane">جرثقیل</option>
+                                    <option value="repairs">تعمیرات</option>
+                                    <option value="spare_parts">خرید لوازم یدکی</option>
+                                    <option value="gas">فیش گاز</option>
+                                    <option value="electricity">فیش برق</option>
+                                    <option value="water">فیش آب</option>
+                                    <option value="tip">انعام</option>
                                     <option value="salary">حقوق پرسنل</option>
-                                    <option value="transport">کرایه حمل</option>
                                     <option value="other">سایر</option>
                                 </select>
                             </div>
@@ -931,12 +1048,10 @@
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
 
-            // وقتی تب مشتریان باز می‌شود، لیست را آپدیت کن
             if (tabName === 'customers') {
                 displayContracts();
             }
             
-            // وقتی تب کارکنان باز می‌شود، لیست را آپدیت کن
             if (tabName === 'workers') {
                 displayWorkers();
             }
@@ -949,7 +1064,6 @@
             const phone = document.getElementById('workerPhone').value.trim();
             const startDate = document.getElementById('workerStartDate').value;
             
-            // اعتبارسنجی
             if (!firstName) {
                 showAlert('لطفا نام کارمند را وارد کنید', 'error');
                 return;
@@ -975,11 +1089,12 @@
                 firstName: firstName,
                 lastName: lastName,
                 phone: phone,
+                jobType: document.getElementById('workerJobType').value,
                 address: document.getElementById('workerAddress').value,
                 startDate: startDate,
                 endDate: document.getElementById('workerEndDate').value || '',
                 description: document.getElementById('workerDescription').value,
-                status: document.getElementById('workerEndDate').value ? 'inactive' : 'active',
+                status: 'active',
                 dateAdded: new Date().toLocaleDateString('fa-IR')
             };
             
@@ -1022,15 +1137,16 @@
                 
                 const statusClass = worker.status === 'active' ? 'worker-status-active' : 'worker-status-inactive';
                 const statusText = worker.status === 'active' ? 'فعال' : 'غیرفعال';
+                const jobTypeText = worker.jobType === 'driver' ? 'راننده' : 'کارگر';
                 
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${worker.firstName} ${worker.lastName}</td>
                     <td>${worker.phone}</td>
-                    <td>${worker.address || '-'}</td>
+                    <td>${jobTypeText}</td>
                     <td>${worker.startDate}</td>
                     <td>${worker.endDate || 'در حال کار'}</td>
-                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td><span class="${statusClass}" onclick="toggleWorkerStatus('${worker.id}')">${statusText}</span></td>
                     <td>
                         <button class="btn btn-danger btn-sm" onclick="deleteWorker('${worker.id}')">🗑️ حذف</button>
                     </td>
@@ -1038,6 +1154,17 @@
                 
                 tableBody.appendChild(row);
             });
+        }
+
+        function toggleWorkerStatus(workerId) {
+            const worker = workers.find(w => w.id === workerId);
+            if (worker) {
+                worker.status = worker.status === 'active' ? 'inactive' : 'active';
+                saveAllData();
+                updateDashboard();
+                displayWorkers();
+                showAlert('وضعیت کارمند به روز شد', 'success');
+            }
         }
 
         function deleteWorker(workerId) {
@@ -1050,7 +1177,149 @@
             }
         }
 
-        // ========== بقیه توابع بدون تغییر ==========
+        // ========== صدور فاکتور ==========
+        function generateInvoice() {
+            const customer = document.getElementById('contractCustomer').value.trim();
+            const phone = document.getElementById('contractPhone').value.trim();
+            
+            if (!customer) {
+                showAlert('لطفا نام مشتری را وارد کنید', 'error');
+                return;
+            }
+            
+            const products = [];
+            let totalAmount = 0;
+            
+            document.querySelectorAll('.product-row').forEach(row => {
+                const meterage = parseFloat(row.querySelector('.productMeterage').value) || 0;
+                const unitPrice = parseFloat(row.querySelector('.productUnitPrice').value) || 0;
+                
+                if (meterage > 0 && unitPrice > 0) {
+                    const total = meterage * unitPrice;
+                    totalAmount += total;
+                    products.push({
+                        type: row.querySelector('.productType').value,
+                        size: row.querySelector('.productSize').value,
+                        meterage: meterage,
+                        unitPrice: unitPrice,
+                        total: total
+                    });
+                }
+            });
+            
+            if (products.length === 0) {
+                showAlert('لطفا حداقل یک محصول وارد کنید', 'error');
+                return;
+            }
+            
+            const invoiceId = 'INV' + Date.now();
+            const invoicePreview = document.getElementById('invoicePreview');
+            
+            let productsHTML = '';
+            products.forEach((product, index) => {
+                productsHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${getProductTypeName(product.type)}</td>
+                        <td>${product.size || '-'}</td>
+                        <td>${product.meterage.toLocaleString('fa-IR')}</td>
+                        <td>${product.unitPrice.toLocaleString('fa-IR')}</td>
+                        <td>${product.total.toLocaleString('fa-IR')}</td>
+                    </tr>
+                `;
+            });
+            
+            invoicePreview.innerHTML = `
+                <div class="no-print" style="text-align: left; margin-bottom: 20px;">
+                    <button class="btn btn-success" onclick="printInvoice()">🖨️ چاپ فاکتور</button>
+                    <button class="btn btn-info" onclick="closeInvoice()">بستن</button>
+                </div>
+                
+                <div class="invoice-header">
+                    <svg class="invoice-logo" viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="6" y="6" width="348" height="348" rx="28" fill="#0b0b0b"/>
+                        <text x="180" y="190" text-anchor="middle" font-size="72" font-weight="800" font-family="Vazir, Tahoma, Helvetica, sans-serif" fill="#ffffff">کلشی</text>
+                        <text x="180" y="225" text-anchor="middle" font-size="16" font-weight="700" font-family="Vazir, Tahoma, Helvetica, sans-serif" fill="#d4a13a">کارخانه یونولیت</text>
+                    </svg>
+                    <h2>فاکتور فروش</h2>
+                    <p>شماره فاکتور: ${invoiceId} | تاریخ: ${new Date().toLocaleDateString('fa-IR')}</p>
+                </div>
+                
+                <div class="invoice-details">
+                    <div>
+                        <h4>اطلاعات فروشنده</h4>
+                        <p><strong>کارخانه یونولیت کلشی فوم</strong></p>
+                        <p>شماره ثبت: ۱۲۳۴۵۶</p>
+                        <p>شناسه ملی: ۰۱۲۳۴۵۶۷۸۹</p>
+                        <p>تلفن: ۰۲۱-۱۲۳۴۵۶۷۸</p>
+                    </div>
+                    <div>
+                        <h4>اطلاعات خریدار</h4>
+                        <p><strong>${customer}</strong></p>
+                        <p>تلفن: ${phone}</p>
+                        <p>آدرس: ${document.getElementById('contractAddress').value || '-'}</p>
+                    </div>
+                </div>
+                
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>ردیف</th>
+                            <th>نوع کالا</th>
+                            <th>اندازه</th>
+                            <th>متراژ (متر)</th>
+                            <th>قیمت واحد (تومان)</th>
+                            <th>مبلغ کل (تومان)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${productsHTML}
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="5">جمع کل:</td>
+                            <td>${totalAmount.toLocaleString('fa-IR')} تومان</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                
+                <div class="signature-section">
+                    <div class="signature-box">
+                        <p>امضای فروشنده</p>
+                    </div>
+                    <div class="signature-box">
+                        <p>امضای خریدار</p>
+                    </div>
+                    <div class="factory-stamp">
+                        مهر و امضای شرکت
+                    </div>
+                </div>
+            `;
+            
+            invoicePreview.style.display = 'block';
+            showAlert('فاکتور با موفقیت ایجاد شد', 'success');
+        }
+
+        function printInvoice() {
+            window.print();
+        }
+
+        function closeInvoice() {
+            document.getElementById('invoicePreview').style.display = 'none';
+        }
+
+        function getProductTypeName(type) {
+            const types = {
+                'foam': 'فوم سقفی',
+                'sheet': 'ورق',
+                'panel': 'پانل'
+            };
+            return types[type] || type;
+        }
+
+        // ========== بقیه توابع ==========
+        // ... (بقیه توابع بدون تغییر میمونن)
+
         // مدیریت ردیف‌های محصولات
         function addProductRow() {
             productRowsCount++;
