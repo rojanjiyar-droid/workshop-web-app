@@ -418,6 +418,22 @@
             border-right: 4px solid #f39c12;
         }
         
+        .worker-status-active {
+            background: #e8f5e8;
+            color: #27ae60;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .worker-status-inactive {
+            background: #ffebee;
+            color: #e74c3c;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
         @media (max-width: 768px) {
             .nav {
                 flex-direction: column;
@@ -511,6 +527,7 @@
                 <button class="nav-btn active" onclick="showTab('dashboard')">📊 داشبورد</button>
                 <button class="nav-btn" onclick="showTab('contracts')">📝 قرارداد جدید</button>
                 <button class="nav-btn" onclick="showTab('customers')">👥 مشتریان</button>
+                <button class="nav-btn" onclick="showTab('workers')">👷 کارکنان</button>
                 <button class="nav-btn" onclick="showTab('expenses')">💰 هزینه‌ها</button>
             </div>
 
@@ -533,8 +550,8 @@
                             <div class="stat-label">قراردادهای فعال</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-value" id="totalCustomers">۰</div>
-                            <div class="stat-label">تعداد مشتریان</div>
+                            <div class="stat-value" id="totalWorkers">۰</div>
+                            <div class="stat-label">کارکنان فعال</div>
                         </div>
                     </div>
 
@@ -544,12 +561,14 @@
                             <button class="btn btn-sm" onclick="showTab('contracts')">📝 قرارداد جدید</button>
                             <button class="btn btn-success btn-sm" onclick="showTab('expenses')">💰 ثبت هزینه</button>
                             <button class="btn btn-info btn-sm" onclick="showTab('customers')">👥 مشاهده مشتریان</button>
+                            <button class="btn btn-warning btn-sm" onclick="showTab('workers')">👷 مدیریت کارکنان</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- قراردادها -->
                 <div id="contracts" class="tab-content">
+                    <!-- محتوای قراردادها بدون تغییر -->
                     <div class="form-section">
                         <h3>📝 ثبت قرارداد جدید</h3>
                         <div class="form-grid">
@@ -733,6 +752,77 @@
                     </div>
                 </div>
 
+                <!-- کارکنان -->
+                <div id="workers" class="tab-content">
+                    <div class="form-section">
+                        <h3>👷 مدیریت کارکنان</h3>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>نام *</label>
+                                <input type="text" id="workerFirstName" placeholder="نام">
+                            </div>
+                            <div class="form-group">
+                                <label>نام خانوادگی *</label>
+                                <input type="text" id="workerLastName" placeholder="نام خانوادگی">
+                            </div>
+                            <div class="form-group">
+                                <label>شماره تماس *</label>
+                                <input type="tel" id="workerPhone" placeholder="09123456789">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>آدرس</label>
+                                <textarea id="workerAddress" placeholder="آدرس کامل" rows="2"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>تاریخ شروع فعالیت *</label>
+                                <input type="text" id="workerStartDate" placeholder="1402/10/15">
+                            </div>
+                            <div class="form-group">
+                                <label>تاریخ پایان فعالیت</label>
+                                <input type="text" id="workerEndDate" placeholder="1402/10/15">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>توضیحات</label>
+                            <textarea id="workerDescription" placeholder="توضیحات اضافی" rows="3"></textarea>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button class="btn btn-success" onclick="addWorker()">➕ افزودن کارمند</button>
+                            <button class="btn btn-warning" onclick="resetWorkerForm()">🔄 پاک کردن فرم</button>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📋 لیست کارکنان</h3>
+                        
+                        <div class="table-container">
+                            <table id="workersTable">
+                                <thead>
+                                    <tr>
+                                        <th>ردیف</th>
+                                        <th>نام و نام خانوادگی</th>
+                                        <th>شماره تماس</th>
+                                        <th>آدرس</th>
+                                        <th>شروع فعالیت</th>
+                                        <th>پایان فعالیت</th>
+                                        <th>وضعیت</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="workersTableBody">
+                                    <!-- داده‌ها اینجا نمایش داده می‌شوند -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- هزینه‌ها -->
                 <div id="expenses" class="tab-content">
                     <div class="form-section">
@@ -774,6 +864,7 @@
         let checks = [];
         let contracts = [];
         let contractChecks = [];
+        let workers = [];
         let productRowsCount = 1;
 
         // مدیریت لاگین
@@ -806,6 +897,7 @@
                 expenses: expenses,
                 checks: checks,
                 contracts: contracts,
+                workers: workers,
                 lastSave: new Date().toISOString()
             };
             
@@ -821,10 +913,8 @@
                 expenses = data.expenses || [];
                 checks = data.checks || [];
                 contracts = data.contracts || [];
+                workers = data.workers || [];
                 console.log('داده‌ها بارگذاری شدند');
-                
-                // نمایش داده‌ها در کنسول برای دیباگ
-                console.log('قراردادهای بارگذاری شده:', contracts);
             }
         }
 
@@ -845,8 +935,122 @@
             if (tabName === 'customers') {
                 displayContracts();
             }
+            
+            // وقتی تب کارکنان باز می‌شود، لیست را آپدیت کن
+            if (tabName === 'workers') {
+                displayWorkers();
+            }
         }
 
+        // ========== مدیریت کارکنان ==========
+        function addWorker() {
+            const firstName = document.getElementById('workerFirstName').value.trim();
+            const lastName = document.getElementById('workerLastName').value.trim();
+            const phone = document.getElementById('workerPhone').value.trim();
+            const startDate = document.getElementById('workerStartDate').value;
+            
+            // اعتبارسنجی
+            if (!firstName) {
+                showAlert('لطفا نام کارمند را وارد کنید', 'error');
+                return;
+            }
+            
+            if (!lastName) {
+                showAlert('لطفا نام خانوادگی کارمند را وارد کنید', 'error');
+                return;
+            }
+            
+            if (!phone) {
+                showAlert('لطفا شماره تماس کارمند را وارد کنید', 'error');
+                return;
+            }
+            
+            if (!startDate) {
+                showAlert('لطفا تاریخ شروع فعالیت را وارد کنید', 'error');
+                return;
+            }
+            
+            const worker = {
+                id: 'W' + Date.now(),
+                firstName: firstName,
+                lastName: lastName,
+                phone: phone,
+                address: document.getElementById('workerAddress').value,
+                startDate: startDate,
+                endDate: document.getElementById('workerEndDate').value || '',
+                description: document.getElementById('workerDescription').value,
+                status: document.getElementById('workerEndDate').value ? 'inactive' : 'active',
+                dateAdded: new Date().toLocaleDateString('fa-IR')
+            };
+            
+            workers.push(worker);
+            saveAllData();
+            updateDashboard();
+            
+            showAlert(`کارمند ${firstName} ${lastName} با موفقیت اضافه شد`, 'success');
+            resetWorkerForm();
+            displayWorkers();
+        }
+
+        function resetWorkerForm() {
+            document.getElementById('workerFirstName').value = '';
+            document.getElementById('workerLastName').value = '';
+            document.getElementById('workerPhone').value = '';
+            document.getElementById('workerAddress').value = '';
+            document.getElementById('workerStartDate').value = '';
+            document.getElementById('workerEndDate').value = '';
+            document.getElementById('workerDescription').value = '';
+        }
+
+        function displayWorkers() {
+            const tableBody = document.getElementById('workersTableBody');
+            tableBody.innerHTML = '';
+            
+            if (workers.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 20px;">
+                            هیچ کارمندی ثبت نشده است
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            workers.forEach((worker, index) => {
+                const row = document.createElement('tr');
+                
+                const statusClass = worker.status === 'active' ? 'worker-status-active' : 'worker-status-inactive';
+                const statusText = worker.status === 'active' ? 'فعال' : 'غیرفعال';
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${worker.firstName} ${worker.lastName}</td>
+                    <td>${worker.phone}</td>
+                    <td>${worker.address || '-'}</td>
+                    <td>${worker.startDate}</td>
+                    <td>${worker.endDate || 'در حال کار'}</td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteWorker('${worker.id}')">🗑️ حذف</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        function deleteWorker(workerId) {
+            if (confirm('آیا از حذف این کارمند اطمینان دارید؟')) {
+                workers = workers.filter(worker => worker.id !== workerId);
+                saveAllData();
+                updateDashboard();
+                displayWorkers();
+                showAlert('کارمند با موفقیت حذف شد', 'success');
+            }
+        }
+
+        // ========== بقیه توابع بدون تغییر ==========
         // مدیریت ردیف‌های محصولات
         function addProductRow() {
             productRowsCount++;
@@ -1193,12 +1397,12 @@
             const totalIncome = contracts.reduce((sum, contract) => sum + contract.totalAmount, 0);
             const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
             const activeContracts = contracts.filter(contract => contract.status === 'active').length;
-            const totalCustomers = [...new Set(contracts.map(contract => contract.customer))].length;
+            const activeWorkers = workers.filter(worker => worker.status === 'active').length;
             
             document.getElementById('totalIncome').textContent = totalIncome.toLocaleString('fa-IR');
             document.getElementById('totalExpenses').textContent = totalExpenses.toLocaleString('fa-IR');
             document.getElementById('activeContracts').textContent = activeContracts;
-            document.getElementById('totalCustomers').textContent = totalCustomers;
+            document.getElementById('totalWorkers').textContent = activeWorkers;
         }
 
         // نمایش قراردادها در تب مشتریان
@@ -1373,6 +1577,7 @@
             document.getElementById('deliveryDate').value = today;
             document.getElementById('expenseDate').value = today;
             document.getElementById('checkDueDate').value = today;
+            document.getElementById('workerStartDate').value = today;
             
             // فعال کردن پیش پرداخت در ابتدا
             document.getElementById('contractAdvance').disabled = false;
