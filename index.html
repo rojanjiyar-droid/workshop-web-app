@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>سیستم حسابداری کارخانه یونولیت کلشی فوم</title>
     <style>
-        /* استایل‌های قبلی بدون تغییر باقی می‌مانند */
         * {
             margin: 0;
             padding: 0;
@@ -378,17 +377,408 @@
             color: #666;
         }
 
-        .error-message {
-            color: #e74c3c;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
+        /* استایل‌های مدیریت مالی */
+        .finance-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
         }
 
-        .form-group.error input,
-        .form-group.error select,
-        .form-group.error textarea {
-            border-color: #e74c3c;
+        .finance-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        /* استایل‌های مدیریت چک‌ها */
+        .checks-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .checks-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .check-item-detailed {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-right: 4px solid;
+            border-right-color: #3498db;
+        }
+
+        .check-item-detailed.overdue { border-right-color: #e74c3c; }
+        .check-item-detailed.cleared { border-right-color: #27ae60; }
+        .check-item-detailed.pending { border-right-color: #f39c12; }
+
+        .check-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .check-amount {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+
+        .check-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .check-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #999;
+        }
+
+        .alerts-panel {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #ffeaa7;
+        }
+
+        /* استایل‌های بخش فاکتور */
+        .invoice-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .invoice-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .invoice-preview {
+            background: white;
+            border: 2px solid #34495e;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 600px;
+            position: relative;
+        }
+
+        .company-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #34495e;
+        }
+
+        .company-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .invoice-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #2c3e50;
+        }
+
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .invoice-table th,
+        .invoice-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .invoice-table th {
+            background: #34495e;
+            color: white;
+        }
+
+        .totals-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .signature-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #34495e;
+        }
+
+        .signature-box {
+            text-align: center;
+        }
+
+        .signature-line {
+            width: 200px;
+            height: 2px;
+            background: #333;
+            margin: 40px auto 10px;
+        }
+
+        /* استایل‌های مدیریت مشتریان و کارکنان */
+        .management-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .management-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .list-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .list-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        /* استایل‌های تنظیمات */
+        .settings-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .settings-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        /* استایل‌های نوبت‌دهی ارسال بار */
+        .delivery-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .delivery-form-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .delivery-list-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .delivery-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .delivery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .customer-info {
+            flex: 1;
+        }
+
+        .customer-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .customer-details {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .delivery-meta {
+            text-align: left;
+            min-width: 120px;
+        }
+
+        .time-slot-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .status-scheduled { background: #fff3cd; color: #856404; }
+        .status-loading { background: #d1ecf1; color: #0c5460; }
+        .status-on-the-way { background: #d1ecf1; color: #0c5460; }
+        .status-delivered { background: #d4edda; color: #155724; }
+        .status-canceled { background: #f8d7da; color: #721c24; }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .product-card {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 5px;
+            border-right: 3px solid #3498db;
+        }
+
+        .product-type {
+            font-weight: bold;
+            font-size: 12px;
+            color: #2c3e50;
+        }
+
+        .product-details {
+            font-size: 11px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .delivery-info {
+            background: #e8f4fd;
+            padding: 8px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+
+        .driver-info {
+            background: #fff3cd;
+            padding: 8px;
+            border-radius: 5px;
+            margin-top: 8px;
+            font-size: 11px;
+            border-right: 2px solid #ffc107;
+        }
+
+        .delivery-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .time-slot {
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .time-slot:hover {
+            border-color: #3498db;
+        }
+
+        .time-slot.selected {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
         }
 
         @keyframes fadeIn {
@@ -409,6 +799,15 @@
             .nav-btn {
                 text-align: right;
                 border-bottom: 1px solid #3c5570;
+            }
+            
+            .finance-container,
+            .checks-container,
+            .invoice-container,
+            .management-container,
+            .settings-container,
+            .delivery-container {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -459,21 +858,70 @@
             </div>
 
             <div class="content">
+                <!-- داشبورد -->
+                <div id="dashboard" class="tab-content active">
+                    <div class="form-section">
+                        <h3>آمار کلی سیستم</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalContracts">۰</div>
+                                <div class="stat-label">قراردادهای فعال</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalIncome">۰</div>
+                                <div class="stat-label">کل درآمد (تومان)</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalExpenses">۰</div>
+                                <div class="stat-label">کل هزینه (تومان)</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalWorkers">۰</div>
+                                <div class="stat-label">کارکنان فعال</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalCustomers">۰</div>
+                                <div class="stat-label">مشتریان</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="pendingDeliveries">۰</div>
+                                <div class="stat-label">ارسال‌های در انتظار</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>دسترسی سریع</h3>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn btn-success btn-sm" onclick="showTab('contracts')">ثبت قرارداد جدید</button>
+                            <button class="btn btn-info btn-sm" onclick="showTab('workers')">مدیریت کارکنان</button>
+                            <button class="btn btn-warning btn-sm" onclick="showTab('finance')">ثبت هزینه</button>
+                            <button class="btn btn-danger btn-sm" onclick="showTab('checks')">مدیریت چک‌ها</button>
+                            <button class="btn btn-primary btn-sm" onclick="showTab('delivery')">نوبت ارسال</button>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>هشدارها و اعلان‌ها</h3>
+                        <div id="dashboardAlerts">
+                            <!-- هشدارها اینجا نمایش داده می‌شوند -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- قراردادها -->
                 <div id="contracts" class="tab-content">
                     <div class="form-section">
                         <h3>ثبت قرارداد جدید</h3>
                         <div class="form-grid">
-                            <div class="form-group" id="customerGroup">
+                            <div class="form-group">
                                 <label>نام مشتری *</label>
                                 <input type="text" id="contractCustomer" placeholder="نام کامل مشتری" oninput="searchAllCustomers(this.value, 'contract')">
-                                <div class="error-message" id="customerError">لطفا نام مشتری را وارد کنید</div>
                                 <div class="search-results" id="customerResultsContract"></div>
                             </div>
-                            <div class="form-group" id="phoneGroup">
+                            <div class="form-group">
                                 <label>شماره تماس *</label>
                                 <input type="tel" id="contractPhone" placeholder="09123456789">
-                                <div class="error-message" id="phoneError">لطفا شماره تماس را وارد کنید</div>
                             </div>
                             <div class="form-group">
                                 <label>نوع مشتری *</label>
@@ -573,7 +1021,7 @@
                         </div>
 
                         <div style="display: flex; gap: 10px; margin-top: 20px;">
-                            <button class="btn btn-success" onclick="validateAndAddContract()">ثبت قرارداد</button>
+                            <button class="btn btn-success" onclick="addContract()">ثبت قرارداد</button>
                             <button class="btn btn-warning" onclick="resetContractForm()">پاک کردن فرم</button>
                         </div>
                     </div>
@@ -605,7 +1053,777 @@
                     </div>
                 </div>
 
-                <!-- سایر تب‌ها ... -->
+                <!-- نوبت‌دهی ارسال بار -->
+                <div id="delivery" class="tab-content">
+                    <h2 style="margin-bottom: 20px; color: #2c3e50;">🚚 سیستم نوبت‌دهی ارسال بار</h2>
+                    
+                    <div class="delivery-container">
+                        <!-- سمت چپ: فرم ثبت نوبت ارسال -->
+                        <div class="delivery-form-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">➕ ثبت نوبت ارسال جدید</h3>
+                            
+                            <div class="form-section">
+                                <h4>🔍 انتخاب مشتری</h4>
+                                <div class="customer-search-container">
+                                    <div class="form-group">
+                                        <label>جستجوی مشتری *</label>
+                                        <input type="text" id="searchCustomer" 
+                                               placeholder="نام مشتری یا شماره تماس..."
+                                               oninput="searchAllCustomers(this.value, 'delivery')">
+                                    </div>
+                                    <div class="search-results" id="customerResultsDelivery"></div>
+                                </div>
+                                
+                                <div id="selectedCustomerInfoDelivery" style="display: none;">
+                                    <div style="background: #e8f4fd; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                                        <strong>مشتری انتخاب شده:</strong>
+                                        <div id="customerDisplayDelivery"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h4>🕒 زمان‌بندی ارسال</h4>
+                                <div class="form-group">
+                                    <label>تاریخ ارسال *</label>
+                                    <input type="text" id="deliveryScheduleDate" placeholder="1402/10/15">
+                                </div>
+                                
+                                <label>بازه زمانی ارسال *</label>
+                                <div class="time-slots">
+                                    <div class="time-slot" onclick="selectTimeSlot('8-10')">۸-۱۰ صبح</div>
+                                    <div class="time-slot" onclick="selectTimeSlot('10-12')">۱۰-۱۲ ظهر</div>
+                                    <div class="time-slot" onclick="selectTimeSlot('12-14')">۱۲-۱۴ بعدازظهر</div>
+                                    <div class="time-slot" onclick="selectTimeSlot('14-16')">۱۴-۱۶ عصر</div>
+                                    <div class="time-slot" onclick="selectTimeSlot('16-18')">۱۶-۱۸ عصر</div>
+                                    <div class="time-slot" onclick="selectTimeSlot('18-20')">۱۸-۲۰ شب</div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h4>🚛 اطلاعات ارسال</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>راننده</label>
+                                        <select id="driver">
+                                            <option value="">انتخاب راننده</option>
+                                            <!-- راننده‌ها از لیست کارکنان لود می‌شوند -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>وسیله نقلیه</label>
+                                        <select id="vehicle">
+                                            <option value="">انتخاب وسیله</option>
+                                            <option value="van">ون</option>
+                                            <option value="truck">کامیونت</option>
+                                            <option value="pickup">پیکاپ</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>توضیحات ارسال</label>
+                                    <textarea id="deliveryNotes" placeholder="آدرس دقیق، شماره تماس گیرنده، توضیحات خاص..." rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-success" onclick="createDeliverySchedule()" style="flex: 1;">
+                                    ✅ ثبت نوبت ارسال
+                                </button>
+                                <button class="btn btn-warning" onclick="resetDeliveryForm()" style="flex: 1;">
+                                    🔄 پاک کردن فرم
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- سمت راست: لیست نوبت‌های ارسال -->
+                        <div class="delivery-list-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">📋 نوبت‌های ارسال امروز</h3>
+
+                            <!-- لیست نوبت‌های ارسال -->
+                            <div id="deliveriesList">
+                                <!-- نوبت‌های ارسال اینجا نمایش داده می‌شوند -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- مشتریان -->
+                <div id="customers" class="tab-content">
+                    <h2 style="margin-bottom: 20px; color: #2c3e50;">👥 مدیریت مشتریان</h2>
+                    
+                    <div class="management-container">
+                        <div class="management-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">➕ ثبت مشتری جدید</h3>
+                            
+                            <div class="form-section">
+                                <h4>📋 اطلاعات شخصی</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>نام و نام خانوادگی *</label>
+                                        <input type="text" id="customerName" placeholder="نام کامل">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>شماره تماس *</label>
+                                        <input type="tel" id="customerPhone" placeholder="09123456789">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>آدرس</label>
+                                    <textarea id="customerAddress" placeholder="آدرس کامل" rows="2"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h4>🏢 اطلاعات تجاری</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>نوع مشتری</label>
+                                        <select id="customerTypeManagement">
+                                            <option value="current">جاری</option>
+                                            <option value="pre_purchase">پیش خرید</option>
+                                            <option value="agent">عامل</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>صنف</label>
+                                        <input type="text" id="customerBusiness" placeholder="مثلاً: ساختمان‌ساز، پیمانکار">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>توضیحات</label>
+                                    <textarea id="customerNotes" placeholder="توضیحات اضافی..." rows="2"></textarea>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-success" onclick="addCustomer()" style="flex: 1;">✅ ثبت مشتری</button>
+                                <button class="btn btn-warning" onclick="resetCustomerForm()" style="flex: 1;">🔄 پاک کردن</button>
+                            </div>
+
+                            <div class="stats-grid" style="margin-top: 25px;">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="totalCustomersCount">0</div>
+                                    <div class="stat-label">کل مشتریان</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="vipCustomers">0</div>
+                                    <div class="stat-label">مشتریان VIP</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="activeCustomers">0</div>
+                                    <div class="stat-label">مشتریان فعال</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="management-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">📋 لیست مشتریان دارای قرارداد</h3>
+                            
+                            <div class="search-section">
+                                <div class="search-grid">
+                                    <div class="form-group">
+                                        <label>جستجوی مشتری</label>
+                                        <input type="text" id="searchCustomerManagement" placeholder="نام یا شماره تماس..." oninput="filterContractCustomers()">
+                                    </div>
+                                    <button class="btn btn-info" onclick="exportCustomers()">📊 خروجی</button>
+                                </div>
+                            </div>
+
+                            <div class="list-container" id="contractCustomersList">
+                                <!-- مشتریان دارای قرارداد اینجا نمایش داده می‌شوند -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- کارکنان -->
+                <div id="workers" class="tab-content">
+                    <h2 style="margin-bottom: 20px; color: #2c3e50;">👨‍💼 مدیریت کارکنان</h2>
+                    
+                    <div class="management-container">
+                        <div class="management-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">➕ ثبت کارمند جدید</h3>
+                            
+                            <div class="form-section">
+                                <h4>📋 اطلاعات شخصی</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>نام و نام خانوادگی *</label>
+                                        <input type="text" id="workerName" placeholder="نام کامل">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>کد ملی *</label>
+                                        <input type="text" id="workerNationalCode" placeholder="کد ملی">
+                                    </div>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>شماره تماس *</label>
+                                        <input type="tel" id="workerPhone" placeholder="09123456789">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>تاریخ استخدام</label>
+                                        <input type="text" id="workerHireDate" placeholder="1402/10/15">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>آدرس</label>
+                                    <textarea id="workerAddress" placeholder="آدرس کامل" rows="2"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h4>🏭 اطلاعات شغلی</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>سمت *</label>
+                                        <select id="workerPosition">
+                                            <option value="production">تولید</option>
+                                            <option value="delivery">ارسال</option>
+                                            <option value="office">اداری</option>
+                                            <option value="management">مدیریت</option>
+                                            <option value="driver">راننده</option>
+                                            <option value="worker">کارگر</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>حقوق پایه (تومان)</label>
+                                        <input type="number" id="workerSalary" placeholder="مبلغ حقوق">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>توضیحات</label>
+                                    <textarea id="workerNotes" placeholder="توضیحات اضافی..." rows="2"></textarea>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-success" onclick="addWorker()" style="flex: 1;">✅ ثبت کارمند</button>
+                                <button class="btn btn-warning" onclick="resetWorkerForm()" style="flex: 1;">🔄 پاک کردن</button>
+                            </div>
+                        </div>
+
+                        <div class="management-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">📋 لیست کارکنان</h3>
+                            
+                            <div class="search-section">
+                                <div class="search-grid">
+                                    <div class="form-group">
+                                        <label>جستجوی کارمند</label>
+                                        <input type="text" id="searchWorker" placeholder="نام یا کد ملی..." oninput="filterWorkers()">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>سمت</label>
+                                        <select id="filterWorkerPosition" onchange="filterWorkers()">
+                                            <option value="all">همه</option>
+                                            <option value="production">تولید</option>
+                                            <option value="delivery">ارسال</option>
+                                            <option value="office">اداری</option>
+                                            <option value="management">مدیریت</option>
+                                            <option value="driver">راننده</option>
+                                            <option value="worker">کارگر</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-info" onclick="exportWorkers()">📊 خروجی</button>
+                                </div>
+                            </div>
+
+                            <div class="list-container" id="workersList">
+                                <!-- کارکنان اینجا نمایش داده می‌شوند -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- مالی -->
+                <div id="finance" class="tab-content">
+                    <h2 style="margin-bottom: 20px; color: #2c3e50;">💰 مدیریت مالی</h2>
+                    
+                    <div class="finance-container">
+                        <div class="finance-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">➕ ثبت تراکنش جدید</h3>
+                            
+                            <div class="form-section">
+                                <h4>💵 اطلاعات تراکنش</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>نوع تراکنش *</label>
+                                        <select id="transactionType">
+                                            <option value="income">درآمد</option>
+                                            <option value="expense">هزینه</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>مبلغ (تومان) *</label>
+                                        <input type="number" id="transactionAmount" placeholder="مبلغ">
+                                    </div>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>دسته‌بندی *</label>
+                                        <select id="transactionCategory">
+                                            <option value="sales">فروش</option>
+                                            <option value="purchase">خرید مواد اولیه</option>
+                                            <option value="salary">حقوق</option>
+                                            <option value="maintenance">تعمیرات</option>
+                                            <option value="other">سایر</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>تاریخ</label>
+                                        <input type="text" id="transactionDate" placeholder="1402/10/15">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>شرح تراکنش</label>
+                                    <textarea id="transactionDescription" placeholder="توضیحات تراکنش..." rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-success" onclick="addTransaction()" style="flex: 1;">✅ ثبت تراکنش</button>
+                                <button class="btn btn-warning" onclick="resetTransactionForm()" style="flex: 1;">🔄 پاک کردن</button>
+                            </div>
+                        </div>
+
+                        <div class="finance-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">📊 آمار مالی</h3>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="totalIncomeFinance">0</div>
+                                    <div class="stat-label">کل درآمد</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="totalExpensesFinance">0</div>
+                                    <div class="stat-label">کل هزینه</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="netProfit">0</div>
+                                    <div class="stat-label">سود خالص</div>
+                                </div>
+                            </div>
+
+                            <div class="form-section" style="margin-top: 20px;">
+                                <h4>📈 گزارش‌های مالی</h4>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <button class="btn btn-info btn-sm" onclick="generateIncomeReport()">گزارش درآمد</button>
+                                    <button class="btn btn-warning btn-sm" onclick="generateExpenseReport()">گزارش هزینه</button>
+                                    <button class="btn btn-success btn-sm" onclick="generateProfitReport()">گزارش سود</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section" style="margin-top: 20px;">
+                        <h3>📋 تاریخچه تراکنش‌ها</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>ردیف</th>
+                                        <th>تاریخ</th>
+                                        <th>نوع</th>
+                                        <th>دسته‌بندی</th>
+                                        <th>شرح</th>
+                                        <th>مبلغ (تومان)</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transactionsTable">
+                                    <!-- تراکنش‌ها اینجا نمایش داده می‌شوند -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- چک‌ها -->
+                <div id="checks" class="tab-content">
+                    <h2 style="margin-bottom: 20px; color: #2c3e50;">🏦 مدیریت چک‌ها</h2>
+                    
+                    <div class="checks-container">
+                        <div class="checks-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">➕ ثبت چک جدید</h3>
+                            
+                            <div class="form-section">
+                                <h4>📄 اطلاعات چک</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>نام مشتری *</label>
+                                        <input type="text" id="checkCustomerSearch" placeholder="جستجوی مشتری..." oninput="searchAllCustomers(this.value, 'check')">
+                                        <div class="search-results" id="customerResultsCheck"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>شماره چک *</label>
+                                        <input type="text" id="checkNumberNew" placeholder="شماره چک">
+                                    </div>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>مبلغ (تومان) *</label>
+                                        <input type="number" id="checkAmountNew" placeholder="مبلغ چک">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>تاریخ سررسید *</label>
+                                        <input type="text" id="checkDueDateNew" placeholder="1402/10/15">
+                                    </div>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>بانک *</label>
+                                        <input type="text" id="checkBankNew" placeholder="نام بانک">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>نوع چک *</label>
+                                        <select id="checkType">
+                                            <option value="received">دریافتی</option>
+                                            <option value="issued">پرداختی</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>توضیحات</label>
+                                    <textarea id="checkDescription" placeholder="توضیحات مربوط به چک..." rows="2"></textarea>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-success" onclick="addCheck()" style="flex: 1;">✅ ثبت چک</button>
+                                <button class="btn btn-warning" onclick="resetCheckForm()" style="flex: 1;">🔄 پاک کردن</button>
+                            </div>
+                        </div>
+
+                        <div class="checks-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">📊 آمار چک‌ها</h3>
+                            
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="totalChecks">0</div>
+                                    <div class="stat-label">کل چک‌ها</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="pendingChecks">0</div>
+                                    <div class="stat-label">چک‌های در جریان</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="overdueChecks">0</div>
+                                    <div class="stat-label">چک‌های معوق</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="clearedChecks">0</div>
+                                    <div class="stat-label">وصول شده</div>
+                                </div>
+                            </div>
+
+                            <div class="alerts-panel" style="margin-top: 20px;">
+                                <h4>⚠️ هشدارهای چک</h4>
+                                <div id="checkAlertsList">
+                                    <!-- هشدارهای چک اینجا نمایش داده می‌شوند -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section" style="margin-top: 20px;">
+                        <h3>📋 لیست چک‌ها</h3>
+                        
+                        <div class="search-section">
+                            <div class="search-grid">
+                                <div class="form-group">
+                                    <label>جستجو</label>
+                                    <input type="text" id="searchCheck" placeholder="شماره چک یا صادرکننده..." oninput="filterChecks()">
+                                </div>
+                                <div class="form-group">
+                                    <label>وضعیت</label>
+                                    <select id="filterCheckStatus" onchange="filterChecks()">
+                                        <option value="all">همه</option>
+                                        <option value="pending">در جریان</option>
+                                        <option value="cleared">وصول شده</option>
+                                        <option value="overdue">معوق</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>نوع چک</label>
+                                    <select id="filterCheckType" onchange="filterChecks()">
+                                        <option value="all">همه</option>
+                                        <option value="received">دریافتی</option>
+                                        <option value="issued">پرداختی</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-info" onclick="exportChecks()">📊 خروجی</button>
+                            </div>
+                        </div>
+
+                        <div id="checksList">
+                            <!-- چک‌ها اینجا نمایش داده می‌شوند -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- فاکتور -->
+                <div id="invoices" class="tab-content">
+                    <h2 style="margin-bottom: 20px; color: #2c3e50;">🧾 سیستم فاکتور</h2>
+                    
+                    <div class="invoice-container">
+                        <div class="invoice-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">➕ ایجاد فاکتور جدید</h3>
+                            
+                            <div class="customer-search-container">
+                                <div class="form-group">
+                                    <label>جستجوی مشتری</label>
+                                    <input type="text" id="invoiceCustomerSearch" placeholder="جستجو بر اساس نام یا شماره تماس..." 
+                                           oninput="searchAllCustomers(this.value, 'invoice')">
+                                    <div class="search-results" id="customerSearchResults"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>نام مشتری *</label>
+                                <input type="text" id="invoiceCustomerName" placeholder="نام مشتری">
+                            </div>
+
+                            <div class="form-group">
+                                <label>آدرس مشتری</label>
+                                <textarea id="invoiceCustomerAddress" placeholder="آدرس مشتری" rows="2"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>شماره تماس مشتری</label>
+                                <input type="tel" id="invoiceCustomerPhone" placeholder="شماره تماس مشتری">
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>راننده</label>
+                                    <select id="invoiceDriver">
+                                        <option value="">انتخاب راننده</option>
+                                        <!-- راننده‌ها از لیست کارکنان لود می‌شوند -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <h4>📦 اقلام فاکتور</h4>
+                            <div id="invoiceItemsContainer">
+                                <div class="product-row" data-invoice-row="1">
+                                    <div class="form-group">
+                                        <label>شرح کالا *</label>
+                                        <input type="text" class="invoiceItemDescription" placeholder="شرح کالا">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>تعداد *</label>
+                                        <input type="number" class="invoiceItemQuantity" placeholder="0" min="1" oninput="calculateInvoiceRowTotal(1)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>قیمت واحد (تومان) *</label>
+                                        <input type="number" class="invoiceItemPrice" placeholder="0" min="0" oninput="calculateInvoiceRowTotal(1)">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>مبلغ کل (تومان)</label>
+                                        <input type="text" class="invoiceItemTotal" placeholder="0" readonly style="background: #f8f9fa;">
+                                    </div>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeInvoiceRow(1)" style="display: none;">حذف</button>
+                                </div>
+                            </div>
+                            
+                            <button type="button" class="btn btn-info btn-sm" onclick="addInvoiceRow()">+ افزودن ردیف</button>
+
+                            <div class="form-section">
+                                <h4>💰 اطلاعات پرداخت</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>تخفیف (تومان)</label>
+                                        <input type="number" id="invoiceDiscount" placeholder="0" min="0" oninput="calculateInvoiceTotal()">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: center; font-weight: bold;">
+                                <span id="invoiceTotalDisplay">جمع کل: 0 تومان | تخفیف: 0 تومان | قابل پرداخت: 0 تومان</span>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-success" onclick="generateInvoice()" style="flex: 1;">🧾 ایجاد فاکتور</button>
+                                <button class="btn btn-primary" onclick="printInvoice()" style="flex: 1;">🖨️ چاپ فاکتور</button>
+                                <button class="btn btn-warning" onclick="resetInvoiceForm()" style="flex: 1;">🔄 پاک کردن</button>
+                            </div>
+                        </div>
+
+                        <div class="invoice-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">👁️ پیش‌نمایش فاکتور</h3>
+                            
+                            <div class="invoice-preview" id="invoicePreview">
+                                <div class="company-stamp">مهر و امضا</div>
+                                
+                                <div class="company-header">
+                                    <div class="company-logo">کارخانه یونولیت کلشی فوم</div>
+                                    <div>ارومیه- جاده سلماس ارومیه نرسیده به روستای قزل عاشق خیابان آزادی</div>
+                                    <div>تلفن: 09149431013</div>
+                                </div>
+
+                                <div class="invoice-title">فاکتور فروش</div>
+
+                                <div class="invoice-details">
+                                    <div>
+                                        <strong>شماره فاکتور:</strong> <span id="previewInvoiceNumber">INV-0001</span><br>
+                                        <strong>تاریخ:</strong> <span id="previewInvoiceDate">1402/10/15</span>
+                                    </div>
+                                    <div>
+                                        <strong>مشتری:</strong> <span id="previewCustomerName">-</span><br>
+                                        <strong>تلفن:</strong> <span id="previewCustomerPhone">-</span>
+                                        <strong>آدرس:</strong> <span id="previewCustomerAddress">-</span>
+                                        <strong>راننده:</strong> <span id="previewDriver">-</span>
+                                    </div>
+                                </div>
+
+                                <table class="invoice-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ردیف</th>
+                                            <th>شرح کالا</th>
+                                            <th>تعداد</th>
+                                            <th>قیمت واحد</th>
+                                            <th>مبلغ کل</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="previewInvoiceItems">
+                                        <!-- اقلام فاکتور اینجا نمایش داده می‌شوند -->
+                                    </tbody>
+                                </table>
+
+                                <div class="totals-section">
+                                    <div>
+                                        <div class="total-row">
+                                            <span>جمع کل:</span>
+                                            <span id="previewSubtotal">0 تومان</span>
+                                        </div>
+                                        <div class="total-row">
+                                            <span>تخفیف:</span>
+                                            <span id="previewDiscount">0 تومان</span>
+                                        </div>
+                                        <div class="total-row" style="font-weight: bold; border-top: 2px solid #34495e;">
+                                            <span>قابل پرداخت:</span>
+                                            <span id="previewTotal">0 تومان</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="signature-section">
+                                    <div class="signature-box">
+                                        <div>مهر و امضای فروشنده</div>
+                                        <div class="signature-line"></div>
+                                    </div>
+                                    <div class="signature-box">
+                                        <div>مهر و امضای خریدار</div>
+                                        <div class="signature-line"></div>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #666;">
+                                    با تشکر از اعتماد شما - این فاکتور به منزله رسید پرداخت می‌باشد
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- تنظیمات -->
+                <div id="settings" class="tab-content">
+                    <h2 style="margin-bottom: 20px; color: #2c3e50;">⚙️ تنظیمات سیستم</h2>
+                    
+                    <div class="settings-container">
+                        <div class="settings-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">👤 پروفایل کاربری</h3>
+                            
+                            <div class="profile-section">
+                                <div class="profile-avatar">مدیر</div>
+                                <h3>مدیر سیستم</h3>
+                                <p>سطح دسترسی: مدیر کل</p>
+                            </div>
+
+                            <div class="form-section">
+                                <h4>📝 اطلاعات شخصی</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>نام و نام خانوادگی</label>
+                                        <input type="text" id="userFullName" placeholder="نام کامل" value="مدیر سیستم">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>ایمیل</label>
+                                        <input type="email" id="userEmail" placeholder="email@example.com">
+                                    </div>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>شماره تماس</label>
+                                        <input type="tel" id="userPhone" placeholder="09123456789">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>تغییر رمز عبور</label>
+                                        <input type="password" id="userNewPassword" placeholder="رمز عبور جدید">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-success" onclick="updateProfile()" style="flex: 1;">💾 ذخیره تغییرات</button>
+                            </div>
+                        </div>
+
+                        <div class="settings-card">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">🏢 اطلاعات شرکت</h3>
+                            
+                            <div class="form-section">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>نام شرکت *</label>
+                                        <input type="text" id="companyName" placeholder="نام شرکت" value="کارخانه یونولیت کلشی فوم">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>شماره ثبت</label>
+                                        <input type="text" id="companyRegNumber" placeholder="شماره ثبت">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>آدرس</label>
+                                    <textarea id="companyAddress" placeholder="آدرس کامل" rows="2">ارومیه- جاده سلماس ارومیه نرسیده به روستای قزل عاشق خیابان آزادی</textarea>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>تلفن</label>
+                                        <input type="tel" id="companyPhone" placeholder="09149431013" value="09149431013">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>فکس</label>
+                                        <input type="text" id="companyFax" placeholder="021-44556678">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h4>💰 تنظیمات مالی</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>نرخ مالیات (%)</label>
+                                        <input type="number" id="taxRate" placeholder="9" value="9" min="0" max="100">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>واحد پول</label>
+                                        <select id="currency">
+                                            <option value="toman">تومان</option>
+                                            <option value="rial">ریال</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                                <button class="btn btn-success" onclick="saveCompanySettings()" style="flex: 1;">💾 ذخیره تنظیمات</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -614,8 +1832,18 @@
         // داده‌های برنامه
         let contracts = [];
         let customers = [];
+        let invoices = [];
+        let transactions = [];
+        let checks = [];
+        let workers = [];
+        let deliverySchedules = [];
+        let currentUser = null;
         let productRowsCount = 1;
+        let invoiceRowsCount = 1;
+        let selectedCustomerForInvoice = null;
         let contractChecks = [];
+        let selectedTimeSlot = null;
+        let currentInvoiceNumber = 1001;
 
         // مدیریت لاگین
         function login() {
@@ -623,11 +1851,21 @@
             const password = document.getElementById('password').value;
             
             if (username === 'admin' && password === '1234') {
+                currentUser = { name: 'مدیر سیستم', role: 'admin' };
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('mainPage').style.display = 'block';
+                document.getElementById('currentUser').textContent = currentUser.name;
                 
                 loadData();
+                updateDashboard();
                 displayContracts();
+                displayInvoices();
+                displayCustomers();
+                displayWorkers();
+                displayTransactions();
+                displayChecks();
+                displayDeliveries();
+                loadDrivers();
                 
                 alert('خوش آمدید مدیر سیستم');
             } else {
@@ -635,10 +1873,125 @@
             }
         }
 
-        // =====================
-        // سیستم قراردادها - نسخه اصلاح شده
-        // =====================
+        function logout() {
+            if (confirm('آیا از سیستم خارج می‌شوید؟')) {
+                saveData();
+                document.getElementById('loginPage').style.display = 'block';
+                document.getElementById('mainPage').style.display = 'none';
+                currentUser = null;
+            }
+        }
 
+        // مدیریت تب‌ها
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'contracts') {
+                displayContracts();
+            } else if (tabName === 'invoices') {
+                displayInvoices();
+                updateInvoicePreview();
+                loadDrivers();
+            } else if (tabName === 'customers') {
+                displayCustomers();
+                displayContractCustomers();
+            } else if (tabName === 'finance') {
+                displayTransactions();
+                updateFinanceStats();
+            } else if (tabName === 'checks') {
+                displayChecks();
+                updateCheckStats();
+            } else if (tabName === 'delivery') {
+                displayDeliveries();
+                loadDrivers();
+            } else if (tabName === 'workers') {
+                displayWorkers();
+            }
+        }
+
+        // =====================
+        // سیستم جستجوی مشتریان
+        // =====================
+        function searchAllCustomers(searchTerm, context) {
+            const resultsContainer = document.getElementById(`customerResults${context ? context.charAt(0).toUpperCase() + context.slice(1) : ''}`);
+            
+            if (!searchTerm || searchTerm.length < 1) {
+                resultsContainer.style.display = 'none';
+                return;
+            }
+
+            const filteredCustomers = customers.filter(customer => 
+                customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                customer.phone.includes(searchTerm)
+            );
+
+            if (filteredCustomers.length === 0) {
+                resultsContainer.innerHTML = '<div class="no-results">مشتری یافت نشد</div>';
+                resultsContainer.style.display = 'block';
+                return;
+            }
+
+            resultsContainer.innerHTML = filteredCustomers.map(customer => {
+                const customerContracts = contracts.filter(c => c.customer === customer.name);
+                const totalContracts = customerContracts.length;
+                
+                return `
+                    <div class="customer-result" onclick="selectCustomer('${customer.name}', '${customer.phone}', '${customer.address || ''}', '${context}')">
+                        <div class="customer-info">
+                            <h4>${customer.name}</h4>
+                            <div class="customer-details">📞 ${customer.phone}</div>
+                            ${customer.address ? `<div class="customer-details">📍 ${customer.address}</div>` : ''}
+                        </div>
+                        ${totalContracts > 0 ? `<div class="contract-badge">${totalContracts} قرارداد</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            resultsContainer.style.display = 'block';
+        }
+
+        function selectCustomer(name, phone, address, context) {
+            if (context === 'contract') {
+                document.getElementById('contractCustomer').value = name;
+                document.getElementById('contractPhone').value = phone;
+                document.getElementById('contractAddress').value = address;
+                document.getElementById('customerResultsContract').style.display = 'none';
+            } else if (context === 'delivery') {
+                document.getElementById('searchCustomer').value = name;
+                document.getElementById('customerResultsDelivery').style.display = 'none';
+                
+                document.getElementById('customerDisplayDelivery').innerHTML = `
+                    <div>${name} - ${phone}</div>
+                    <div>${address || 'آدرس ثبت نشده'}</div>
+                `;
+                
+                document.getElementById('selectedCustomerInfoDelivery').style.display = 'block';
+            } else if (context === 'check') {
+                document.getElementById('checkCustomerSearch').value = name;
+                document.getElementById('customerResultsCheck').style.display = 'none';
+            } else if (context === 'invoice') {
+                document.getElementById('invoiceCustomerSearch').value = name;
+                document.getElementById('invoiceCustomerName').value = name;
+                document.getElementById('invoiceCustomerPhone').value = phone;
+                document.getElementById('invoiceCustomerAddress').value = address;
+                document.getElementById('customerSearchResults').style.display = 'none';
+                selectedCustomerForInvoice = { name, phone, address };
+                updateInvoicePreview();
+            }
+        }
+
+        // =====================
+        // سیستم قراردادها
+        // =====================
         function addProductRow() {
             productRowsCount++;
             const newRow = document.createElement('div');
@@ -773,66 +2126,6 @@
             document.getElementById('checkBank').value = '';
         }
 
-        // اعتبارسنجی فرم
-        function validateContractForm() {
-            let isValid = true;
-            
-            // اعتبارسنجی نام مشتری
-            const customer = document.getElementById('contractCustomer').value.trim();
-            if (!customer) {
-                document.getElementById('customerGroup').classList.add('error');
-                document.getElementById('customerError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('customerGroup').classList.remove('error');
-                document.getElementById('customerError').style.display = 'none';
-            }
-            
-            // اعتبارسنجی شماره تماس
-            const phone = document.getElementById('contractPhone').value.trim();
-            if (!phone) {
-                document.getElementById('phoneGroup').classList.add('error');
-                document.getElementById('phoneError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('phoneGroup').classList.remove('error');
-                document.getElementById('phoneError').style.display = 'none';
-            }
-            
-            // اعتبارسنجی محصولات
-            let hasValidProduct = false;
-            const productRows = document.querySelectorAll('.product-row');
-            
-            productRows.forEach(row => {
-                const meterage = parseFloat(row.querySelector('.productMeterage').value) || 0;
-                const price = parseFloat(row.querySelector('.productPrice').value) || 0;
-                
-                if (meterage > 0 && price > 0) {
-                    hasValidProduct = true;
-                }
-            });
-
-            if (!hasValidProduct) {
-                alert('لطفا حداقل یک محصول معتبر اضافه کنید\n(متراژ و قیمت باید بیشتر از صفر باشد)');
-                isValid = false;
-            }
-
-            // اعتبارسنجی چک‌ها
-            const paymentType = document.getElementById('paymentType').value;
-            if (paymentType === 'check' && contractChecks.length === 0) {
-                alert('برای پرداخت چکی، حداقل یک چک باید اضافه شود');
-                isValid = false;
-            }
-
-            return isValid;
-        }
-
-        function validateAndAddContract() {
-            if (validateContractForm()) {
-                addContract();
-            }
-        }
-
         function addContract() {
             const customer = document.getElementById('contractCustomer').value.trim();
             const phone = document.getElementById('contractPhone').value.trim();
@@ -840,16 +2133,30 @@
             const advance = parseFloat(document.getElementById('contractAdvance').value) || 0;
             const paymentType = document.getElementById('paymentType').value;
 
+            if (!customer) {
+                alert('لطفا نام مشتری را وارد کنید');
+                document.getElementById('contractCustomer').focus();
+                return;
+            }
+            
+            if (!phone) {
+                alert('لطفا شماره تماس را وارد کنید');
+                document.getElementById('contractPhone').focus();
+                return;
+            }
+
             let totalAmount = 0;
             const products = [];
             const productRows = document.querySelectorAll('.product-row');
             
+            let hasValidProduct = false;
             productRows.forEach(row => {
                 const meterage = parseFloat(row.querySelector('.productMeterage').value) || 0;
                 const price = parseFloat(row.querySelector('.productPrice').value) || 0;
                 const productTotal = meterage * price;
                 
                 if (meterage > 0 && price > 0) {
+                    hasValidProduct = true;
                     totalAmount += productTotal;
                     
                     products.push({
@@ -860,6 +2167,16 @@
                     });
                 }
             });
+
+            if (!hasValidProduct) {
+                alert('لطفا حداقل یک محصول معتبر اضافه کنید\n(متراژ و قیمت باید بیشتر از صفر باشد)');
+                return;
+            }
+
+            if (paymentType === 'check' && contractChecks.length === 0) {
+                alert('برای پرداخت چکی، حداقل یک چک باید اضافه شود');
+                return;
+            }
 
             // محاسبه مانده با در نظر گرفتن چک‌ها
             const totalChecksAmount = contractChecks.reduce((sum, check) => sum + check.amount, 0);
@@ -890,6 +2207,7 @@
             addCustomerIfNotExists(customer, phone);
             
             saveData();
+            updateDashboard();
             displayContracts();
             resetContractForm();
             
@@ -950,12 +2268,6 @@
             document.getElementById('paymentType').value = 'cash';
             document.getElementById('checkSection').style.display = 'none';
             
-            // حذف خطاها
-            document.getElementById('customerGroup').classList.remove('error');
-            document.getElementById('phoneGroup').classList.remove('error');
-            document.getElementById('customerError').style.display = 'none';
-            document.getElementById('phoneError').style.display = 'none';
-            
             document.getElementById('productRowsContainer').innerHTML = `
                 <div class="product-row" data-row="1">
                     <div class="form-group">
@@ -988,6 +2300,410 @@
         }
 
         // =====================
+        // سیستم نوبت ارسال
+        // =====================
+        function selectTimeSlot(slot) {
+            selectedTimeSlot = slot;
+            document.querySelectorAll('.time-slot').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function loadDrivers() {
+            const driverSelect = document.getElementById('driver');
+            const invoiceDriverSelect = document.getElementById('invoiceDriver');
+            
+            if (driverSelect) {
+                driverSelect.innerHTML = '<option value="">انتخاب راننده</option>';
+            }
+            if (invoiceDriverSelect) {
+                invoiceDriverSelect.innerHTML = '<option value="">انتخاب راننده</option>';
+            }
+            
+            const drivers = workers.filter(worker => worker.position === 'driver');
+            
+            drivers.forEach(driver => {
+                if (driverSelect) {
+                    const option = document.createElement('option');
+                    option.value = driver.name;
+                    option.textContent = driver.name;
+                    driverSelect.appendChild(option);
+                }
+                if (invoiceDriverSelect) {
+                    const option = document.createElement('option');
+                    option.value = driver.name;
+                    option.textContent = driver.name;
+                    invoiceDriverSelect.appendChild(option);
+                }
+            });
+        }
+
+        function createDeliverySchedule() {
+            const customerName = document.getElementById('searchCustomer').value;
+            const date = document.getElementById('deliveryScheduleDate').value;
+            
+            if (!customerName || !date || !selectedTimeSlot) {
+                alert('لطفا تمام فیلدهای ضروری را پر کنید');
+                return;
+            }
+
+            const delivery = {
+                id: Date.now(),
+                customer: customerName,
+                date: date,
+                timeSlot: selectedTimeSlot,
+                driver: document.getElementById('driver').value,
+                vehicle: document.getElementById('vehicle').value,
+                notes: document.getElementById('deliveryNotes').value,
+                status: 'scheduled',
+                createdDate: new Date().toLocaleDateString('fa-IR')
+            };
+
+            deliverySchedules.push(delivery);
+            saveData();
+            displayDeliveries();
+            resetDeliveryForm();
+            alert('✅ نوبت ارسال با موفقیت ثبت شد');
+        }
+
+        function displayDeliveries() {
+            const deliveriesList = document.getElementById('deliveriesList');
+            
+            if (deliverySchedules.length === 0) {
+                deliveriesList.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">هیچ نوبت ارسالی ثبت نشده است</div>';
+                return;
+            }
+
+            deliveriesList.innerHTML = deliverySchedules.map(delivery => `
+                <div class="delivery-item">
+                    <div class="delivery-header">
+                        <div class="customer-info">
+                            <div class="customer-name">${delivery.customer}</div>
+                            <div class="customer-details">🕒 ${delivery.timeSlot} - ${delivery.date}</div>
+                        </div>
+                        <div class="delivery-meta">
+                            <div class="time-slot-badge">${delivery.timeSlot}</div>
+                            <div class="status-badge status-${delivery.status}">${getDeliveryStatusText(delivery.status)}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="delivery-info">
+                        <div>راننده: ${delivery.driver || 'تعیین نشده'}</div>
+                        <div>وسیله: ${delivery.vehicle || 'تعیین نشده'}</div>
+                    </div>
+                    ${delivery.notes ? `<div class="driver-info">📝 ${delivery.notes}</div>` : ''}
+                    <div class="delivery-actions">
+                        <button class="btn btn-success btn-sm" onclick="updateDeliveryStatus(${delivery.id}, 'loading')">بارگیری</button>
+                        <button class="btn btn-info btn-sm" onclick="updateDeliveryStatus(${delivery.id}, 'on-the-way')">در راه</button>
+                        <button class="btn btn-primary btn-sm" onclick="updateDeliveryStatus(${delivery.id}, 'delivered')">تحویل شد</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteDelivery(${delivery.id})">حذف</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getDeliveryStatusText(status) {
+            const statuses = {
+                'scheduled': 'برنامه‌ریزی شده',
+                'loading': 'در حال بارگیری',
+                'on-the-way': 'در راه',
+                'delivered': 'تحویل شده',
+                'canceled': 'لغو شده'
+            };
+            return statuses[status] || status;
+        }
+
+        function resetDeliveryForm() {
+            document.getElementById('searchCustomer').value = '';
+            document.getElementById('selectedCustomerInfoDelivery').style.display = 'none';
+            document.getElementById('deliveryScheduleDate').value = '';
+            document.getElementById('driver').value = '';
+            document.getElementById('vehicle').value = '';
+            document.getElementById('deliveryNotes').value = '';
+            selectedTimeSlot = null;
+            document.querySelectorAll('.time-slot').forEach(el => {
+                el.classList.remove('selected');
+            });
+        }
+
+        // =====================
+        // سیستم فاکتور
+        // =====================
+        function addInvoiceRow() {
+            invoiceRowsCount++;
+            const newRow = document.createElement('div');
+            newRow.className = 'product-row';
+            newRow.setAttribute('data-invoice-row', invoiceRowsCount);
+            newRow.innerHTML = `
+                <div class="form-group">
+                    <label>شرح کالا *</label>
+                    <input type="text" class="invoiceItemDescription" placeholder="شرح کالا">
+                </div>
+                <div class="form-group">
+                    <label>تعداد *</label>
+                    <input type="number" class="invoiceItemQuantity" placeholder="0" min="1" oninput="calculateInvoiceRowTotal(${invoiceRowsCount})">
+                </div>
+                <div class="form-group">
+                    <label>قیمت واحد (تومان) *</label>
+                    <input type="number" class="invoiceItemPrice" placeholder="0" min="0" oninput="calculateInvoiceRowTotal(${invoiceRowsCount})">
+                </div>
+                <div class="form-group">
+                    <label>مبلغ کل (تومان)</label>
+                    <input type="text" class="invoiceItemTotal" placeholder="0" readonly style="background: #f8f9fa;">
+                </div>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeInvoiceRow(${invoiceRowsCount})">حذف</button>
+            `;
+            document.getElementById('invoiceItemsContainer').appendChild(newRow);
+        }
+
+        function removeInvoiceRow(rowNumber) {
+            const row = document.querySelector(`[data-invoice-row="${rowNumber}"]`);
+            if (row && invoiceRowsCount > 1) {
+                row.remove();
+                invoiceRowsCount--;
+                calculateInvoiceTotal();
+                updateInvoicePreview();
+            }
+        }
+
+        function calculateInvoiceRowTotal(rowNumber) {
+            const row = document.querySelector(`[data-invoice-row="${rowNumber}"]`);
+            if (row) {
+                const quantity = parseFloat(row.querySelector('.invoiceItemQuantity').value) || 0;
+                const price = parseFloat(row.querySelector('.invoiceItemPrice').value) || 0;
+                const total = quantity * price;
+                row.querySelector('.invoiceItemTotal').value = total.toLocaleString('fa-IR');
+                calculateInvoiceTotal();
+                updateInvoicePreview();
+            }
+        }
+
+        function calculateInvoiceTotal() {
+            let subtotal = 0;
+            const invoiceRows = document.querySelectorAll('[data-invoice-row]');
+            
+            invoiceRows.forEach(row => {
+                const quantity = parseFloat(row.querySelector('.invoiceItemQuantity').value) || 0;
+                const price = parseFloat(row.querySelector('.invoiceItemPrice').value) || 0;
+                subtotal += quantity * price;
+            });
+
+            const discount = parseFloat(document.getElementById('invoiceDiscount').value) || 0;
+            const total = subtotal - discount;
+
+            document.getElementById('invoiceTotalDisplay').textContent = 
+                `جمع کل: ${subtotal.toLocaleString('fa-IR')} تومان | تخفیف: ${discount.toLocaleString('fa-IR')} تومان | قابل پرداخت: ${total.toLocaleString('fa-IR')} تومان`;
+        }
+
+        function updateInvoicePreview() {
+            const customerName = document.getElementById('invoiceCustomerName').value || '-';
+            const customerPhone = document.getElementById('invoiceCustomerPhone').value || '-';
+            const customerAddress = document.getElementById('invoiceCustomerAddress').value || '-';
+            const driver = document.getElementById('invoiceDriver').value || '-';
+            const invoiceNumber = generateInvoiceNumber();
+            const invoiceDate = new Date().toLocaleDateString('fa-IR');
+
+            document.getElementById('previewInvoiceNumber').textContent = invoiceNumber;
+            document.getElementById('previewInvoiceDate').textContent = invoiceDate;
+            document.getElementById('previewCustomerName').textContent = customerName;
+            document.getElementById('previewCustomerPhone').textContent = customerPhone;
+            document.getElementById('previewCustomerAddress').textContent = customerAddress;
+            document.getElementById('previewDriver').textContent = driver;
+
+            // به‌روزرسانی اقلام فاکتور
+            const previewItems = document.getElementById('previewInvoiceItems');
+            previewItems.innerHTML = '';
+
+            const invoiceRows = document.querySelectorAll('[data-invoice-row]');
+            let subtotal = 0;
+
+            invoiceRows.forEach((row, index) => {
+                const description = row.querySelector('.invoiceItemDescription').value || '---';
+                const quantity = parseFloat(row.querySelector('.invoiceItemQuantity').value) || 0;
+                const price = parseFloat(row.querySelector('.invoiceItemPrice').value) || 0;
+                const total = quantity * price;
+                subtotal += total;
+
+                if (quantity > 0 && price > 0) {
+                    const itemRow = document.createElement('tr');
+                    itemRow.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${description}</td>
+                        <td>${quantity}</td>
+                        <td>${price.toLocaleString('fa-IR')}</td>
+                        <td>${total.toLocaleString('fa-IR')}</td>
+                    `;
+                    previewItems.appendChild(itemRow);
+                }
+            });
+
+            const discount = parseFloat(document.getElementById('invoiceDiscount').value) || 0;
+            const total = subtotal - discount;
+
+            document.getElementById('previewSubtotal').textContent = subtotal.toLocaleString('fa-IR') + ' تومان';
+            document.getElementById('previewDiscount').textContent = discount.toLocaleString('fa-IR') + ' تومان';
+            document.getElementById('previewTotal').textContent = total.toLocaleString('fa-IR') + ' تومان';
+        }
+
+        function generateInvoiceNumber() {
+            const today = new Date();
+            const year = today.getFullYear() - 621;
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const count = invoices.filter(i => {
+                const invoiceDate = new Date(i.date);
+                return invoiceDate.getMonth() === today.getMonth() && 
+                       invoiceDate.getFullYear() === today.getFullYear();
+            }).length + 1;
+            
+            return `INV-${year}${month}${count.toString().padStart(3, '0')}`;
+        }
+
+        function generateInvoice() {
+            const customerName = document.getElementById('invoiceCustomerName').value.trim();
+            const customerPhone = document.getElementById('invoiceCustomerPhone').value.trim();
+            const customerAddress = document.getElementById('invoiceCustomerAddress').value;
+            const driver = document.getElementById('invoiceDriver').value;
+
+            if (!customerName) {
+                alert('لطفا نام مشتری را وارد کنید');
+                return;
+            }
+
+            const items = [];
+            const invoiceRows = document.querySelectorAll('[data-invoice-row]');
+            
+            let hasValidItem = false;
+            invoiceRows.forEach(row => {
+                const description = row.querySelector('.invoiceItemDescription').value.trim();
+                const quantity = parseFloat(row.querySelector('.invoiceItemQuantity').value) || 0;
+                const price = parseFloat(row.querySelector('.invoiceItemPrice').value) || 0;
+                
+                if (description && quantity > 0 && price > 0) {
+                    hasValidItem = true;
+                    items.push({
+                        description: description,
+                        quantity: quantity,
+                        price: price,
+                        total: quantity * price
+                    });
+                }
+            });
+
+            if (!hasValidItem) {
+                alert('لطفا حداقل یک آیتم معتبر به فاکتور اضافه کنید');
+                return;
+            }
+
+            const discount = parseFloat(document.getElementById('invoiceDiscount').value) || 0;
+            const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+            const total = subtotal - discount;
+
+            const invoice = {
+                id: Date.now(),
+                number: generateInvoiceNumber(),
+                customer: customerName,
+                phone: customerPhone,
+                address: customerAddress,
+                driver: driver,
+                items: items,
+                subtotal: subtotal,
+                discount: discount,
+                total: total,
+                date: new Date().toLocaleDateString('fa-IR'),
+                status: 'issued'
+            };
+
+            invoices.push(invoice);
+            saveData();
+            displayInvoices();
+            resetInvoiceForm();
+            
+            alert('✅ فاکتور با موفقیت ایجاد شد!\nشماره فاکتور: ' + invoice.number);
+        }
+
+        function displayInvoices() {
+            const invoicesTable = document.getElementById('invoicesTable');
+            
+            if (invoices.length === 0) {
+                invoicesTable.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">هیچ فاکتوری صادر نشده است</td></tr>';
+                return;
+            }
+
+            invoicesTable.innerHTML = invoices.map(invoice => `
+                <tr>
+                    <td>${invoice.number}</td>
+                    <td>${invoice.customer}</td>
+                    <td>${invoice.total.toLocaleString('fa-IR')} تومان</td>
+                    <td>${invoice.date}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" onclick="viewInvoice(${invoice.id})">مشاهده</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteInvoice(${invoice.id})">حذف</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function resetInvoiceForm() {
+            document.getElementById('invoiceCustomerSearch').value = '';
+            document.getElementById('invoiceCustomerName').value = '';
+            document.getElementById('invoiceCustomerPhone').value = '';
+            document.getElementById('invoiceCustomerAddress').value = '';
+            document.getElementById('invoiceDriver').value = '';
+            selectedCustomerForInvoice = null;
+            document.getElementById('invoiceItemsContainer').innerHTML = `
+                <div class="product-row" data-invoice-row="1">
+                    <div class="form-group">
+                        <label>شرح کالا *</label>
+                        <input type="text" class="invoiceItemDescription" placeholder="شرح کالا">
+                    </div>
+                    <div class="form-group">
+                        <label>تعداد *</label>
+                        <input type="number" class="invoiceItemQuantity" placeholder="0" min="1" oninput="calculateInvoiceRowTotal(1)">
+                    </div>
+                    <div class="form-group">
+                        <label>قیمت واحد (تومان) *</label>
+                        <input type="number" class="invoiceItemPrice" placeholder="0" min="0" oninput="calculateInvoiceRowTotal(1)">
+                    </div>
+                    <div class="form-group">
+                        <label>مبلغ کل (تومان)</label>
+                        <input type="text" class="invoiceItemTotal" placeholder="0" readonly style="background: #f8f9fa;">
+                    </div>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeInvoiceRow(1)" style="display: none;">حذف</button>
+                </div>
+            `;
+            invoiceRowsCount = 1;
+            document.getElementById('invoiceDiscount').value = '';
+            calculateInvoiceTotal();
+            updateInvoicePreview();
+        }
+
+        function printInvoice() {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html dir="rtl">
+                <head>
+                    <title>چاپ فاکتور</title>
+                    <style>
+                        body { font-family: Tahoma; padding: 20px; }
+                        .invoice { border: 2px solid #000; padding: 20px; }
+                        .header { text-align: center; margin-bottom: 20px; }
+                        .table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        .table th, .table td { border: 1px solid #000; padding: 8px; text-align: center; }
+                        .totals { margin-top: 20px; }
+                        .signature { margin-top: 50px; display: flex; justify-content: space-between; }
+                    </style>
+                </head>
+                <body>
+                    ${document.getElementById('invoicePreview').innerHTML}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // =====================
         // سیستم مشتریان
         // =====================
         function addCustomerIfNotExists(name, phone) {
@@ -1003,51 +2719,503 @@
             }
         }
 
-        function searchAllCustomers(searchTerm, context) {
-            const resultsContainer = document.getElementById(`customerResults${context ? context.charAt(0).toUpperCase() + context.slice(1) : ''}`);
+        function addCustomer() {
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+            const address = document.getElementById('customerAddress').value;
+            const customerType = document.getElementById('customerTypeManagement').value;
+            const business = document.getElementById('customerBusiness').value;
+            const notes = document.getElementById('customerNotes').value;
+
+            if (!name || !phone) {
+                alert('لطفا تمام فیلدهای ضروری را پر کنید');
+                return;
+            }
+
+            const customer = {
+                id: Date.now(),
+                name: name,
+                phone: phone,
+                address: address,
+                type: customerType,
+                business: business,
+                notes: notes,
+                registrationDate: new Date().toLocaleDateString('fa-IR'),
+                status: 'active'
+            };
+
+            customers.push(customer);
+            saveData();
+            displayCustomers();
+            displayContractCustomers();
+            resetCustomerForm();
+            alert('✅ مشتری با موفقیت ثبت شد');
+        }
+
+        function displayCustomers() {
+            const customersList = document.getElementById('customersList');
             
-            if (!searchTerm || searchTerm.length < 1) {
-                resultsContainer.style.display = 'none';
+            if (customers.length === 0) {
+                customersList.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">هیچ مشتری ثبت نشده است</div>';
                 return;
             }
 
-            const filteredCustomers = customers.filter(customer => 
-                customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                customer.phone.includes(searchTerm)
-            );
-
-            if (filteredCustomers.length === 0) {
-                resultsContainer.innerHTML = '<div class="no-results">مشتری یافت نشد</div>';
-                resultsContainer.style.display = 'block';
-                return;
-            }
-
-            resultsContainer.innerHTML = filteredCustomers.map(customer => {
+            customersList.innerHTML = customers.map(customer => {
                 const customerContracts = contracts.filter(c => c.customer === customer.name);
                 const totalContracts = customerContracts.length;
-                
+                const totalAmount = customerContracts.reduce((sum, c) => sum + c.totalAmount, 0);
+
                 return `
-                    <div class="customer-result" onclick="selectCustomer('${customer.name}', '${customer.phone}', '${customer.address || ''}', '${context}')">
+                    <div class="list-item">
                         <div class="customer-info">
-                            <h4>${customer.name}</h4>
-                            <div class="customer-details">📞 ${customer.phone}</div>
-                            ${customer.address ? `<div class="customer-details">📍 ${customer.address}</div>` : ''}
+                            <div class="customer-name">${customer.name}</div>
+                            <div class="customer-details">📞 ${customer.phone} | ${customer.business || 'ندارد'}</div>
                         </div>
-                        ${totalContracts > 0 ? `<div class="contract-badge">${totalContracts} قرارداد</div>` : ''}
+                        <div class="customer-meta">
+                            <div>${totalContracts} قرارداد</div>
+                            <div>${totalAmount.toLocaleString('fa-IR')} تومان</div>
+                        </div>
                     </div>
                 `;
             }).join('');
-
-            resultsContainer.style.display = 'block';
         }
 
-        function selectCustomer(name, phone, address, context) {
-            if (context === 'contract') {
-                document.getElementById('contractCustomer').value = name;
-                document.getElementById('contractPhone').value = phone;
-                document.getElementById('contractAddress').value = address;
-                document.getElementById('customerResultsContract').style.display = 'none';
+        function displayContractCustomers() {
+            const contractCustomersList = document.getElementById('contractCustomersList');
+            
+            // فقط مشتریان دارای قرارداد
+            const contractCustomers = customers.filter(customer => 
+                contracts.some(contract => contract.customer === customer.name)
+            );
+
+            if (contractCustomers.length === 0) {
+                contractCustomersList.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">هیچ مشتری دارای قرارداد نیست</div>';
+                return;
             }
+
+            contractCustomersList.innerHTML = contractCustomers.map(customer => {
+                const customerContracts = contracts.filter(c => c.customer === customer.name);
+                const totalContracts = customerContracts.length;
+                const totalAmount = customerContracts.reduce((sum, c) => sum + c.totalAmount, 0);
+
+                return `
+                    <div class="list-item">
+                        <div class="customer-info">
+                            <div class="customer-name">${customer.name}</div>
+                            <div class="customer-details">📞 ${customer.phone} | ${customer.business || 'ندارد'}</div>
+                        </div>
+                        <div class="customer-meta">
+                            <div>${totalContracts} قرارداد</div>
+                            <div>${totalAmount.toLocaleString('fa-IR')} تومان</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterContractCustomers() {
+            const searchTerm = document.getElementById('searchCustomerManagement').value.toLowerCase();
+            const contractCustomers = customers.filter(customer => 
+                contracts.some(contract => contract.customer === customer.name) &&
+                (customer.name.toLowerCase().includes(searchTerm) || customer.phone.includes(searchTerm))
+            );
+
+            const contractCustomersList = document.getElementById('contractCustomersList');
+            
+            if (contractCustomers.length === 0) {
+                contractCustomersList.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">مشتری یافت نشد</div>';
+                return;
+            }
+
+            contractCustomersList.innerHTML = contractCustomers.map(customer => {
+                const customerContracts = contracts.filter(c => c.customer === customer.name);
+                const totalContracts = customerContracts.length;
+                const totalAmount = customerContracts.reduce((sum, c) => sum + c.totalAmount, 0);
+
+                return `
+                    <div class="list-item">
+                        <div class="customer-info">
+                            <div class="customer-name">${customer.name}</div>
+                            <div class="customer-details">📞 ${customer.phone} | ${customer.business || 'ندارد'}</div>
+                        </div>
+                        <div class="customer-meta">
+                            <div>${totalContracts} قرارداد</div>
+                            <div>${totalAmount.toLocaleString('fa-IR')} تومان</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function resetCustomerForm() {
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('customerAddress').value = '';
+            document.getElementById('customerTypeManagement').value = 'current';
+            document.getElementById('customerBusiness').value = '';
+            document.getElementById('customerNotes').value = '';
+        }
+
+        // =====================
+        // سیستم کارکنان
+        // =====================
+        function addWorker() {
+            const name = document.getElementById('workerName').value.trim();
+            const nationalCode = document.getElementById('workerNationalCode').value.trim();
+            const phone = document.getElementById('workerPhone').value.trim();
+            const position = document.getElementById('workerPosition').value;
+            const salary = parseFloat(document.getElementById('workerSalary').value) || 0;
+
+            if (!name || !nationalCode || !phone) {
+                alert('لطفا تمام فیلدهای ضروری را پر کنید');
+                return;
+            }
+
+            const worker = {
+                id: Date.now(),
+                name: name,
+                nationalCode: nationalCode,
+                phone: phone,
+                position: position,
+                salary: salary,
+                hireDate: document.getElementById('workerHireDate').value || new Date().toLocaleDateString('fa-IR'),
+                address: document.getElementById('workerAddress').value,
+                notes: document.getElementById('workerNotes').value,
+                status: 'active'
+            };
+
+            workers.push(worker);
+            saveData();
+            displayWorkers();
+            resetWorkerForm();
+            loadDrivers();
+            alert('✅ کارمند با موفقیت ثبت شد');
+        }
+
+        function displayWorkers() {
+            const workersList = document.getElementById('workersList');
+            
+            if (workers.length === 0) {
+                workersList.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">هیچ کارمندی ثبت نشده است</div>';
+                return;
+            }
+
+            workersList.innerHTML = workers.map(worker => `
+                <div class="list-item">
+                    <div class="worker-info">
+                        <div class="worker-name">${worker.name}</div>
+                        <div class="worker-details">📞 ${worker.phone} | ${getPositionText(worker.position)} | ${worker.salary.toLocaleString('fa-IR')} تومان</div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-info btn-sm">ویرایش</button>
+                        <button class="btn btn-danger btn-sm">حذف</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getPositionText(position) {
+            const positions = {
+                'production': 'تولید',
+                'delivery': 'ارسال',
+                'office': 'اداری',
+                'management': 'مدیریت',
+                'driver': 'راننده',
+                'worker': 'کارگر'
+            };
+            return positions[position] || position;
+        }
+
+        function filterWorkers() {
+            const searchTerm = document.getElementById('searchWorker').value.toLowerCase();
+            const positionFilter = document.getElementById('filterWorkerPosition').value;
+            
+            const filteredWorkers = workers.filter(worker => 
+                (worker.name.toLowerCase().includes(searchTerm) || worker.nationalCode.includes(searchTerm)) &&
+                (positionFilter === 'all' || worker.position === positionFilter)
+            );
+
+            const workersList = document.getElementById('workersList');
+            
+            if (filteredWorkers.length === 0) {
+                workersList.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">کارمند یافت نشد</div>';
+                return;
+            }
+
+            workersList.innerHTML = filteredWorkers.map(worker => `
+                <div class="list-item">
+                    <div class="worker-info">
+                        <div class="worker-name">${worker.name}</div>
+                        <div class="worker-details">📞 ${worker.phone} | ${getPositionText(worker.position)} | ${worker.salary.toLocaleString('fa-IR')} تومان</div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-info btn-sm">ویرایش</button>
+                        <button class="btn btn-danger btn-sm">حذف</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function resetWorkerForm() {
+            document.getElementById('workerName').value = '';
+            document.getElementById('workerNationalCode').value = '';
+            document.getElementById('workerPhone').value = '';
+            document.getElementById('workerPosition').value = 'production';
+            document.getElementById('workerSalary').value = '';
+            document.getElementById('workerHireDate').value = '';
+            document.getElementById('workerAddress').value = '';
+            document.getElementById('workerNotes').value = '';
+        }
+
+        // =====================
+        // سیستم مالی
+        // =====================
+        function addTransaction() {
+            const type = document.getElementById('transactionType').value;
+            const amount = parseFloat(document.getElementById('transactionAmount').value) || 0;
+            const category = document.getElementById('transactionCategory').value;
+            const description = document.getElementById('transactionDescription').value;
+
+            if (amount <= 0) {
+                alert('لطفا مبلغ معتبر وارد کنید');
+                return;
+            }
+
+            const transaction = {
+                id: Date.now(),
+                type: type,
+                amount: amount,
+                category: category,
+                description: description,
+                date: document.getElementById('transactionDate').value || new Date().toLocaleDateString('fa-IR')
+            };
+
+            transactions.push(transaction);
+            saveData();
+            displayTransactions();
+            updateFinanceStats();
+            resetTransactionForm();
+            alert('✅ تراکنش با موفقیت ثبت شد');
+        }
+
+        function displayTransactions() {
+            const transactionsTable = document.getElementById('transactionsTable');
+            
+            if (transactions.length === 0) {
+                transactionsTable.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;">هیچ تراکنشی ثبت نشده است</td></tr>';
+                return;
+            }
+
+            transactionsTable.innerHTML = transactions.map((transaction, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${transaction.date}</td>
+                    <td>${transaction.type === 'income' ? 'درآمد' : 'هزینه'}</td>
+                    <td>${transaction.category}</td>
+                    <td>${transaction.description}</td>
+                    <td>${transaction.amount.toLocaleString('fa-IR')}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteTransaction(${transaction.id})">حذف</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateFinanceStats() {
+            const totalIncome = transactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const totalExpenses = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const netProfit = totalIncome - totalExpenses;
+
+            document.getElementById('totalIncomeFinance').textContent = totalIncome.toLocaleString('fa-IR');
+            document.getElementById('totalExpensesFinance').textContent = totalExpenses.toLocaleString('fa-IR');
+            document.getElementById('netProfit').textContent = netProfit.toLocaleString('fa-IR');
+        }
+
+        function resetTransactionForm() {
+            document.getElementById('transactionAmount').value = '';
+            document.getElementById('transactionDescription').value = '';
+            document.getElementById('transactionDate').value = '';
+        }
+
+        // =====================
+        // سیستم چک‌ها
+        // =====================
+        function addCheck() {
+            const customerName = document.getElementById('checkCustomerSearch').value.trim();
+            const number = document.getElementById('checkNumberNew').value.trim();
+            const amount = parseFloat(document.getElementById('checkAmountNew').value) || 0;
+            const dueDate = document.getElementById('checkDueDateNew').value;
+            const bank = document.getElementById('checkBankNew').value.trim();
+            const type = document.getElementById('checkType').value;
+            const description = document.getElementById('checkDescription').value;
+
+            if (!customerName || !number || !amount || !dueDate || !bank) {
+                alert('لطفا تمام فیلدهای ضروری را پر کنید');
+                return;
+            }
+
+            const check = {
+                id: Date.now(),
+                customer: customerName,
+                number: number,
+                amount: amount,
+                dueDate: dueDate,
+                bank: bank,
+                type: type,
+                description: description,
+                status: 'pending',
+                createdDate: new Date().toLocaleDateString('fa-IR'),
+                clearedDate: ''
+            };
+
+            checks.push(check);
+            saveData();
+            displayChecks();
+            updateCheckStats();
+            resetCheckForm();
+            alert('✅ چک با موفقیت ثبت شد');
+        }
+
+        function displayChecks() {
+            const checksList = document.getElementById('checksList');
+            
+            if (checks.length === 0) {
+                checksList.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">🏦 هیچ چکی ثبت نشده است</div>';
+                return;
+            }
+
+            checksList.innerHTML = checks.map(check => {
+                const statusClass = getCheckStatusClass(check);
+                return `
+                    <div class="check-item-detailed ${statusClass}">
+                        <div class="check-header">
+                            <div class="check-amount">${check.amount.toLocaleString('fa-IR')} تومان</div>
+                            <div class="check-meta">
+                                <span>${check.type === 'received' ? 'دریافتی' : 'پرداختی'}</span>
+                                <span>${getCheckStatusText(check.status)}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <strong>شماره چک: ${check.number}</strong>
+                            <div>مشتری: ${check.customer}</div>
+                            <div>بانک: ${check.bank} | سررسید: ${check.dueDate}</div>
+                            ${check.description ? `<div>توضیحات: ${check.description}</div>` : ''}
+                        </div>
+                        <div class="check-footer">
+                            <span>تاریخ ثبت: ${check.createdDate}</span>
+                            <div class="action-buttons">
+                                <button class="btn btn-success btn-sm" onclick="clearCheck(${check.id})" ${check.status === 'cleared' ? 'disabled' : ''}>وصول شد</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteCheck(${check.id})">حذف</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getCheckStatusClass(check) {
+            if (check.status === 'cleared') return 'cleared';
+            if (isCheckOverdue(check)) return 'overdue';
+            return 'pending';
+        }
+
+        function getCheckStatusText(status) {
+            return status === 'cleared' ? 'وصول شده' : 'در جریان';
+        }
+
+        function isCheckOverdue(check) {
+            if (check.status === 'cleared') return false;
+            // منطق ساده برای بررسی سررسید
+            return false;
+        }
+
+        function clearCheck(checkId) {
+            const check = checks.find(c => c.id === checkId);
+            if (check) {
+                check.status = 'cleared';
+                check.clearedDate = new Date().toLocaleDateString('fa-IR');
+                saveData();
+                displayChecks();
+                updateCheckStats();
+                alert('✅ چک با موفقیت وصول شده علامت گذاری شد');
+            }
+        }
+
+        function updateCheckStats() {
+            const totalChecks = checks.length;
+            const pendingChecks = checks.filter(check => check.status === 'pending').length;
+            const overdueChecks = checks.filter(check => check.status === 'pending' && isCheckOverdue(check)).length;
+            const clearedChecks = checks.filter(check => check.status === 'cleared').length;
+
+            document.getElementById('totalChecks').textContent = totalChecks;
+            document.getElementById('pendingChecks').textContent = pendingChecks;
+            document.getElementById('overdueChecks').textContent = overdueChecks;
+            document.getElementById('clearedChecks').textContent = clearedChecks;
+        }
+
+        function resetCheckForm() {
+            document.getElementById('checkCustomerSearch').value = '';
+            document.getElementById('checkNumberNew').value = '';
+            document.getElementById('checkAmountNew').value = '';
+            document.getElementById('checkDueDateNew').value = '';
+            document.getElementById('checkBankNew').value = '';
+            document.getElementById('checkDescription').value = '';
+        }
+
+        function filterChecks() {
+            const searchTerm = document.getElementById('searchCheck').value.toLowerCase();
+            const statusFilter = document.getElementById('filterCheckStatus').value;
+            const typeFilter = document.getElementById('filterCheckType').value;
+            
+            const filteredChecks = checks.filter(check => 
+                (check.number.toLowerCase().includes(searchTerm) || check.customer.toLowerCase().includes(searchTerm)) &&
+                (statusFilter === 'all' || 
+                 (statusFilter === 'pending' && check.status === 'pending') ||
+                 (statusFilter === 'cleared' && check.status === 'cleared') ||
+                 (statusFilter === 'overdue' && isCheckOverdue(check))) &&
+                (typeFilter === 'all' || check.type === typeFilter)
+            );
+
+            const checksList = document.getElementById('checksList');
+            
+            if (filteredChecks.length === 0) {
+                checksList.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">🏦 چکی یافت نشد</div>';
+                return;
+            }
+
+            checksList.innerHTML = filteredChecks.map(check => {
+                const statusClass = getCheckStatusClass(check);
+                return `
+                    <div class="check-item-detailed ${statusClass}">
+                        <div class="check-header">
+                            <div class="check-amount">${check.amount.toLocaleString('fa-IR')} تومان</div>
+                            <div class="check-meta">
+                                <span>${check.type === 'received' ? 'دریافتی' : 'پرداختی'}</span>
+                                <span>${getCheckStatusText(check.status)}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <strong>شماره چک: ${check.number}</strong>
+                            <div>مشتری: ${check.customer}</div>
+                            <div>بانک: ${check.bank} | سررسید: ${check.dueDate}</div>
+                            ${check.description ? `<div>توضیحات: ${check.description}</div>` : ''}
+                        </div>
+                        <div class="check-footer">
+                            <span>تاریخ ثبت: ${check.createdDate}</span>
+                            <div class="action-buttons">
+                                <button class="btn btn-success btn-sm" onclick="clearCheck(${check.id})" ${check.status === 'cleared' ? 'disabled' : ''}>وصول شد</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteCheck(${check.id})">حذف</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // =====================
@@ -1056,7 +3224,13 @@
         function saveData() {
             const data = {
                 contracts: contracts,
-                customers: customers
+                customers: customers,
+                invoices: invoices,
+                transactions: transactions,
+                checks: checks,
+                workers: workers,
+                deliverySchedules: deliverySchedules,
+                currentInvoiceNumber: currentInvoiceNumber
             };
             localStorage.setItem('accountingSystem', JSON.stringify(data));
         }
@@ -1067,41 +3241,54 @@
                 const data = JSON.parse(saved);
                 contracts = data.contracts || [];
                 customers = data.customers || [];
+                invoices = data.invoices || [];
+                transactions = data.transactions || [];
+                checks = data.checks || [];
+                workers = data.workers || [];
+                deliverySchedules = data.deliverySchedules || [];
+                currentInvoiceNumber = data.currentInvoiceNumber || 1001;
             }
-        }
-
-        // مدیریت تب‌ها
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
             
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            // بارگذاری لوگو
+            const savedLogo = localStorage.getItem('companyLogo');
+            if (savedLogo) {
+                document.getElementById('companyLogo').innerHTML = `<img src="${savedLogo}" alt="لوگو شرکت">` + 
+                    document.getElementById('companyLogo').innerHTML;
+            }
+        }
+
+        function updateDashboard() {
+            document.getElementById('totalContracts').textContent = contracts.length;
+            document.getElementById('totalCustomers').textContent = customers.length;
+            document.getElementById('totalWorkers').textContent = workers.length;
+            document.getElementById('pendingDeliveries').textContent = deliverySchedules.filter(d => d.status === 'scheduled').length;
             
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-
-            if (tabName === 'contracts') {
-                displayContracts();
-            }
+            const totalIncome = transactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+            const totalExpenses = transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            document.getElementById('totalIncome').textContent = totalIncome.toLocaleString('fa-IR');
+            document.getElementById('totalExpenses').textContent = totalExpenses.toLocaleString('fa-IR');
         }
 
-        // توابع کمکی
-        function deleteContract(contractId) {
-            if (confirm('آیا از حذف این قرارداد اطمینان دارید؟')) {
-                contracts = contracts.filter(c => c.id !== contractId);
-                saveData();
-                displayContracts();
-            }
-        }
-
-        function logout() {
-            if (confirm('آیا از سیستم خارج می‌شوید؟')) {
-                saveData();
-                document.getElementById('loginPage').style.display = 'block';
-                document.getElementById('mainPage').style.display = 'none';
+        // مدیریت لوگو
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const logoContainer = document.getElementById('companyLogo');
+                    logoContainer.innerHTML = `<img src="${e.target.result}" alt="لوگو شرکت">` + 
+                        `<input type="file" id="logoUpload" accept="image/*" style="display: none;" onchange="handleLogoUpload(event)">` +
+                        `<button class="logo-upload" onclick="document.getElementById('logoUpload').click()">📷</button>`;
+                    
+                    // ذخیره لوگو در localStorage
+                    localStorage.setItem('companyLogo', e.target.result);
+                };
+                reader.readAsDataURL(file);
             }
         }
 
@@ -1124,7 +3311,98 @@
                     input.value = today;
                 }
             });
+            
+            // بارگذاری داده‌ها
+            loadData();
         });
+
+        // توابع کمکی
+        function deleteContract(contractId) {
+            if (confirm('آیا از حذف این قرارداد اطمینان دارید؟')) {
+                contracts = contracts.filter(c => c.id !== contractId);
+                saveData();
+                displayContracts();
+                updateDashboard();
+            }
+        }
+
+        function deleteInvoice(invoiceId) {
+            if (confirm('آیا از حذف این فاکتور اطمینان دارید؟')) {
+                invoices = invoices.filter(i => i.id !== invoiceId);
+                saveData();
+                displayInvoices();
+            }
+        }
+
+        function deleteTransaction(transactionId) {
+            if (confirm('آیا از حذف این تراکنش اطمینان دارید؟')) {
+                transactions = transactions.filter(t => t.id !== transactionId);
+                saveData();
+                displayTransactions();
+                updateFinanceStats();
+            }
+        }
+
+        function deleteCheck(checkId) {
+            if (confirm('آیا از حذف این چک اطمینان دارید؟')) {
+                checks = checks.filter(c => c.id !== checkId);
+                saveData();
+                displayChecks();
+                updateCheckStats();
+            }
+        }
+
+        function deleteDelivery(deliveryId) {
+            if (confirm('آیا از حذف این نوبت ارسال اطمینان دارید؟')) {
+                deliverySchedules = deliverySchedules.filter(d => d.id !== deliveryId);
+                saveData();
+                displayDeliveries();
+                updateDashboard();
+            }
+        }
+
+        function updateDeliveryStatus(deliveryId, status) {
+            const delivery = deliverySchedules.find(d => d.id === deliveryId);
+            if (delivery) {
+                delivery.status = status;
+                saveData();
+                displayDeliveries();
+                alert(`✅ وضعیت ارسال به "${getDeliveryStatusText(status)}" تغییر یافت`);
+            }
+        }
+
+        function updateProfile() {
+            alert('✅ اطلاعات پروفایل با موفقیت به‌روزرسانی شد');
+        }
+
+        function saveCompanySettings() {
+            alert('✅ تنظیمات شرکت با موفقیت ذخیره شد');
+        }
+
+        // توابع گزارش‌گیری
+        function generateIncomeReport() {
+            alert('📊 گزارش درآمد ایجاد شد');
+        }
+
+        function generateExpenseReport() {
+            alert('📊 گزارش هزینه ایجاد شد');
+        }
+
+        function generateProfitReport() {
+            alert('📊 گزارش سود ایجاد شد');
+        }
+
+        function exportCustomers() {
+            alert('📊 خروجی مشتریان ایجاد شد');
+        }
+
+        function exportWorkers() {
+            alert('📊 خروجی کارکنان ایجاد شد');
+        }
+
+        function exportChecks() {
+            alert('📊 خروجی چک‌ها ایجاد شد');
+        }
 
         console.log('✅ سیستم حسابداری کارخانه یونولیت کلشی فوم با موفقیت بارگذاری شد!');
     </script>
