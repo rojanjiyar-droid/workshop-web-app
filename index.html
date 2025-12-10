@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حسابداری یونولیت کلشی‌فوم – نسخه ۸</title>
+    <title>حسابداری یونولیت کلشی‌فوم – نسخه ۸.1</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -60,6 +60,10 @@
         .check-row input{font-size:16px !important;padding:8px 10px !important;min-height:42px}
         /* حروف فارسی فقط */
         .fa-only{ime-mode:active}
+        /* چاپ فاکتور 10×20 cm */
+        @media print{@page{size:10cm 20cm;margin:0}body{width:10cm;height:20cm;overflow:hidden;font-size:9pt}}
+        .logo-preview{width:60px;height:60px;object-fit:contain;border-radius:8px;border:1px solid #ddd}
+        .invoice-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
     </style>
 </head>
 <body>
@@ -79,7 +83,10 @@
 <!-- داشبورد -->
 <div class="container dashboard-view" id="dashboardView">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#34495e;color:white">
-        <h2 id="welcomeUser">سلام، خوش آمدید</h2>
+        <div class="invoice-header">
+            <img id="headerLogo" class="logo-preview" style="display:none">
+            <h2 id="welcomeUser">سلام، خوش آمدید</h2>
+        </div>
         <button class="btn btn-danger btn-sm" onclick="logout()">خروج</button>
     </div>
     <nav class="top-nav">
@@ -318,11 +325,24 @@
             </div>
         </div>
 
-        <!-- چک‌ها -->
+        <!-- چک‌ها – مشابه ماژول قرارداد -->
         <div id="checks" class="page">
             <div class="form-section">
-                <h3>🏦 چک‌ها</h3>
-                <div style="margin-bottom:10px"><button class="btn btn-success" onclick="addNewCheck()">➕ ثبت چک جدید</button></div>
+                <h3>🏦 ثبت / ویرایش چک جدید</h3>
+                <div class="form-grid">
+                    <div class="form-group"><label>شماره چک *</label><input id="checkNumber" placeholder="شماره چک"></div>
+                    <div class="form-group"><label>مبلغ (تومان) *</label><input id="checkAmount" type="number" min="0" oninput="validatePositive(this)"></div>
+                    <div class="form-group"><label>تاریخ سررسید *</label><input id="checkDueDate" class="pdate" placeholder="۱۴۰۴/۰۳/۲۵" oninput="validateDate(this)"></div>
+                    <div class="form-group"><label>بانک *</label><input id="checkBank" placeholder="نام بانک" class="fa-only" oninput="validatePersian(this)"></div>
+                    <div class="form-group"><label>نام مشتری *</label><input id="checkCustomer" list="customerList" placeholder="نام کامل"></div>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:15px">
+                    <button class="btn btn-success" onclick="saveStandaloneCheck()">✅ ثبت / به‌روزرسانی</button>
+                    <button class="btn btn-warning" onclick="resetStandaloneCheckForm()">🔄 پاک کردن</button>
+                </div>
+            </div>
+            <div class="form-section">
+                <h3>📋 لیست چک‌ها</h3>
                 <div class="search-box"><input placeholder="جستجو..." oninput="filterTable('allChecksTable',this.value)"></div>
                 <div class="table-container"><table><thead><tr><th>ردیف</th><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>سررسید</th><th>بانک</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody id="allChecksTable"></tbody></table></div>
             </div>
@@ -699,7 +719,8 @@ function printThermal(id=null){
         <style>
             @media print{@page{margin:0;size:80mm auto}body{margin:0;font-size:10pt;width:70mm}}
             body{width:70mm;margin:2mm auto;font-family:Tahoma;font-size:10pt}
-            .center{text-align:center}.bold{font-weight:bold}.line{border-top:1px dashed #000;margin:3px 0}.logo{width:40px;margin:0 auto;display:block}
+            .center{text-align:center}.bold{font-weight:bold}.line{border-top:1px dashed #000;margin:3px 0}
+            .logo{width:40px;margin:0 auto;display:block}
         </style>`;
     const content=`
         ${styles}
@@ -818,58 +839,40 @@ function printInvoice(){
     const printWindow=window.open('','invoicePrint','width=800,height=600');
     printWindow.document.write(`
         <html dir="rtl">
-        <head><title>فاکتور تحویل کالا</title></head>
-        <body style="font-family:Tahoma;padding:20px;max-width:800px;margin:0 auto">
-        <div style="text-align:center;border-bottom:2px solid #333;padding-bottom:10px;margin-bottom:20px">
-            <h1>فاکتور تحویل کالا</h1>
-            <h3>${appData.settings.companyName}</h3>
+        <head><title>فاکتور تحویل کالا</title>
+        <style>
+            @media print{@page{size:10cm 20cm;margin:0}body{width:10cm;height:20cm;margin:0;font-size:9pt;overflow:hidden}}
+            body{font-family:Tahoma;padding:5px}
+            .header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+            .header img{height:40px}
+            .header div{font-weight:bold;font-size:10pt}
+            .line{border-top:1px dashed #000;margin:5px 0}
+            table{width:100%;border-collapse:collapse;font-size:8pt}
+            th,td{padding:4px;text-align:right;border:1px solid #ddd}
+            .bold{font-weight:bold}
+            .sig-box{border:1px dashed #ccc;padding:10px;margin-top:10px;text-align:center;font-size:8pt}
+        </style>
+        </head>
+        <body>
+        <div class="header">
+            <img src="${appData.settings.logo||''}" alt="لوگو">
+            <div>${appData.settings.companyName}<br>تاریخ: ${new Date().toLocaleDateString('fa-IR')}</div>
         </div>
-        <div style="margin-bottom:20px">
-            <h3>مشخصات مشتری</h3>
-            <p><strong>نام مشتری:</strong> ${c.customer}</p>
-            <p><strong>تلفن:</strong> ${c.phone}</p>
-            <p><strong>آدرس:</strong> ${c.address||'ندارد'}</p>
-        </div>
-        <div style="margin-bottom:20px">
-            <h3>اطلاعات تحویل</h3>
-            <p><strong>راننده:</strong> ${driver}</p>
-            <p><strong>پلاک خودرو:</strong> ${carPlate}</p>
-            <p><strong>تاریخ تحویل:</strong> ${deliveryDate}</p>
-        </div>
-        <h3>لیست محصولات</h3>
-        <table style="width:100%;border-collapse:collapse;border:1px solid #ddd">
-            <thead><tr style="background:#34495e;color:white"><th>ردیف</th><th>محصول</th><th>متراژ</th><th>فی متر</th><th>مبلغ کل</th></tr></thead>
+        <div class="line"></div>
+        <div><strong>مشتری:</strong> ${c.customer}<br><strong>تلفن:</strong> ${c.phone}<br><strong>آدرس:</strong> ${c.address||'ندارد'}</div>
+        <div class="line"></div>
+        <table>
+            <thead><tr><th>#</th><th>محصول</th><th>متراژ</th><th>فی (تومان)</th><th>کل (تومان)</th></tr></thead>
             <tbody>
                 ${c.products.map((p,i)=>`<tr><td>${i+1}</td><td>${p.type}</td><td>${p.meterage}</td><td>${p.price.toLocaleString('fa-IR')}</td><td>${p.total.toLocaleString('fa-IR')}</td></tr>`).join('')}
-                <tr style="font-weight:bold;background:#f0f8ff"><td colspan="4">جمع کل</td><td>${c.totalAmount.toLocaleString('fa-IR')} تومان</td></tr>
+                <tr class="bold"><td colspan="4">جمع کل</td><td>${c.totalAmount.toLocaleString('fa-IR')}</td></tr>
             </tbody>
         </table>
-        <div style="display:flex;justify-content:space-between;margin-top:40px">
-            <div style="border:2px dashed #ccc;padding:15px;width:45%;min-height:120px;text-align:center">
-                <h4>مهر و امضای کارخانه</h4>
-                <p>${appData.settings.companyName}</p>
-                <p>تاریخ: ${new Date().toLocaleDateString('fa-IR')}</p>
-                <p>امضاء: ...........................</p>
-            </div>
-            <div style="border:2px dashed #ccc;padding:15px;width:45%;min-height:120px;text-align:center">
-                <h4>امضای راننده</h4>
-                <p>نام: ${driver}</p>
-                <p>پلاک: ${carPlate}</p>
-                <p>امضاء: ...........................</p>
-            </div>
-        </div>
-        <div style="margin-top:20px">
-            <div style="border:2px dashed #ccc;padding:15px;min-height:120px;text-align:center">
-                <h4>امضای تحویل‌گیرنده</h4>
-                <p>نام: ${receiverName||'...................'}</p>
-                <p>کد ملی: ${document.getElementById('receiverNationalCode').value||'...................'}</p>
-                <p>امضاء: ...........................</p>
-            </div>
-        </div>
-        <div style="margin-top:30px;text-align:center;border-top:1px solid #ccc;padding-top:10px;font-size:12px">
-            <p>این فاکتور به منزله رسید تحویل کالا می‌باشد.</p>
-            <p>${appData.settings.companyName} - ${appData.settings.companyAddress} - تلفن: ${appData.settings.companyPhone}</p>
-        </div>
+        <div class="line"></div>
+        <div><strong>راننده:</strong> ${driver} | <strong>پلاک:</strong> ${carPlate} | <strong>تاریخ تحویل:</strong> ${deliveryDate}</div>
+        <div class="sig-box">امضای راننده: ...........................</div>
+        <div class="sig-box">امضای تحویل‌گیرنده (${receiverName||'...................'}): ...........................</div>
+        <div style="margin-top:10px;font-size:7pt;text-align:center">${appData.settings.companyAddress} | تلفن: ${appData.settings.companyPhone}</div>
         </body>
         </html>
     `);
@@ -887,30 +890,29 @@ function downloadInvoicePDF(){
     const deliveryDate=document.getElementById('invoiceDeliveryDate').value;
     const receiverName=document.getElementById('receiverName').value;
     const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
+    const doc=new jsPDF({orientation:'p',unit:'mm',format:[100,200]});
     doc.setFont('Tahoma');
-    doc.addImage(appData.settings.logo||'', 'PNG', 170, 10, 30, 30, undefined, 'FAST');
-    doc.text(appData.settings.companyName, 10, 20);
-    doc.text(`تاریخ: ${new Date().toLocaleDateString('fa-IR')}`, 10, 30);
-    doc.text(`مشتری: ${c.customer}`, 10, 40);
-    doc.text(`تلفن: ${c.phone}`, 10, 50);
-    doc.text(`آدرس: ${c.address}`, 10, 60);
-    doc.text(`راننده: ${driver}`, 10, 70);
-    doc.text(`پلاک: ${carPlate}`, 10, 80);
-    doc.text(`تاریخ تحویل: ${deliveryDate}`, 10, 90);
+    if(appData.settings.logo){
+        try{doc.addImage(appData.settings.logo,'PNG',5,5,15,15);}catch{}
+    }
+    doc.text(appData.settings.companyName,25,10);
+    doc.text(`تاریخ: ${new Date().toLocaleDateString('fa-IR')}`,5,20);
+    doc.text(`مشتری: ${c.customer}`,5,30);
+    doc.text(`تلفن: ${c.phone}`,5,40);
     doc.autoTable({
-        head:[['ردیف','محصول','متراژ','فی (تومان)','کل (تومان)']],
+        head:[['#','محصول','متراژ','فی','کل']],
         body:c.products.map((p,i)=>[i+1,p.type,p.meterage,p.price.toLocaleString('fa-IR'),p.total.toLocaleString('fa-IR')]),
-        startY:100,
+        startY:50,
         theme:'grid',
-        styles:{font:'Tahoma',halign:'right'}
+        styles:{font:'Tahoma',halign:'right',fontSize:8}
     });
-    const finalY=doc.lastAutoTable.finalY+10;
-    doc.text(`جمع کل: ${c.totalAmount.toLocaleString('fa-IR')} تومان`, 10, finalY);
-    doc.text(`نقدی: ${c.advance.toLocaleString('fa-IR')} تومان`, 10, finalY+10);
-    doc.text(`چک: ${c.checkAmount.toLocaleString('fa-IR')} تومان`, 10, finalY+20);
-    doc.text(`مانده: ${c.balance.toLocaleString('fa-IR')} تومان`, 10, finalY+30);
-    doc.save(`فاکتور-تحویل-${c.customer}-${deliveryDate}.pdf`);
+    const finalY=doc.lastAutoTable.finalY+5;
+    doc.text(`راننده: ${driver}`,5,finalY);
+    doc.text(`پلاک: ${carPlate}`,5,finalY+5);
+    doc.text(`تاریخ تحویل: ${deliveryDate}`,5,finalY+10);
+    doc.text(`امضای راننده: ....................`,5,finalY+20);
+    doc.text(`امضای تحویل‌گیرنده (${receiverName}): ....................`,5,finalY+30);
+    doc.save(`فاکتور-${c.customer}-${deliveryDate}.pdf`);
     showNotification('PDF فاکتور دانلود شد');
 }
 function resetInvoiceForm(){
@@ -1081,35 +1083,34 @@ function displayTransactions(){
 function editTransaction(id){const t=appData.transactions.find(x=>x.id===id);if(!t)return;document.getElementById('transactionType').value=t.type;document.getElementById('transactionAmount').value=t.amount;document.getElementById('transactionCategory').value=t.category;document.getElementById('transactionDescription').value=t.description;document.getElementById('transactionDate').value=t.date;toggleWorkerSelect();appData.transactions=appData.transactions.filter(x=>x.id!==id);saveData();displayTransactions();showNotification('تراکنش در حالت ویرایش قرار گرفت','info');}
 function deleteTransaction(id){if(confirm('تراکنش حذف شود؟')){appData.transactions=appData.transactions.filter(x=>x.id!==id);saveData();displayTransactions();showNotification('تراکنش حذف شد');}}
 
-/* ==================== چک‌ها – ثبت جدید + مرتب‌سازی تاریخی ==================== */
+/* ==================== چک‌ها – ثبت مستقل مشابه قرارداد ==================== */
+let editingCheckId=null;
+function saveStandaloneCheck(){
+    const num=document.getElementById('checkNumber').value.trim();
+    const amt=parseFloat(document.getElementById('checkAmount').value)||0;
+    const due=document.getElementById('checkDueDate').value;
+    const bank=document.getElementById('checkBank').value.trim();
+    const customer=document.getElementById('checkCustomer').value.trim();
+    if(!num||!amt||!due||!bank||!customer){showNotification('تمام فیلدهای ستاره‌دار را پر کنید','error');return;}
+    const check={id:editingCheckId||Date.now(),contractId:null,customer,number:num,amount:amt,dueDate:due,bank:bank,status:'در جریان',createdDate:new Date().toLocaleDateString('fa-IR')};
+    if(editingCheckId){const i=appData.checks.findIndex(ch=>ch.id===editingCheckId);appData.checks[i]=check;}else{appData.checks.push(check);}
+    logAudit('ثبت/ویرایش چک',num);
+    saveData();displayAllChecks();resetStandaloneCheckForm();showNotification('چک ثبت شد');
+}
+function resetStandaloneCheckForm(){
+    editingCheckId=null;
+    document.getElementById('checkNumber').value='';
+    document.getElementById('checkAmount').value='';
+    document.getElementById('checkDueDate').value='';
+    document.getElementById('checkBank').value='';
+    document.getElementById('checkCustomer').value='';
+}
 function sortChecksByDueDate(){
     appData.checks.sort((a,b)=>{
         const [y1,m1,d1]=a.dueDate.split('/').map(Number);
         const [y2,m2,d2]=b.dueDate.split('/').map(Number);
         return new Date(y1,m1-1,d1)-new Date(y2,m2-1,d2);
     });
-}
-function addNewCheck(){
-    const num  = prompt('شماره چک:');
-    const amt  = parseFloat(prompt('مبلغ (تومان):'))||0;
-    const due  = prompt('تاریخ سررسید (۱۴۰۴/۰۳/۲۵):');
-    const bank = prompt('بانک:');
-    const cust = prompt('نام مشتری:');
-    if(!num||!due||!bank||!cust)return;
-    appData.checks.push({
-        id:Date.now(),
-        contractId:null,
-        customer:cust,
-        number:num,
-        amount:amt,
-        dueDate:due,
-        bank:bank,
-        status:'در جریان',
-        createdDate:new Date().toLocaleDateString('fa-IR')
-    });
-    sortChecksByDueDate();
-    saveData();displayAllChecks();
-    showNotification('چک جدید ثبت شد');
 }
 function displayAllChecks(){
     sortChecksByDueDate();
@@ -1126,7 +1127,7 @@ function displayAllChecks(){
         `;tbody.appendChild(row);
     });
 }
-function editCheck(id){const c=appData.checks.find(x=>x.id===id);if(!c)return;const status=prompt('وضعیت جدید را وارد کنید (در جریان / پاس‌شده / برگشتی / وصول‌جزئی)',c.status);if(status){c.status=status;logAudit('تغییر وضعیت چک',`${c.number} → ${status}`);saveData();displayAllChecks();showNotification('وضعیت چک به‌روز شد');}}
+function editCheck(id){const c=appData.checks.find(x=>x.id===id);if(!c)return;editingCheckId=c.id;document.getElementById('checkNumber').value=c.number;document.getElementById('checkAmount').value=c.amount;document.getElementById('checkDueDate').value=c.dueDate;document.getElementById('checkBank').value=c.bank;document.getElementById('checkCustomer').value=c.customer;showNotification('چک در حالت ویرایش قرار گرفت','info');}
 function deleteCheck(id){if(confirm('چک حذف شود؟')){appData.checks=appData.checks.filter(x=>x.id!==id);saveData();displayAllChecks();showNotification('چک حذف شد');}}
 
 /* ==================== پشتیبان‌گیری ==================== */
@@ -1175,7 +1176,7 @@ function exportToPDF(){
     doc.save(`گزارش-کامل-${new Date().toLocaleDateString('fa-IR')}.pdf`);
 }
 
-/* ==================== گزارش‌ها – نمایش واقعی بر اساس بازه زمانی ==================== */
+/* ==================== گزارش‌ها – فیلتر تاریخی واقعی ==================== */
 function generateReport(){
     const type=document.getElementById('reportType').value;
     const from=document.getElementById('reportFromDate').value;
@@ -1232,10 +1233,10 @@ function loadSettings(){
     document.getElementById('companyName').value=appData.settings.companyName;
     document.getElementById('companyPhone').value=appData.settings.companyPhone;
     document.getElementById('companyAddress').value=appData.settings.companyAddress;
-    if(appData.settings.logo){document.getElementById('logoPreview').src=appData.settings.logo;document.getElementById('logoPreview').style.display='block';}
+    if(appData.settings.logo){document.getElementById('logoPreview').src=appData.settings.logo;document.getElementById('logoPreview').style.display='block';document.getElementById('headerLogo').src=appData.settings.logo;document.getElementById('headerLogo').style.display='block';}
 }
 function showSystemInfo(){
-    alert(`ورژن برنامه: ۸.۰\nتاریخ ساخت: ۲۰۲۵\nسازنده: کلشی‌فوم\nحجم داده: ${JSON.stringify(appData).length} کاراکتر`);
+    alert(`ورژن برنامه: ۸.۱\nتاریخ ساخت: ۲۰۲۵\nسازنده: کلشی‌فوم\nحجم داده: ${JSON.stringify(appData).length} کاراکتر`);
 }
 function changePasswordFromSettings(){
     const current=document.getElementById('currentPasswordSettings').value;
@@ -1255,6 +1256,8 @@ function applyLogo(){
     if(appData.settings.logo){
         document.getElementById('logoPreview').src=appData.settings.logo;
         document.getElementById('logoPreview').style.display='block';
+        document.getElementById('headerLogo').src=appData.settings.logo;
+        document.getElementById('headerLogo').style.display='block';
     }
 }
 function uploadLogo(e){
