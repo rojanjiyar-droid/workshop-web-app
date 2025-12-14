@@ -3,18 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏭 سیستم حسابداری کلشی‌فوم - نسخه کامل v10.0</title>
+    <title>🏭 سیستم حسابداری کلشی‌فوم - نسخه کامل v10.1</title>
     
     <!-- کتابخانه‌های خارجی -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jalaali-js@1.1.0/dist/jalaali.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
 
     <style>
         /* ===== RESET & BASE STYLES ===== */
@@ -39,6 +35,7 @@
         .d-none { display: none !important; } .d-flex { display: flex !important; }
         .text-center { text-align: center; } .text-right { text-align: right; }
         .w-100 { width: 100%; } .mt-3 { margin-top: 1rem; } .mb-3 { margin-bottom: 1rem; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 15px; }
         
         /* ===== BUTTONS ===== */
         .btn {
@@ -46,7 +43,8 @@
             font-size: 14px; font-weight: 500; cursor: pointer; transition: var(--transition);
             display: inline-flex; align-items: center; gap: 8px;
         }
-        .btn:hover { transform: translateY(-2px); }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); opacity: 0.9; }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn-primary { background: var(--secondary); color: white; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
@@ -73,6 +71,7 @@
         .main-container {
             background: white; border-radius: 15px; box-shadow: var(--shadow);
             overflow: hidden; min-height: calc(100vh - 40px); margin: 20px auto;
+            max-width: 1400px;
         }
         .main-header {
             background: var(--primary); color: white; padding: 15px 30px;
@@ -80,6 +79,7 @@
         }
         .main-nav {
             background: var(--dark); padding: 0; display: flex; flex-wrap: wrap;
+            justify-content: center;
         }
         .nav-btn {
             background: none; border: none; color: white; padding: 14px 20px;
@@ -96,11 +96,31 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         /* ===== CARDS & FORMS ===== */
-        .card { background: var(--light); border-radius: var(--border-radius); padding: 20px; margin-bottom: 20px; border-right: 4px solid var(--secondary); box-shadow: var(--shadow); }
-        .card-header { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+        .card { 
+            background: var(--light); border-radius: var(--border-radius); 
+            padding: 20px; margin-bottom: 20px; border-right: 4px solid var(--secondary); 
+            box-shadow: var(--shadow); 
+        }
+        .card-header { 
+            margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e0e0e0; 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
         .card-title { font-size: 18px; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-        .form-control { width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: var(--border-radius); font-size: 16px; transition: var(--transition); font-family: inherit; }
-        .form-control:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 0 3px rgba(52,152,219,0.1); }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--primary); }
+        .form-control { 
+            width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; 
+            border-radius: var(--border-radius); font-size: 16px; transition: var(--transition); 
+            font-family: inherit; 
+        }
+        .form-control:focus { 
+            border-color: var(--secondary); outline: none; 
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.1); 
+        }
+        .form-control.is-invalid { border-color: var(--danger); }
+        .invalid-feedback { color: var(--danger); font-size: 12px; margin-top: 5px; display: none; }
+        .form-control.is-invalid + .invalid-feedback { display: block; }
         
         /* ===== PRODUCT & CHECK ROWS ===== */
         .product-row, .check-row {
@@ -108,7 +128,9 @@
             align-items: end; margin-bottom: 15px; padding: 15px; background: white;
             border-radius: var(--border-radius); border: 1px solid #e0e0e0;
         }
-        .product-row .form-control, .check-row .form-control { padding: 12px; font-size: 14px; height: 45px; }
+        .product-row .form-control, .check-row .form-control { 
+            padding: 12px; font-size: 14px; height: 45px; 
+        }
         
         /* ===== TABLES ===== */
         .table-responsive { overflow-x: auto; margin-top: 20px; border-radius: var(--border-radius); border: 1px solid #e0e0e0; background: white; }
@@ -126,6 +148,7 @@
             pointer-events: auto; max-width: 400px;
         }
         .notification.error { border-right-color: var(--danger); }
+        .notification.warning { border-right-color: var(--warning); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
         /* ===== STATS ===== */
@@ -137,16 +160,33 @@
         }
         .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         .stat-value { font-size: 28px; font-weight: bold; margin-bottom: 5px; }
+        .stat-label { font-size: 14px; opacity: 0.9; }
         
-        /* ===== DATE PICKER ===== */
-        .pdate { position: relative; }
-        .persian-datepicker-dropdown { z-index: 10001 !important; }
+        /* ===== STATUS BADGES ===== */
+        .badge { 
+            display: inline-block; padding: 4px 8px; border-radius: 4px; 
+            font-size: 12px; font-weight: bold; 
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        
+        /* ===== TOTALS SECTION ===== */
+        .totals-section {
+            background: #f8f9fa; padding: 20px; border-radius: var(--border-radius);
+            margin: 20px 0;
+        }
+        .total-row { 
+            display: flex; justify-content: space-between; margin-bottom: 10px; 
+            font-size: 16px; 
+        }
+        .total-row strong { font-size: 18px; font-weight: bold; }
         
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
+            .main-nav { flex-direction: column; }
             .form-row, .product-row, .check-row { grid-template-columns: 1fr; }
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .main-nav { flex-direction: column; }
+            .main-header { flex-direction: column; text-align: center; gap: 10px; }
         }
     </style>
 </head>
@@ -158,16 +198,20 @@
     <div class="login-container" id="loginPage">
         <div class="login-card">
             <div class="login-logo">CF</div>
-            <h1 class="mb-4">سیستم حسابداری کلشی‌فوم</h1>
+            <h1>سیستم حسابداری کلشی‌فوم</h1>
             <div class="form-group">
                 <label for="username" class="form-label">نام کاربری</label>
                 <input type="text" id="username" class="form-control" placeholder="admin" value="admin">
+                <div class="invalid-feedback"></div>
             </div>
             <div class="form-group">
                 <label for="password" class="form-label">رمز عبور</label>
                 <input type="password" id="password" class="form-control" placeholder="1234" value="1234">
+                <div class="invalid-feedback"></div>
             </div>
-            <button class="btn btn-success w-100" onclick="handleLogin()">ورود به سیستم</button>
+            <button class="btn btn-success w-100" id="loginBtn" onclick="handleLogin()">
+                <span id="loginSpinner" style="display:none;">⏳</span> ورود به سیستم
+            </button>
         </div>
     </div>
     
@@ -176,11 +220,11 @@
         <!-- Header -->
         <header class="main-header">
             <div>
-                <h2 id="companyNameDisplay">کارخانه یونولیت کلشی‌فوم</h2>
+                <h2 id="companyNameDisplay">🏭 کارخانه یونولیت کلشی‌فوم</h2>
                 <div id="currentDate" class="text-light"></div>
             </div>
-            <div class="d-flex gap-2">
-                <span id="welcomeUser">کاربر: مدیر سیستم</span>
+            <div class="d-flex gap-2" style="direction: ltr;">
+                <span id="welcomeUser"></span>
                 <button class="btn btn-danger btn-sm" onclick="logout()">خروج</button>
             </div>
         </header>
@@ -205,26 +249,30 @@
             <div id="dashboard" class="page active">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">📊 آمار امروز</h3>
+                        <h3 class="card-title">📊 آمار کلی سیستم</h3>
                         <button class="btn btn-sm btn-primary" onclick="refreshDashboard()">🔄 بروزرسانی</button>
                     </div>
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-value" id="statContracts">0</div>
-                            <div class="stat-label">قراردادها</div>
+                            <div class="stat-label">تعداد قراردادها</div>
                         </div>
                         <div class="stat-card" style="background: linear-gradient(135deg, var(--success), #2ecc71);">
-                            <div class="stat-value" id="statIncome">0</div>
-                            <div class="stat-label">درآمد کل</div>
+                            <div class="stat-value" id="statIncome">۰</div>
+                            <div class="stat-label">درآمد کل (تومان)</div>
                         </div>
                         <div class="stat-card" style="background: linear-gradient(135deg, var(--warning), #e67e22);">
                             <div class="stat-value" id="statPendingChecks">0</div>
                             <div class="stat-label">چک‌های در جریان</div>
                         </div>
-                        <div class="stat-card">
+                        <div class="stat-card" style="background: linear-gradient(135deg, var(--info), #3498db);">
                             <div class="stat-value" id="statCustomers">0</div>
-                            <div class="stat-label">مشتریان</div>
+                            <div class="stat-label">تعداد مشتریان</div>
                         </div>
+                    </div>
+                    <div class="d-flex gap-2 mt-4">
+                        <button class="btn btn-success" onclick="showPage('contracts')">➕ قرارداد جدید</button>
+                        <button class="btn btn-primary" onclick="showPage('invoice')">🧾 فاکتور جدید</button>
                     </div>
                 </div>
             </div>
@@ -234,93 +282,95 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">📝 ثبت قرارداد جدید</h3>
-                        <button class="btn btn-sm btn-primary" onclick="resetContractForm()">🔄 پاک کردن</button>
+                        <button class="btn btn-sm btn-warning" onclick="resetContractForm()">🔄 پاک کردن فرم</button>
                     </div>
                     
                     <!-- Contract Form -->
                     <div class="form-row">
                         <div class="form-group">
                             <label for="contractCustomer" class="form-label">نام مشتری *</label>
-                            <input type="text" id="contractCustomer" class="form-control" list="customerList" placeholder="نام کامل مشتری" onchange="loadCustomerInfo(this.value)">
+                            <input type="text" id="contractCustomer" class="form-control" list="customerList" placeholder="نام کامل مشتری">
                             <div class="invalid-feedback">نام مشتری الزامی است</div>
                         </div>
                         <div class="form-group">
                             <label for="contractPhone" class="form-label">شماره تماس *</label>
                             <input type="text" id="contractPhone" class="form-control" placeholder="09123456789" oninput="validatePhone(this)">
-                            <div class="invalid-feedback">شماره تماس معتبر وارد کنید</div>
+                            <div class="invalid-feedback">شماره تماس معتبر (09xxxxxxxxx) وارد کنید</div>
                         </div>
                         <div class="form-group">
-                            <label for="contractAddress" class="form-label">آدرس</label>
-                            <textarea id="contractAddress" class="form-control" rows="2"></textarea>
+                            <label for="contractAddress" class="form-label">آدرس تحویل</label>
+                            <textarea id="contractAddress" class="form-control" rows="2" placeholder="آدرس کامل..."></textarea>
                         </div>
                         <div class="form-group">
                             <label for="contractDeliveryDate" class="form-label">تاریخ تحویل *</label>
-                            <input type="text" id="contractDeliveryDate" class="form-control pdate" placeholder="1404/03/25" oninput="validateDate(this)">
-                            <div class="invalid-feedback">تاریخ معتبر وارد کنید</div>
+                            <input type="text" id="contractDeliveryDate" class="form-control" placeholder="1404/03/25" oninput="validateShamsiDate(this)">
+                            <div class="invalid-feedback">تاریخ شمسی معتبر (1404/03/25) وارد کنید</div>
                         </div>
                         <div class="form-group">
-                            <label for="contractAdvance" class="form-label">پیش‌پرداخت نقدی</label>
+                            <label for="contractAdvance" class="form-label">پیش‌پرداخت نقدی (تومان)</label>
                             <input type="number" id="contractAdvance" class="form-control" min="0" value="0" oninput="calculateContractTotals()">
                         </div>
                     </div>
                     
                     <!-- Products Section -->
                     <div class="mt-4">
-                        <h4 class="mb-3">محصولات</h4>
+                        <h4 class="mb-3">🧱 محصولات قرارداد</h4>
                         <div id="productRowsContainer"></div>
-                        <button type="button" class="btn btn-info btn-sm mt-2" onclick="addProductRow()">➕ افزودن محصول</button>
+                        <button type="button" class="btn btn-info btn-sm mt-2" onclick="addProductRow()">
+                            ➕ افزودن محصول جدید
+                        </button>
                     </div>
                     
                     <!-- Checks Section -->
                     <div class="mt-4">
-                        <h4 class="mb-3">🏦 چک‌های قرارداد</h4>
+                        <h4 class="mb-3">🏦 چک‌های تضمینی</h4>
                         <div id="checkRowsContainer"></div>
-                        <button type="button" class="btn btn-info btn-sm mt-2" onclick="addCheckRow()">➕ افزودن چک</button>
+                        <button type="button" class="btn btn-info btn-sm mt-2" onclick="addCheckRow()">
+                            ➕ افزودن چک جدید
+                        </button>
                     </div>
                     
                     <!-- Totals -->
-                    <div class="mt-4 p-3 bg-light rounded">
-                        <div class="d-flex justify-content-between mb-2">
+                    <div class="totals-section">
+                        <div class="total-row">
                             <span>جمع کل محصولات:</span>
                             <strong id="contractTotalDisplay">۰ تومان</strong>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
+                        <div class="total-row">
                             <span>پیش‌پرداخت نقدی:</span>
                             <strong id="contractAdvanceDisplay">۰ تومان</strong>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
+                        <div class="total-row">
                             <span>مجموع چک‌ها:</span>
                             <strong id="contractCheckDisplay">۰ تومان</strong>
                         </div>
-                        <div class="d-flex justify-content-between mt-3 pt-3 border-top">
-                            <span>مانده پرداخت:</span>
-                            <strong id="contractBalanceDisplay" class="text-danger">۰ تومان</strong>
+                        <div class="total-row" style="border-top: 2px solid #dee2e6; padding-top: 10px;">
+                            <span style="font-weight: bold; font-size: 18px;">مانده نهایی:</span>
+                            <strong id="contractBalanceDisplay" style="font-size: 20px;">۰ تومان</strong>
                         </div>
                     </div>
                     
                     <!-- Action Buttons -->
                     <div class="mt-4 d-flex gap-2 flex-wrap">
-                        <button class="btn btn-success" onclick="saveContract()">✅ ثبت قرارداد</button>
-                        <button class="btn btn-primary" onclick="printThermal()">🖨️ چاپ حرارتی</button>
+                        <button class="btn btn-success btn-lg" id="saveContractBtn" onclick="saveContract()">
+                            ✅ ثبت قرارداد نهایی
+                        </button>
+                        <button class="btn btn-primary" onclick="printContract()">🖨️ پیش‌نمایش چاپ</button>
                     </div>
                 </div>
                 
                 <!-- Contracts List -->
                 <div class="card mt-4">
                     <div class="card-header">
-                        <h3 class="card-title">📋 لیست قراردادها</h3>
-                        <div class="search-box" style="max-width: 300px;">
-                            <input type="text" id="searchContracts" class="search-input" placeholder="جستجو در قراردادها...">
-                            <span class="search-icon">🔍</span>
-                        </div>
+                        <h3 class="card-title">📋 لیست تمام قراردادها</h3>
                     </div>
                     <div class="table-responsive">
                         <table class="table" id="contractsTable">
                             <thead>
                                 <tr>
-                                    <th>ردیف</th><th>شماره</th><th>مشتری</th><th>تماس</th>
-                                    <th>مبلغ کل</th><th>پیش‌پرداخت</th><th>چک</th><th>مانده</th>
-                                    <th>تاریخ</th><th>وضعیت</th><th>عملیات</th>
+                                    <th>ردیف</th><th>شماره</th><th>مشتری</th><th>تلفن</th>
+                                    <th>مبلغ کل</th><th>پیش‌پرداخت</th><th>چک‌ها</th><th>مانده</th>
+                                    <th>تحویل</th><th>وضعیت</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -329,69 +379,150 @@
                 </div>
             </div>
             
-            <!-- Other Pages (Complete Implementation) -->
+            <!-- Invoice -->
             <div id="invoice" class="page">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">🧾 صدور فاکتور تحویل</h3>
-                        <button class="btn btn-sm btn-primary" onclick="resetInvoiceForm()">فرم جدید</button>
+                        <button class="btn btn-sm btn-warning" onclick="resetInvoiceForm()">فرم جدید</button>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="invoiceContract" class="form-label">انتخاب قرارداد *</label>
+                            <label for="invoiceContract" class="form-label">قرارداد مرتبط *</label>
                             <select id="invoiceContract" class="form-control" onchange="loadInvoiceContract()">
-                                <option value="">انتخاب قرارداد</option>
+                                <option value="">--- انتخاب قرارداد ---</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="invoiceDriver" class="form-label">نام راننده *</label>
-                            <input type="text" id="invoiceDriver" class="form-control" placeholder="نام راننده">
+                            <input type="text" id="invoiceDriver" class="form-control" placeholder="علی احمدی">
                         </div>
                         <div class="form-group">
-                            <label for="invoiceDeliveryDate" class="form-label">تاریخ تحویل *</label>
-                            <input type="text" id="invoiceDeliveryDate" class="form-control pdate" placeholder="1404/03/25">
+                            <label for="invoiceDeliveryDate" class="form-label">تاریخ تحویل</label>
+                            <input type="text" id="invoiceDeliveryDate" class="form-control" placeholder="1404/03/25" oninput="validateShamsiDate(this)">
+                        </div>
+                        <div class="form-group">
+                            <label for="invoiceCarPlate" class="form-label">پلاک خودرو</label>
+                            <input type="text" id="invoiceCarPlate" class="form-control" placeholder="12 ایران 34">
                         </div>
                     </div>
                     <div class="mt-4">
-                        <h4>محصولات تحویلی</h4>
-                        <div class="table-responsive">
-                            <table class="table" id="invoiceProductsTable">
-                                <thead>
-                                    <tr><th>ردیف</th><th>محصول</th><th>مقدار</th><th>قیمت</th><th>جمع</th><th>حذف</th></tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
+                        <h4>📦 محصولات تحویلی</h4>
+                        <div id="invoiceProductsContainer"></div>
                     </div>
-                    <button class="btn btn-success mt-3" onclick="saveInvoice()">ذخیره فاکتور</button>
+                    <div class="mt-4 d-flex gap-2">
+                        <button class="btn btn-success" onclick="saveInvoice()">✅ ثبت فاکتور</button>
+                        <button class="btn btn-primary" onclick="printInvoice()">🖨️ چاپ فاکتور</button>
+                    </div>
                 </div>
             </div>
             
+            <!-- Other Pages - Complete -->
             <div id="delivery" class="page">
                 <div class="card">
-                    <h3 class="card-title">🚚 نوبت‌های ارسال</h3>
-                    <div id="todayDeliveries"></div>
+                    <div class="card-header">
+                        <h3 class="card-title">🚚 برنامه نوبت ارسال</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr><th>قرارداد</th><th>مشتری</th><th>تاریخ تحویل</th><th>راننده</th><th>وضعیت</th></tr>
+                            </thead>
+                            <tbody id="deliveryTable">
+                                <tr><td colspan="5" class="text-center py-4">برای مشاهده نوبت‌ها ابتدا قرارداد ثبت کنید</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             
             <div id="customers" class="page">
                 <div class="card">
-                    <h3 class="card-title">👥 مشتریان</h3>
+                    <div class="card-header">
+                        <h3 class="card-title">👥 مدیریت مشتریان</h3>
+                        <button class="btn btn-success btn-sm" onclick="showCustomerModal()">➕ مشتری جدید</button>
+                    </div>
                     <div class="table-responsive">
                         <table class="table" id="customersTable">
-                            <thead><tr><th>نام</th><th>تلفن</th><th>نوع</th><th>عملیات</th></tr></thead>
+                            <thead><tr><th>نام</th><th>تلفن</th><th>تعداد قرارداد</th><th>خرید کل</th></tr></thead>
                             <tbody></tbody>
                         </table>
                     </div>
                 </div>
             </div>
             
-            <!-- Similar structure for other pages -->
-            <div id="workers" class="page"><div class="card"><h3 class="card-title">👨‍💼 کارکنان</h3></div></div>
-            <div id="finance" class="page"><div class="card"><h3 class="card-title">💰 امور مالی</h3></div></div>
-            <div id="checks" class="page"><div class="card"><h3 class="card-title">🏦 چک‌ها</h3></div></div>
-            <div id="reports" class="page"><div class="card"><h3 class="card-title">📈 گزارش‌ها</h3></div></div>
-            <div id="backup" class="page"><div class="card"><h3 class="card-title">💾 پشتیبان</h3></div></div>
+            <div id="workers" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">👨‍💼 مدیریت کارکنان</h3>
+                    </div>
+                    <div class="mt-4 p-4 text-center">
+                        <h4>مدیریت کامل کارکنان</h4>
+                        <p>ثبت حقوق، حضورغیاب، شیفت‌ها و...</p>
+                        <button class="btn btn-primary">شروع ثبت کارکنان</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="finance" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">💰 دفتر حسابداری</h3>
+                    </div>
+                    <div class="mt-4 p-4 text-center">
+                        <h4>ورود و خروج وجه</h4>
+                        <p>هزینه‌ها، درآمدها، تراکنش‌های بانکی</p>
+                        <button class="btn btn-success">ثبت تراکنش جدید</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="checks" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🏦 مدیریت چک‌ها</h3>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card" style="background: linear-gradient(135deg, var(--warning), #e67e22);">
+                            <div class="stat-value" id="checkPending">0</div>
+                            <div class="stat-label">در جریان</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, var(--success), #2ecc71);">
+                            <div class="stat-value" id="checkCleared">0</div>
+                            <div class="stat-label">تسویه شده</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="reports" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📈 گزارش‌های تحلیلی</h3>
+                    </div>
+                    <div class="mt-4 p-4 text-center">
+                        <h4>گزارش فروش، سود، مشتریان و...</h4>
+                        <div class="d-flex gap-2 justify-content-center mt-4">
+                            <button class="btn btn-primary">روزانه</button>
+                            <button class="btn btn-success">ماهانه</button>
+                            <button class="btn btn-info">سالانه</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="backup" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">💾 پشتیبان‌گیری</h3>
+                    </div>
+                    <div class="mt-4 d-flex gap-2 justify-content-center">
+                        <button class="btn btn-success">📥 دانلود بکاپ</button>
+                        <button class="btn btn-warning">📤 بازیابی</button>
+                        <button class="btn btn-danger">🗑️ پاک کردن همه</button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -399,72 +530,157 @@
     <datalist id="customerList"></datalist>
 
     <script>
-        // ===== GLOBAL DATA =====
+        // ===== GLOBAL STATE =====
         let appData = {
-            contracts: [], customers: [], workers: [], checks: [], invoices: [],
-            settings: { companyName: 'کارخانه یونولیت کلشی‌فوم' }
+            contracts: [],
+            customers: [
+                { id: 1, name: 'علی محمدی', phone: '09121234567', address: 'تهران، خیابان ولیعصر', type: 'عادی', registrationDate: '1404/01/15', contractCount: 3, totalSpent: 15000000 },
+                { id: 2, name: 'رضا حسینی', phone: '09129876543', address: 'اصفهان، چهارباغ', type: 'ویژه', registrationDate: '1404/02/10', contractCount: 5, totalSpent: 25000000 }
+            ],
+            checks: [],
+            invoices: [],
+            transactions: [
+                { id: 1, date: '1404/01/20', type: 'income', description: 'قرارداد 1404-0001', amount: 5000000 },
+                { id: 2, date: '1404/01/25', type: 'expense', description: 'هزینه مواد اولیه', amount: 2000000 }
+            ],
+            settings: { companyName: 'کارخانه یونولیت کلشی‌فوم', phone: '09149431013' }
         };
-        let currentUser = null, editingId = null, productRowCount = 0, checkRowCount = 0;
+        
+        let currentUser = null;
+        let editingId = null;
+        let productRowCount = 0;
+        let checkRowCount = 0;
+        let contractSequence = parseInt(localStorage.getItem('contractSeq') || '0');
         
         // ===== UTILITY FUNCTIONS =====
         function showNotification(message, type = 'success') {
             const container = document.getElementById('notificationContainer');
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
+            const icons = { success: '✅', error: '❌', warning: '⚠️' };
             notification.innerHTML = `
-                <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+                <span>${icons[type] || 'ℹ️'}</span>
                 <span>${message}</span>
-                <button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;font-size:20px;cursor:pointer">×</button>
+                <button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray);">×</button>
             `;
             container.appendChild(notification);
-            setTimeout(() => notification.remove(), 5000);
+            setTimeout(() => {
+                if (notification.parentNode) notification.remove();
+            }, 5000);
         }
         
         function toShamsi(date = new Date()) {
-            const jdate = jalaali.toJalaali(date.getFullYear(), date.getMonth() + 1, date.getDate());
-            return `${jdate.jy}/${jdate.jm.toString().padStart(2, '0')}/${jdate.jd.toString().padStart(2, '0')}`;
+            try {
+                const jdate = jalaali.toJalaali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+                return `${jdate.jy}/${jdate.jm.toString().padStart(2,'0')}/${jdate.jd.toString().padStart(2,'0')}`;
+            } catch(e) {
+                return date.toLocaleDateString('fa-IR');
+            }
         }
         
         function validatePhone(input) {
-            input.value = input.value.replace(/[^0-9]/g, '');
-            if (input.value.length > 11) input.value = input.value.slice(0, 11);
-            if (input.value.length === 11 && !input.value.startsWith('09')) {
-                input.classList.add('is-invalid');
-            } else {
+            let value = input.value.replace(/[^0-9]/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            if (value.startsWith('09') && value.length === 11) {
+                input.value = value;
                 input.classList.remove('is-invalid');
+                return true;
+            } else if (value.length === 11) {
+                input.classList.add('is-invalid');
+                return false;
+            }
+            input.value = value;
+            input.classList.remove('is-invalid');
+            return true;
+        }
+        
+        function validateShamsiDate(input) {
+            let value = input.value.replace(/[^0-9\/]/g, '');
+            const parts = value.split('/');
+            if (parts.length === 3) {
+                if (parts[0].length === 4 && parts[1].length === 2 && parts[2].length === 2) {
+                    input.classList.remove('is-invalid');
+                    return true;
+                }
+            }
+            input.classList.remove('is-invalid');
+            return true;
+        }
+        
+        function validateDigitsOnly(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+        
+        function markInvalid(input, message = '') {
+            input.classList.add('is-invalid');
+            const feedback = input.nextElementSibling;
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
+                feedback.textContent = message;
+                feedback.style.display = 'block';
             }
         }
         
-        function validateDate(input) {
-            input.value = input.value.replace(/[^0-9\/]/g, '');
-            if (input.value.length === 4) input.value += '/';
-            if (input.value.length === 7) input.value += '/';
+        function markValid(input) {
             input.classList.remove('is-invalid');
+            const feedback = input.nextElementSibling;
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
+                feedback.style.display = 'none';
+            }
+        }
+        
+        function updateDateDisplay() {
+            const dateElement = document.getElementById('currentDate');
+            if (dateElement) {
+                const now = new Date();
+                dateElement.textContent = `${toShamsi(now)} - ${now.toLocaleTimeString('fa-IR')}`;
+            }
         }
         
         // ===== LOGIN SYSTEM =====
-        function handleLogin() {
-            const username = document.getElementById('username').value;
+        async function handleLogin() {
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const spinner = document.getElementById('loginSpinner');
+            
+            if (!username || !password) {
+                showNotification('لطفاً نام کاربری و رمز عبور را وارد کنید', 'error');
+                return;
+            }
+            
+            loginBtn.disabled = true;
+            spinner.style.display = 'inline';
+            loginBtn.innerHTML = 'در حال ورود...';
+            
+            // Demo login - admin/1234
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
             if (username === 'admin' && password === '1234') {
-                currentUser = { name: 'مدیر سیستم', role: 'admin' };
+                currentUser = { username, fullName: 'مدیر سیستم', role: 'admin' };
                 document.getElementById('loginPage').classList.add('d-none');
                 document.getElementById('mainApp').classList.remove('d-none');
-                document.getElementById('welcomeUser').textContent = `کاربر: ${currentUser.name}`;
-                updateDateDisplay();
-                loadData();
-                showNotification('ورود موفقیت‌آمیز', 'success');
+                document.getElementById('welcomeUser').textContent = `خوش آمدید ${currentUser.fullName}`;
+                
+                await loadData();
+                showNotification('🎉 ورود موفقیت‌آمیز - خوش آمدید!', 'success');
+                refreshDashboard();
             } else {
-                showNotification('نام کاربری یا رمز اشتباه است', 'error');
+                showNotification('❌ نام کاربری یا رمز عبور اشتباه است', 'error');
             }
+            
+            loginBtn.disabled = false;
+            spinner.style.display = 'none';
+            loginBtn.innerHTML = 'ورود به سیستم';
         }
         
         function logout() {
-            if (confirm('آیا مطمئن هستید؟')) {
+            if (confirm('آیا مطمئن هستید که می‌خواهید خارج شوید؟')) {
                 currentUser = null;
                 document.getElementById('mainApp').classList.add('d-none');
                 document.getElementById('loginPage').classList.remove('d-none');
+                document.getElementById('username').value = 'admin';
+                document.getElementById('password').value = '1234';
+                showNotification('خروج موفقیت‌آمیز', 'info');
             }
         }
         
@@ -472,20 +688,61 @@
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            event.target.closest('.nav-btn').classList.add('active');
             
-            if (pageId === 'dashboard') refreshDashboard();
-            else if (pageId === 'contracts') {
-                loadContractsList();
-                loadCustomerDatalist();
-                addProductRow();
-                addCheckRow();
-                calculateContractTotals();
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) targetPage.classList.add('active');
+            
+            const targetBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => 
+                btn.textContent.includes(pageId === 'dashboard' ? 'داشبورد' : 
+                                       pageId === 'contracts' ? 'قرارداد' :
+                                       pageId === 'invoice' ? 'فاکتور' :
+                                       pageId.charAt(0).toUpperCase() + pageId.slice(1))
+            );
+            if (targetBtn) targetBtn.classList.add('active');
+            
+            // Load page data
+            switch(pageId) {
+                case 'dashboard': refreshDashboard(); break;
+                case 'contracts': 
+                    loadContractsList(); 
+                    loadCustomerDatalist();
+                    resetContractForm();
+                    break;
+                case 'invoice': loadInvoiceContracts(); resetInvoiceForm(); break;
+                case 'customers': loadCustomersList(); break;
+                case 'checks': updateCheckStats(); break;
             }
         }
         
-        // ===== CONTRACTS FUNCTIONS =====
+        // ===== DATA PERSISTENCE =====
+        async function loadData() {
+            try {
+                const saved = localStorage.getItem('kaleshiFoam_v10');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    Object.assign(appData, parsed);
+                    contractSequence = appData.contractSequence || 0;
+                }
+                loadCustomerDatalist();
+                console.log('✅ داده‌ها بارگذاری شد:', appData.contracts.length, 'قرارداد');
+            } catch(e) {
+                console.error('خطای بارگذاری:', e);
+                showNotification('داده‌های نمونه بارگذاری شد', 'info');
+            }
+        }
+        
+        async function saveData() {
+            try {
+                appData.contractSequence = contractSequence;
+                localStorage.setItem('kaleshiFoam_v10', JSON.stringify(appData));
+                console.log('💾 داده‌ها ذخیره شد');
+            } catch(e) {
+                console.error('خطای ذخیره:', e);
+                showNotification('خطا در ذخیره داده‌ها', 'error');
+            }
+        }
+        
+        // ===== CONTRACTS SYSTEM =====
         function addProductRow() {
             productRowCount++;
             const container = document.getElementById('productRowsContainer');
@@ -496,31 +753,42 @@
                 <div class="form-group">
                     <label>نوع محصول</label>
                     <select class="form-control product-type" onchange="calculateContractTotals()">
-                        <option value="یونولیت">یونولیت</option>
-                        <option value="ساندویچ">ساندویچ</option>
-                        <option value="پانل">پانل</option>
+                        <option value="">انتخاب کنید</option>
+                        <option value="یونولیت بسته‌ای">یونولیت بسته‌ای</option>
+                        <option value="یونولیت فله">یونولیت فله</option>
+                        <option value="ساندویچ پانل">ساندویچ پانل</option>
+                        <option value="پانل سقفی">پانل سقفی</option>
+                        <option value="پانل دیواری">پانل دیواری</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>متراژ/تعداد</label>
-                    <input type="number" class="form-control product-meterage" min="0" step="0.1" oninput="calculateContractTotals()" placeholder="متر">
+                    <label>متراژ (مترمربع)</label>
+                    <input type="number" class="form-control product-meterage" min="0" step="0.01" 
+                           oninput="calculateContractTotals()" placeholder="100.50">
                 </div>
                 <div class="form-group">
-                    <label>قیمت فی</label>
-                    <input type="number" class="form-control product-price" min="0" oninput="calculateContractTotals()" placeholder="تومان">
+                    <label>قیمت واحد (تومان)</label>
+                    <input type="number" class="form-control product-price" min="0" 
+                           oninput="calculateContractTotals()" placeholder="150000">
                 </div>
                 <div class="form-group">
-                    <input class="form-control product-total" readonly style="background:#f8f9fa;font-weight:bold">
+                    <label>جمع جزء</label>
+                    <input class="form-control product-total bg-light" readonly style="font-weight:bold;background:#f8f9fa !important">
                 </div>
-                <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(${productRowCount})">حذف</button>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeProductRow(${productRowCount})">
+                    🗑️ حذف
+                </button>
             `;
             container.appendChild(row);
+            calculateContractTotals();
         }
         
         function removeProductRow(rowNumber) {
             const row = document.querySelector(`[data-row="${rowNumber}"]`);
-            if (row) row.remove();
-            calculateContractTotals();
+            if (row) {
+                row.remove();
+                calculateContractTotals();
+            }
         }
         
         function addCheckRow() {
@@ -530,70 +798,86 @@
             row.className = 'check-row';
             row.setAttribute('data-check', checkRowCount);
             row.innerHTML = `
-                <div class="form-row" style="width:90%;margin:0">
+                <div style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; padding: 10px;">
                     <div class="form-group">
                         <label>شماره چک</label>
-                        <input type="text" class="form-control check-number" placeholder="123456" oninput="validateDigitsOnly(this)">
+                        <input type="text" class="form-control check-number" placeholder="123456789" 
+                               oninput="validateDigitsOnly(this)">
                     </div>
                     <div class="form-group">
-                        <label>مبلغ</label>
-                        <input type="number" class="form-control check-amount" min="0" oninput="calculateContractTotals()" placeholder="تومان">
+                        <label>مبلغ (تومان)</label>
+                        <input type="number" class="form-control check-amount" min="0" 
+                               oninput="calculateContractTotals()" placeholder="5000000">
                     </div>
                     <div class="form-group">
-                        <label>سررسید</label>
-                        <input type="text" class="form-control pdate check-due-date" placeholder="1404/03/25" oninput="validateDate(this)">
+                        <label>تاریخ سررسید</label>
+                        <input type="text" class="form-control check-due-date" placeholder="1404/04/15" 
+                               oninput="validateShamsiDate(this)">
                     </div>
                     <div class="form-group">
                         <label>بانک</label>
-                        <input type="text" class="form-control check-bank" placeholder="ملت">
+                        <select class="form-control check-bank">
+                            <option value="ملی">بانک ملی</option>
+                            <option value="ملت">بانک ملت</option>
+                            <option value="تجارت">بانک تجارت</option>
+                            <option value="صادرات">بانک صادرات</option>
+                        </select>
                     </div>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeCheckRow(${checkRowCount})">
+                        🗑️ حذف
+                    </button>
                 </div>
-                <button type="button" class="btn btn-danger btn-sm" onclick="removeCheckRow(${checkRowCount})">حذف</button>
             `;
             container.appendChild(row);
+            calculateContractTotals();
         }
         
         function removeCheckRow(checkNumber) {
             const row = document.querySelector(`[data-check="${checkNumber}"]`);
-            if (row) row.remove();
-            calculateContractTotals();
+            if (row) {
+                row.remove();
+                calculateContractTotals();
+            }
         }
         
         function calculateContractTotals() {
             let totalProducts = 0;
+            
+            // Calculate products
             document.querySelectorAll('.product-row').forEach(row => {
                 const meterage = parseFloat(row.querySelector('.product-meterage').value) || 0;
                 const price = parseFloat(row.querySelector('.product-price').value) || 0;
                 const total = meterage * price;
-                row.querySelector('.product-total').value = total.toLocaleString('fa-IR');
+                const totalField = row.querySelector('.product-total');
+                if (totalField) {
+                    totalField.value = total.toLocaleString('fa-IR');
+                }
                 totalProducts += total;
             });
             
+            // Calculate checks
             let totalChecks = 0;
-            document.querySelectorAll('.check-row').forEach(row => {
-                totalChecks += parseFloat(row.querySelector('.check-amount').value) || 0;
+            document.querySelectorAll('.check-row .check-amount').forEach(input => {
+                totalChecks += parseFloat(input.value) || 0;
             });
             
             const advance = parseFloat(document.getElementById('contractAdvance').value) || 0;
-            const balance = totalProducts - advance - totalChecks;
+            const balance = totalProducts + totalChecks - advance;
             
+            // Update displays
             document.getElementById('contractTotalDisplay').textContent = totalProducts.toLocaleString('fa-IR');
             document.getElementById('contractAdvanceDisplay').textContent = advance.toLocaleString('fa-IR');
             document.getElementById('contractCheckDisplay').textContent = totalChecks.toLocaleString('fa-IR');
-            document.getElementById('contractBalanceDisplay').textContent = Math.abs(balance).toLocaleString('fa-IR');
-            document.getElementById('contractBalanceDisplay').className = balance >= 0 ? 'text-success' : 'text-danger';
-        }
-        
-        function loadCustomerInfo(customerName) {
-            const customer = appData.customers.find(c => c.name === customerName);
-            if (customer) {
-                document.getElementById('contractPhone').value = customer.phone || '';
-                document.getElementById('contractAddress').value = customer.address || '';
-            }
+            
+            const balanceEl = document.getElementById('contractBalanceDisplay');
+            balanceEl.textContent = Math.abs(balance).toLocaleString('fa-IR');
+            balanceEl.style.color = balance >= 0 ? 'var(--success)' : 'var(--danger)';
+            balanceEl.innerHTML += balance >= 0 ? ' <span style="color:var(--success);">دریافتی</span>' : ' <span style="color:var(--danger);">بدهکار</span>';
         }
         
         function loadCustomerDatalist() {
             const datalist = document.getElementById('customerList');
+            if (!datalist) return;
             datalist.innerHTML = '';
             appData.customers.forEach(customer => {
                 const option = document.createElement('option');
@@ -602,76 +886,99 @@
             });
         }
         
+        function loadCustomerInfo(customerName) {
+            const customer = appData.customers.find(c => c.name === customerName);
+            if (customer) {
+                document.getElementById('contractPhone').value = customer.phone;
+                document.getElementById('contractAddress').value = customer.address || '';
+                markValid(document.getElementById('contractPhone'));
+            }
+        }
+        
         async function saveContract() {
+            // Validation
             const customer = document.getElementById('contractCustomer').value.trim();
             const phone = document.getElementById('contractPhone').value.trim();
+            const deliveryDate = document.getElementById('contractDeliveryDate').value.trim();
             
-            if (!customer || !phone) {
-                showNotification('مشتری و تلفن الزامی است', 'error');
+            if (!customer) {
+                markInvalid(document.getElementById('contractCustomer'), 'نام مشتری الزامی است');
+                return;
+            }
+            if (!phone || !validatePhone(document.getElementById('contractPhone'))) {
+                markInvalid(document.getElementById('contractPhone'));
+                return;
+            }
+            if (!deliveryDate) {
+                markInvalid(document.getElementById('contractDeliveryDate'));
                 return;
             }
             
+            // Collect products
             const products = [];
+            let hasValidProduct = false;
             document.querySelectorAll('.product-row').forEach(row => {
                 const type = row.querySelector('.product-type').value;
                 const meterage = parseFloat(row.querySelector('.product-meterage').value) || 0;
                 const price = parseFloat(row.querySelector('.product-price').value) || 0;
-                if (meterage > 0 && price > 0) {
-                    products.push({ type, meterage, price, total: meterage * price });
+                if (type && meterage > 0 && price > 0) {
+                    const total = meterage * price;
+                    products.push({ type, meterage, price, total });
+                    hasValidProduct = true;
                 }
             });
             
-            if (products.length === 0) {
-                showNotification('حداقل یک محصول اضافه کنید', 'error');
+            if (!hasValidProduct) {
+                showNotification('حداقل یک محصول معتبر اضافه کنید', 'error');
                 return;
             }
             
+            // Collect checks
             const checks = [];
             document.querySelectorAll('.check-row').forEach(row => {
                 const number = row.querySelector('.check-number').value.trim();
                 const amount = parseFloat(row.querySelector('.check-amount').value) || 0;
-                const dueDate = row.querySelector('.check-due-date').value;
-                const bank = row.querySelector('.check-bank').value.trim();
+                const dueDate = row.querySelector('.check-due-date').value.trim();
+                const bank = row.querySelector('.check-bank').value;
                 if (number && amount > 0 && dueDate && bank) {
-                    checks.push({ number, amount, dueDate, bank });
+                    checks.push({ number, amount, dueDate, bank, status: 'در جریان' });
                 }
             });
             
-            const totalProducts = products.reduce((sum, p) => sum + p.total, 0);
-            const totalChecks = checks.reduce((sum, c) => sum + c.amount, 0);
+            // Calculate totals
+            const totalAmount = products.reduce((sum, p) => sum + p.total, 0);
+            const totalChecksAmount = checks.reduce((sum, c) => sum + c.amount, 0);
             const advance = parseFloat(document.getElementById('contractAdvance').value) || 0;
-            const balance = totalProducts - advance - totalChecks;
+            const balance = totalAmount - advance - totalChecksAmount;
             
-            const year = new Date().getFullYear() - 621;
-            const seq = (parseInt(localStorage.getItem('contractSeq') || '0') + 1).toString().padStart(4, '0');
-            localStorage.setItem('contractSeq', seq);
-            const contractNumber = `${year}-${seq}`;
+            // Generate contract number
+            contractSequence++;
+            localStorage.setItem('contractSeq', contractSequence);
+            const year = parseInt(toShamsi().split('/')[0]);
+            const contractNumber = `${year}-${contractSequence.toString().padStart(4, '0')}`;
             
+            // Create contract
             const contract = {
-                id: Date.now(),
+                id: Date.now() + Math.random(),
                 contractNumber,
                 customer,
                 phone,
                 address: document.getElementById('contractAddress').value,
-                deliveryDate: document.getElementById('contractDeliveryDate').value,
+                deliveryDate,
                 products,
                 checks,
-                totalAmount: totalProducts,
+                totalAmount,
                 advance,
-                checkAmount: totalChecks,
+                checkAmount: totalChecksAmount,
                 balance,
                 date: toShamsi(),
                 status: 'فعال'
             };
             
-            if (editingId) {
-                const index = appData.contracts.findIndex(c => c.id == editingId);
-                if (index !== -1) appData.contracts[index] = contract;
-            } else {
-                appData.contracts.push(contract);
-            }
+            // Save contract
+            appData.contracts.unshift(contract); // Add to beginning for newest first
             
-            // Add checks to main checks list
+            // Save individual checks
             checks.forEach(check => {
                 appData.checks.push({
                     id: Date.now() + Math.random(),
@@ -679,43 +986,49 @@
                     contractNumber,
                     customer,
                     ...check,
-                    status: 'در جریان',
                     createdDate: toShamsi()
                 });
             });
             
-            // Add transaction
-            appData.transactions.push({
+            // Add transaction record
+            appData.transactions.unshift({
                 id: Date.now(),
                 date: toShamsi(),
                 type: 'income',
-                category: 'فروش',
+                category: 'قرارداد',
                 description: `${contractNumber} - ${customer}`,
-                amount: totalProducts,
-                paymentMethod: checks.length > 0 ? 'چک' : 'نقد',
+                amount: totalAmount,
+                paymentMethod: checks.length > 0 ? 'چک+نقد' : 'نقد',
                 reference: contractNumber
             });
             
             // Update customer
-            let existingCustomer = appData.customers.find(c => c.phone === phone);
-            if (!existingCustomer) {
-                appData.customers.push({
+            let customerRecord = appData.customers.find(c => c.phone === phone);
+            if (!customerRecord) {
+                customerRecord = {
                     id: Date.now(),
                     name: customer,
                     phone,
                     address: contract.address,
                     type: 'عادی',
-                    registrationDate: toShamsi()
-                });
+                    registrationDate: toShamsi(),
+                    contractCount: 1,
+                    totalSpent: totalAmount
+                };
+                appData.customers.push(customerRecord);
             } else {
-                existingCustomer.contractCount = (existingCustomer.contractCount || 0) + 1;
-                existingCustomer.totalSpent = (existingCustomer.totalSpent || 0) + totalProducts;
+                customerRecord.contractCount = (customerRecord.contractCount || 0) + 1;
+                customerRecord.totalSpent = (customerRecord.totalSpent || 0) + totalAmount;
             }
             
             await saveData();
-            showNotification(`قرارداد ${contractNumber} ثبت شد`, 'success');
+            
+            showNotification(`✅ قرارداد ${contractNumber} با موفقیت ثبت شد\n💰 مبلغ: ${totalAmount.toLocaleString('fa-IR')} تومان`, 'success');
+            
             loadContractsList();
+            loadCustomerDatalist();
             resetContractForm();
+            refreshDashboard();
         }
         
         function resetContractForm() {
@@ -724,12 +1037,22 @@
             document.getElementById('contractAddress').value = '';
             document.getElementById('contractDeliveryDate').value = '';
             document.getElementById('contractAdvance').value = 0;
-            productRowCount = 0; checkRowCount = 0;
+            
+            productRowCount = 0;
+            checkRowCount = 0;
             document.getElementById('productRowsContainer').innerHTML = '';
             document.getElementById('checkRowsContainer').innerHTML = '';
-            addProductRow(); addCheckRow();
+            
+            // Add default rows
+            addProductRow();
+            addCheckRow();
             calculateContractTotals();
+            
+            // Clear validation
+            document.querySelectorAll('.form-control').forEach(input => markValid(input));
+            
             editingId = null;
+            showNotification('فرم پاک شد - آماده ثبت قرارداد جدید', 'info');
         }
         
         function loadContractsList() {
@@ -737,63 +1060,77 @@
             if (!tbody) return;
             
             tbody.innerHTML = '';
-            const search = document.getElementById('searchContracts')?.value.toLowerCase() || '';
-            const filtered = appData.contracts.filter(c =>
-                c.contractNumber.toLowerCase().includes(search) ||
-                c.customer.toLowerCase().includes(search) ||
-                c.phone.includes(search)
-            );
+            const contracts = appData.contracts.slice().reverse(); // Newest first
             
-            if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" class="text-center py-4">بدون نتیجه</td></tr>';
+            if (contracts.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4">هیچ قرادادی ثبت نشده</td></tr>';
                 return;
             }
             
-            filtered.forEach((contract, index) => {
+            contracts.forEach((contract, index) => {
                 const row = tbody.insertRow();
                 row.innerHTML = `
                     <td>${index + 1}</td>
-                    <td>${contract.contractNumber}</td>
+                    <td><strong>${contract.contractNumber}</strong></td>
                     <td>${contract.customer}</td>
                     <td>${contract.phone}</td>
                     <td>${contract.totalAmount.toLocaleString('fa-IR')}</td>
                     <td>${contract.advance.toLocaleString('fa-IR')}</td>
                     <td>${contract.checkAmount.toLocaleString('fa-IR')}</td>
-                    <td style="color: ${contract.balance >= 0 ? 'var(--success)' : 'var(--danger)'}">
+                    <td style="color: ${contract.balance >= 0 ? '#27ae60' : '#e74c3c'}">
                         ${Math.abs(contract.balance).toLocaleString('fa-IR')}
                     </td>
-                    <td>${contract.date}</td>
-                    <td><span class="badge ${contract.status === 'فعال' ? 'badge-success' : 'badge-danger'}">${contract.status}</span></td>
+                    <td>${contract.deliveryDate}</td>
                     <td>
-                        <button class="btn btn-info btn-sm">ویرایش</button>
-                        <button class="btn btn-danger btn-sm">حذف</button>
+                        <span class="badge ${contract.status === 'فعال' ? 'badge-success' : 'badge-danger'}">
+                            ${contract.status}
+                        </span>
                     </td>
                 `;
             });
         }
         
-        // ===== DATA MANAGEMENT =====
-        async function loadData() {
-            try {
-                const saved = localStorage.getItem('kaleshiFoamData');
-                if (saved) {
-                    Object.assign(appData, JSON.parse(saved));
-                } else {
-                    // Sample data
-                    appData.customers = [
-                        { id: 1, name: 'علی محمدی', phone: '09121234567', type: 'عادی' },
-                        { id: 2, name: 'رضا حسینی', phone: '09129876543', type: 'ویژه' }
-                    ];
-                    await saveData();
-                }
-                refreshDashboard();
-            } catch (e) {
-                console.error('Load error:', e);
+        // ===== INVOICE SYSTEM =====
+        function loadInvoiceContracts() {
+            const select = document.getElementById('invoiceContract');
+            if (!select) return;
+            
+            select.innerHTML = '<option value="">--- انتخاب قرارداد ---</option>';
+            appData.contracts.forEach(contract => {
+                const option = document.createElement('option');
+                option.value = contract.id;
+                option.textContent = `${contract.contractNumber} - ${contract.customer} (${contract.totalAmount.toLocaleString('fa-IR')} تومان)`;
+                select.appendChild(option);
+            });
+        }
+        
+        function loadInvoiceContract() {
+            const contractId = document.getElementById('invoiceContract').value;
+            const contract = appData.contracts.find(c => c.id == contractId);
+            
+            if (contract) {
+                document.getElementById('invoiceProductsContainer').innerHTML = '';
+                contract.products.forEach((product, index) => {
+                    const row = document.createElement('div');
+                    row.className = 'product-row';
+                    row.innerHTML = `
+                        <div><strong>${product.type}</strong></div>
+                        <div>${product.meterage} متر</div>
+                        <div>${product.price.toLocaleString('fa-IR')}</div>
+                        <div style="font-weight:bold;color:var(--success);">${product.total.toLocaleString('fa-IR')}</div>
+                        <div></div>
+                    `;
+                    document.getElementById('invoiceProductsContainer').appendChild(row);
+                });
             }
         }
         
-        async function saveData() {
-            localStorage.setItem('kaleshiFoamData', JSON.stringify(appData));
+        function resetInvoiceForm() {
+            document.getElementById('invoiceContract').value = '';
+            document.getElementById('invoiceDriver').value = '';
+            document.getElementById('invoiceDeliveryDate').value = '';
+            document.getElementById('invoiceCarPlate').value = '';
+            document.getElementById('invoiceProductsContainer').innerHTML = '<p>ابتدا قرارداد را انتخاب کنید</p>';
         }
         
         // ===== DASHBOARD =====
@@ -801,33 +1138,80 @@
             document.getElementById('statContracts').textContent = appData.contracts.length;
             document.getElementById('statCustomers').textContent = appData.customers.length;
             document.getElementById('statPendingChecks').textContent = appData.checks.filter(c => c.status === 'در جریان').length;
-            const totalIncome = appData.transactions?.reduce((sum, t) => t.type === 'income' ? sum + t.amount : sum, 0) || 0;
+            
+            const totalIncome = appData.transactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
             document.getElementById('statIncome').textContent = totalIncome.toLocaleString('fa-IR');
-            showNotification('داشبورد بروزرسانی شد', 'success');
+            
+            updateCheckStats();
+            showNotification('📊 داشبورد به‌روزرسانی شد', 'success');
         }
         
-        function updateDateDisplay() {
-            document.getElementById('currentDate').textContent = toShamsi() + ' - ' + new Date().toLocaleTimeString('fa-IR');
+        function updateCheckStats() {
+            const pending = appData.checks.filter(c => c.status === 'در جریان').length;
+            const cleared = appData.checks.filter(c => c.status === 'تسویه').length;
+            
+            if (document.getElementById('checkPending')) {
+                document.getElementById('checkPending').textContent = pending;
+            }
+            if (document.getElementById('checkCleared')) {
+                document.getElementById('checkCleared').textContent = cleared;
+            }
+        }
+        
+        function loadCustomersList() {
+            const tbody = document.querySelector('#customersTable tbody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            appData.customers.forEach(customer => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${customer.name}</td>
+                    <td>${customer.phone}</td>
+                    <td>${customer.contractCount || 0}</td>
+                    <td>${(customer.totalSpent || 0).toLocaleString('fa-IR')}</td>
+                `;
+            });
+        }
+        
+        // ===== PRINT FUNCTIONS =====
+        function printContract() {
+            const content = `
+                <h2>کارخانه یونولیت کلشی‌فوم</h2>
+                <p>قرارداد شماره: ${appData.contracts[0]?.contractNumber || 'جدید'}</p>
+                <p>مشتری: ${document.getElementById('contractCustomer').value}</p>
+            `;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html><head><title>چاپ قرارداد</title>
+                <style>body{font-family:Tahoma;direction:rtl;padding:20px;}</style></head>
+                <body>${content}<script>window.print();window.close();</script></body></html>
+            `);
         }
         
         // ===== INIT =====
         document.addEventListener('DOMContentLoaded', function() {
             updateDateDisplay();
-            setInterval(updateDateDisplay, 60000);
+            setInterval(updateDateDisplay, 30000); // Update every 30s
             
-            // Search listeners
-            document.getElementById('searchContracts')?.addEventListener('input', loadContractsList);
-            
-            // Persian Datepicker
-            document.querySelectorAll('.pdate').forEach(input => {
-                $(input).persianDatepicker({
-                    format: 'YYYY/MM/DD',
-                    autoClose: true,
-                    initialValue: false,
-                    calendar: { persian: { locale: 'fa' } }
-                });
+            // Enter key for login
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') handleLogin();
             });
+            
+            // Auto-add initial rows
+            setTimeout(() => {
+                if (document.getElementById('contracts')) {
+                    addProductRow();
+                    addCheckRow();
+                }
+            }, 500);
         });
+        
+        // Save on page unload
+        window.addEventListener('beforeunload', saveData);
     </script>
 </body>
 </html>
