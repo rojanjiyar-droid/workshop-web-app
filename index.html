@@ -3,21 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سیستم حسابداری کلشی‌فوم v16.0 - کامل</title>
-    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+    <title>سیستم حسابداری کلشی‌فوم v17.0 - کامل</title>
+    <script src="https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Tahoma, Arial; background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); min-height: 100vh; direction: rtl; padding: 20px; }
         .login-box { max-width: 400px; margin: 50px auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; }
         .logo { width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 28px; font-weight: bold; }
-        input, select { width: 100%; padding: 15px; margin: 15px 0; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
         input:focus, select:focus { border-color: #3b82f6; outline: none; }
-        button { width: 100%; padding: 15px; background: #3b82f6; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button { padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; margin: 5px; }
         button:hover { background: #1d4ed8; }
+        button.btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-success { background: #10b981; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: #f59e0b; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-info { background: #06b6d4; }
+        .btn-info:hover { background: #0891b2; }
         .main-app { display: none; }
         .nav { background: #1e3a8a; padding: 0; display: flex; overflow-x: auto; border-radius: 10px; margin-bottom: 20px; }
-        .nav button { background: none; color: white; border: none; padding: 15px 20px; cursor: pointer; white-space: nowrap; font-weight: bold; flex: 1; }
+        .nav button { background: none; color: white; border: none; padding: 15px 20px; cursor: pointer; white-space: nowrap; font-weight: bold; flex: 1; min-width: 120px; }
         .nav button.active { background: #3b82f6; }
         .page { display: none; }
         .page.active { display: block; }
@@ -28,23 +36,25 @@
         th, td { padding: 12px; text-align: right; border-bottom: 1px solid #eee; }
         th { background: #1e3a8a; color: white; }
         .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .product-row, .check-row { background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: center; }
-        .totals { background: #10b981; color: white; padding: 25px; border-radius: 15px; margin: 25px 0; }
-        .total-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
-        .status-badge { padding: 4px 12px; border-radius: 20px; color: white; font-size: 12px; font-weight: bold; }
+        .product-row, .check-row { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: center; }
+        .totals { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 25px; border-radius: 15px; margin: 25px 0; }
+        .total-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px; }
+        .total-row:last-child { font-size: 24px; font-weight: bold; border-top: 2px solid rgba(255,255,255,0.3); padding-top: 15px; }
+        .status-badge { padding: 6px 12px; border-radius: 20px; color: white; font-size: 12px; font-weight: bold; }
         .status-daraj { background: #f59e0b; }
         .status-vasol { background: #10b981; }
         .status-bargashti { background: #ef4444; }
         .notification { position: fixed; top: 20px; right: 20px; background: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 999; border-right: 5px solid #10b981; display: flex; align-items: center; gap: 10px; }
         .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        .date-picker { position: relative; }
+        .date-picker input { background: #f8f9fa; cursor: pointer; }
         @media (max-width: 768px) { .form-row, .product-row, .check-row { grid-template-columns: 1fr; } .nav { flex-direction: column; } }
-        .persian-datepicker { direction: rtl; }
     </style>
 </head>
 <body>
 <div id="loginBox" class="login-box">
     <div class="logo">CF</div>
-    <h2>سیستم حسابداری کلشی‌فوم v16.0</h2>
+    <h2>سیستم حسابداری کلشی‌فوم v17.0</h2>
     <input type="text" id="userInput" placeholder="admin" value="admin">
     <input type="password" id="passInput" placeholder="1234" value="1234">
     <button onclick="loginNow()">🚀 ورود</button>
@@ -57,7 +67,7 @@
             <div style="width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #3b82f6; font-weight: bold; font-size: 20px;">CF</div>
             <div><h2 style="margin: 0;">کلشی‌فوم</h2><div id="dateNow"></div></div>
         </div>
-        <button onclick="logoutNow()" style="background: #ef4444; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;">خروج</button>
+        <button class="btn-danger" onclick="logoutNow()">خروج</button>
     </div>
 
     <div class="nav" id="navBar">
@@ -65,11 +75,7 @@
         <button onclick="showPage('contracts')">📝 قراردادها</button>
         <button onclick="showPage('checks')">🏦 چک‌ها</button>
         <button onclick="showPage('customers')">👥 مشتریان</button>
-        <button onclick="showPage('invoices')">📄 فاکتورها</button>
         <button onclick="showPage('expenses')">💸 هزینه‌ها</button>
-        <button onclick="showPage('employees')">👷 کارکنان</button>
-        <button onclick="showPage('scheduling')">📅 نوبت‌دهی</button>
-        <button onclick="showPage('settings')">⚙️ تنظیمات</button>
         <button onclick="showPage('backup')">💾 پشتیبان</button>
     </div>
 
@@ -86,34 +92,37 @@
         <div id="contracts" class="page">
             <div class="card">
                 <h3 style="margin-bottom: 25px; color: #1e3a8a;">📝 قرارداد جدید</h3>
+                <button class="btn-warning" onclick="resetForm()" style="width: auto;">🔄 جدید</button>
                 <div class="form-row">
                     <div><label>مشتری *</label><input id="custName" list="custList"></div>
                     <div><label>تلفن</label><input id="custPhone" type="tel"></div>
                     <div><label>آدرس</label><input id="custAddr"></div>
-                    <div><label>تاریخ قرارداد</label><input id="contDate" readonly class="persian-datepicker-input"></div>
-                    <div><label>تاریخ تحویل</label><input id="delDate" class="persian-datepicker-input"></div>
+                    <div><label>تاریخ قرارداد</label><input id="contDate" class="date-picker" readonly></div>
+                    <div><label>تاریخ تحویل</label><input id="delDate" class="date-picker"></div>
                 </div>
                 <h4 style="margin: 25px 0 15px 0; color: #1e3a8a;">📦 محصولات</h4>
                 <div id="prodCont"></div>
-                <button onclick="addProd()" style="background: #06b6d4; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; margin-bottom: 20px;">➕ محصول</button>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                <button class="btn-info" onclick="addProd()" style="width: auto;">➕ محصول</button>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 25px 0;">
                     <div><label>پیش‌پرداخت</label><input id="prePay" type="number" value="0" oninput="calcAll()"></div>
                 </div>
                 <h4 style="margin: 25px 0 15px 0; color: #1e3a8a;">🏦 چک‌ها</h4>
                 <div id="chkCont"></div>
-                <button onclick="addChk()" style="background: #06b6d4; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; margin-bottom: 20px;">➕ چک</button>
+                <button class="btn-info" onclick="addChk()" style="width: auto;">➕ چک</button>
                 <div class="totals">
                     <div class="total-row"><span>جمع محصولات:</span><strong id="prodTot">0 تومان</strong></div>
                     <div class="total-row"><span>پیش‌پرداخت:</span><strong id="advTot">0 تومان</strong></div>
                     <div class="total-row"><span>چک‌ها:</span><strong id="chkTot">0 تومان</strong></div>
-                    <div class="total-row" style="font-size: 22px; color: #ffd700;"><span>🟢 مانده:</span><strong id="balTot">0 تومان</strong></div>
+                    <div class="total-row"><span style="color: #ffd700;">🟢 مانده:</span><strong id="balTot">0 تومان</strong></div>
                 </div>
-                <button onclick="saveCont()" style="background: #10b981; color: white; border: none; padding: 18px 36px; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin: 20px 10px 0 0;">✅ ثبت قرارداد</button>
+                <button class="btn-success" onclick="saveCont()" style="width: auto; padding: 15px 30px; font-size: 16px;">✅ ثبت قرارداد</button>
             </div>
             <div class="card">
                 <h3 style="margin-bottom: 25px; color: #1e3a8a;">📋 قراردادهای ثبت شده</h3>
                 <div style="overflow-x: auto;">
-                    <table id="contTable"><tr><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>تاریخ</th><th>حذف</th></tr></table>
+                    <table id="contTable">
+                        <tr><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>تاریخ</th><th>عملیات</th></tr>
+                    </table>
                 </div>
             </div>
         </div>
@@ -126,7 +135,7 @@
                     <div><label>مشتری</label><input id="newCheckCustomer" list="custList"></div>
                     <div><label>شماره چک</label><input id="newCheckNumber"></div>
                     <div><label>مبلغ</label><input id="newCheckAmount" type="number"></div>
-                    <div><label>سررسید</label><input id="newCheckDue" class="persian-datepicker-input"></div>
+                    <div><label>سررسید</label><input id="newCheckDue" class="date-picker"></div>
                     <div><label>وضعیت</label>
                         <select id="newCheckStatus">
                             <option>در جریان</option>
@@ -135,12 +144,14 @@
                         </select>
                     </div>
                 </div>
-                <button onclick="saveNewCheck()" style="background: #10b981; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">✅ ثبت چک</button>
+                <button class="btn-success" onclick="saveNewCheck()">✅ ثبت چک</button>
             </div>
             <div class="card">
                 <h3 style="margin-bottom: 25px; color: #1e3a8a;">📋 لیست چک‌ها</h3>
                 <div style="overflow-x: auto;">
-                    <table id="chkTab"><tr><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>سررسید</th><th>وضعیت</th><th>عملیات</th></tr></table>
+                    <table id="chkTab">
+                        <tr><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>سررسید</th><th>وضعیت</th><th>عملیات</th></tr>
+                    </table>
                 </div>
             </div>
         </div>
@@ -149,7 +160,7 @@
         <div id="customers" class="page">
             <div class="card">
                 <h3 style="margin-bottom: 25px; color: #1e3a8a;">👥 مشتریان</h3>
-                <button onclick="toggleCustForm()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;">➕ مشتری جدید</button>
+                <button class="btn-success" onclick="toggleCustForm()">➕ مشتری جدید</button>
                 <div id="custForm" style="display: none; background: #f8f9fa; padding: 25px; margin: 25px 0; border-radius: 12px;">
                     <div class="form-row">
                         <div><label>نام *</label><input id="newName"></div>
@@ -161,23 +172,57 @@
                             </select>
                         </div>
                     </div>
-                    <button onclick="saveCust()" style="background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer;">✅ ذخیره</button>
+                    <button class="btn-success" onclick="saveCust()">✅ ذخیره</button>
+                    <button class="btn-danger" onclick="toggleCustForm()">❌ انصراف</button>
                 </div>
-                <table id="custTab"><tr><th>نام</th><th>تلفن</th><th>آدرس</th><th>نوع</th><th>عملیات</th></tr></table>
+                <div style="overflow-x: auto;">
+                    <table id="custTab">
+                        <tr><th>نام</th><th>تلفن</th><th>آدرس</th><th>نوع</th><th>عملیات</th></tr>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- سایر منوها -->
-        <div id="invoices" class="page"><div class="card"><h3>📄 فاکتورها</h3><p>مدیریت فاکتورها...</p></div></div>
-        <div id="expenses" class="page"><div class="card"><h3>💸 هزینه‌ها</h3><p>مدیریت هزینه‌ها...</p></div></div>
-        <div id="employees" class="page"><div class="card"><h3>👷 کارکنان</h3><p>مدیریت کارکنان...</p></div></div>
-        <div id="scheduling" class="page"><div class="card"><h3>📅 نوبت‌دهی</h3><p>سیستم نوبت‌دهی...</p></div></div>
-        <div id="settings" class="page"><div class="card"><h3>⚙️ تنظیمات</h3><p>تنظیمات سیستم...</p></div></div>
+        <!-- هزینه‌ها -->
+        <div id="expenses" class="page">
+            <div class="card">
+                <h3 style="margin-bottom: 25px; color: #1e3a8a;">💸 ثبت هزینه جدید</h3>
+                <div class="form-row">
+                    <div><label>شرح هزینه *</label><input id="expDesc"></div>
+                    <div><label>مبلغ *</label><input id="expAmount" type="number"></div>
+                    <div><label>تاریخ</label><input id="expDate" class="date-picker" readonly></div>
+                    <div><label>دسته‌بندی</label>
+                        <select id="expCategory">
+                            <option>حقوق</option>
+                            <option>اجاره</option>
+                            <option>آب/برق/گاز</option>
+                            <option>مواد اولیه</option>
+                            <option>حمل و نقل</option>
+                            <option>سایر</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-success" onclick="saveExpense()">✅ ثبت هزینه</button>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom: 25px; color: #1e3a8a;">📋 لیست هزینه‌ها</h3>
+                <div style="overflow-x: auto;">
+                    <table id="expTab">
+                        <tr><th>شرح</th><th>مبلغ</th><th>تاریخ</th><th>دسته</th><th>عملیات</th></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- پشتیبان -->
         <div id="backup" class="page">
             <div class="card">
                 <h3>💾 پشتیبان‌گیری</h3>
-                <button onclick="backupData()" style="background: #10b981; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 16px; cursor: pointer;">📥 دانلود پشتیبان</button>
-                <input type="file" id="restoreFile" style="margin-top: 20px;" onchange="restoreData(event)">
+                <button class="btn-success" onclick="backupData()" style="width: auto; padding: 15px 30px;">📥 دانلود پشتیبان</button>
+                <br><input type="file" id="restoreFile" style="margin: 20px 0;" onchange="restoreData(event)">
+                <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 8px;">
+                    <strong>راهنما:</strong> فایل JSON دانلود شده را برای بازیابی انتخاب کنید
+                </div>
             </div>
         </div>
     </div>
@@ -186,27 +231,43 @@
 <datalist id="custList"></datalist>
 
 <script>
-let data = JSON.parse(localStorage.getItem('kaleshi16')) || {
-    customers: [{id:1,name:'علی محمدی',phone:'09121234567',address:'ارومیه',type:'عادی'},{id:2,name:'رضا احمدی',phone:'09129876543',address:'ارومیه',type:'عامل'}],
-    contracts: [], checks: [], invoices: [], expenses: [], employees: []
+let data = JSON.parse(localStorage.getItem('kaleshi17')) || {
+    customers: [
+        {id:1,name:'علی محمدی',phone:'09121234567',address:'ارومیه - بلوار آزادی',type:'عادی'},
+        {id:2,name:'رضا احمدی',phone:'09129876543',address:'ارومیه - قزل عاشق',type:'عامل'}
+    ],
+    contracts: [], checks: [], expenses: []
 };
-let pCount=0, cCount=0;
+let pCount=0, cCount=0, editingId = null;
 
 // تاریخ شمسی
-function pd(){const d=new Date(),p='۰۱۲۳۴۵۶۷۸۹';return d.toLocaleDateString('fa-IR').replace(/\d/g,c=>p[c]);}
+function pd(){const d=new persianDate();return d.format('YYYY/MM/DD');}
 function fmt(n){return n.toLocaleString('fa-IR')+' تومان';}
-function notif(msg,t='success'){const d=document.createElement('div');d.className='notification';d.style.borderRightColor=t=='success'?'#10b981':'#ef4444';d.innerHTML=`${t=='success'?'✅':'❌'}${msg}<button onclick="this.parentNode.remove()" style="float:left;background:none;border:none;font-size:20px;cursor:pointer;">×</button>`;document.body.appendChild(d);setTimeout(()=>d.remove(),4000);}
-function save(){localStorage.setItem('kaleshi16',JSON.stringify(data));}
+function notif(msg,t='success'){
+    const d=document.createElement('div');
+    d.className='notification';
+    d.style.borderRightColor=t=='success'?'#10b981':'#ef4444';
+    d.innerHTML=`${t=='success'?'✅':'❌'}${msg}<button onclick="this.parentNode.remove()" style="float:left;background:none;border:none;font-size:20px;cursor:pointer;">×</button>`;
+    document.body.appendChild(d);setTimeout(()=>d.remove(),4000);
+}
+function save(){localStorage.setItem('kaleshi17',JSON.stringify(data));}
 
-// تقویم جلالی
-$(document).ready(function() {
-    $('.persian-datepicker-input').persianDatepicker({
-        initialValue: false,
-        format: 'YYYY/MM/DD',
-        autoClose: true,
-        calendar: { persian: { locale: 'fa' } }
-    });
-});
+// تقویم جلالی popup
+function showDatePicker(inputId) {
+    const input = document.getElementById(inputId);
+    const rect = input.getBoundingClientRect();
+    let dateStr = prompt('تاریخ شمسی (YYYY/MM/DD):', input.value || pd());
+    if (dateStr && isValidPersianDate(dateStr)) {
+        input.value = dateStr;
+        if (inputId.includes('delDate') || inputId.includes('cd') || inputId.includes('newCheckDue') || inputId.includes('expDate')) calcAll();
+    }
+}
+
+function isValidPersianDate(dateStr) {
+    const p = '۰۱۲۳۴۵۶۷۸۹';
+    const regex = /^1[3-9]\d{2}\/(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/;
+    return regex.test(dateStr.replace(/[۰-۹]/g, d => p.indexOf(d).toString()));
+}
 
 // ورود
 function loginNow(){
@@ -216,116 +277,319 @@ function loginNow(){
         document.getElementById('mainApp').style.display='block';
         document.getElementById('dateNow').textContent=pd();
         document.getElementById('contDate').value=pd();
+        document.getElementById('expDate').value=pd();
         startApp();
         notif('ورود موفق! 🚀');
-    }else notif('اشتباه!','error');
+    }else notif('نام کاربری یا رمز اشتباه!','error');
 }
 
-function logoutNow(){if(confirm('خروج؟'))location.reload();}
+function logoutNow(){if(confirm('آیا مطمئن هستید؟'))location.reload();}
 function showPage(p){
     document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
     document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
     document.getElementById(p).classList.add('active');
     event.target.classList.add('active');
-    if(p=='contracts')loadConts();
-    if(p=='checks')loadChks();
-    if(p=='customers')loadCusts();
+    if(p=='contracts') {loadConts(); resetForm();}
+    if(p=='checks') loadChks();
+    if(p=='customers') loadCusts();
+    if(p=='expenses') loadExpenses();
 }
-function startApp(){updateDash();loadCusts();loadChks();loadConts();resetForm();}
+function startApp(){updateDash();loadCusts();loadChks();loadConts();loadExpenses();resetForm();}
 
 function updateDash(){
-    const tc=data.contracts.length,tr=data.contracts.reduce((s,c)=>s+c.products.reduce((p,pr)=>p+pr.qty*pr.price,0),0);
-    const ch=data.checks.length;
+    const tc=data.contracts.length, tr=data.contracts.reduce((s,c)=>s+c.products.reduce((p,pr)=>p+pr.qty*pr.price,0),0);
+    const ch=data.checks.length, ex=data.expenses.reduce((s,e)=>s+e.amount,0);
     document.getElementById('statsBox').innerHTML=`
         <div class="stat"><div class="stat-value">${tc}</div>قراردادها</div>
         <div class="stat"><div class="stat-value">${fmt(tr)}</div>درآمد</div>
         <div class="stat"><div class="stat-value">${data.customers.length}</div>مشتریان</div>
-        <div class="stat"><div class="stat-value">${ch}</div>چک‌ها</div>`;
+        <div class="stat"><div class="stat-value">${ch}</div>چک‌ها</div>
+        <div class="stat"><div class="stat-value">${fmt(ex)}</div>هزینه‌ها</div>
+        <div class="stat"><div class="stat-value">${data.expenses.length}</div>تعداد هزینه</div>`;
 }
 
-// قراردادها (همان کد قبلی)
-function resetForm(){document.getElementById('custName').value=document.getElementById('custPhone').value=document.getElementById('custAddr').value=document.getElementById('delDate').value=document.getElementById('prePay').value='0';document.getElementById('prodCont').innerHTML=document.getElementById('chkCont').innerHTML='';pCount=cCount=0;addProd();addChk();calcAll();}
-function addProd(){const id=pCount++;document.getElementById('prodCont').innerHTML+=`<div class="product-row"><select id="t${id}"><option>یونولیت</option><option>ورق</option><option>پانل</option></select><input id="n${id}" placeholder="نام"><input id="q${id}" type="number" placeholder="مقدار" oninput="calcAll()"><input id="p${id}" type="number" placeholder="قیمت" oninput="calcAll()"><button onclick="this.parentNode.remove();calcAll()" style="background:#ef4444;color:white;border:none;padding:8px;border-radius:5px;cursor:pointer;">حذف</button></div>`;}
-function addChk(){const id=cCount++;document.getElementById('chkCont').innerHTML+=`<div class="check-row"><input id="cn${id}" placeholder="شماره چک"><input id="ca${id}" type="number" placeholder="مبلغ" oninput="calcAll()"><input id="cd${id}" class="persian-datepicker-input"><button onclick="this.parentNode.remove();calcAll()" style="background:#ef4444;color:white;border:none;padding:8px;border-radius:5px;cursor:pointer;">حذف</button></div>`;}
-function calcAll(){let pt=0,ct=0,ad=parseInt(document.getElementById('prePay').value)||0;for(let i=0;i<50;i++){const q=document.getElementById(`q${i}`),p=document.getElementById(`p${i}`);if(q?.value&&p?.value)pt+=parseInt(q.value)*parseInt(p.value);const ca=document.getElementById(`ca${i}`);if(ca?.value)ct+=parseInt(ca.value);}document.getElementById('prodTot').textContent=fmt(pt);document.getElementById('advTot').textContent=fmt(ad);document.getElementById('chkTot').textContent=fmt(ct);document.getElementById('balTot').textContent=fmt(pt-ad-ct);}
-function saveCont(){const cust=document.getElementById('custName').value;if(!cust)return notif('مشتری الزامی','error');const cont={id:Date.now(),number:'CF'+(data.contracts.length+1),customer:cust,phone:document.getElementById('custPhone').value,address:document.getElementById('custAddr').value,date:document.getElementById('contDate').value,delivery:document.getElementById('delDate').value,products:[],checks:[],advance:parseInt(document.getElementById('prePay').value)||0};for(let i=0;i<50;i++){const t=document.getElementById(`t${i}`),n=document.getElementById(`n${i}`),q=document.getElementById(`q${i}`),p=document.getElementById(`p${i}`);if(t?.value&&n?.value&&q?.value&&p?.value)cont.products.push({type:t.value,name:n.value,qty:parseInt(q.value),price:parseInt(p.value)});const cn=document.getElementById(`cn${i}`),ca=document.getElementById(`ca${i}`),cd=document.getElementById(`cd${i}`);if(cn?.value&&ca?.value){cont.checks.push({number:cn.value,amount:parseInt(ca.value),due:cd?.value||''});}}data.contracts.push(cont);save();notif('قرارداد ثبت شد ✅');loadConts();resetForm();updateDash();}
-function loadConts(){document.getElementById('contTable').innerHTML='<tr><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>تاریخ</th><th>حذف</th></tr>'+data.contracts.map(c=>{const t=c.products.reduce((s,p)=>s+p.qty*p.price,0);return `<tr><td>${c.number}</td><td>${c.customer}</td><td>${fmt(t)}</td><td>${c.date}</td><td><button onclick="delCont(${c.id})" style="background:#ef4444;color:white;border:none;padding:8px;border-radius:5px;cursor:pointer;">حذف</button></td></tr>`;}).join('');}
-function delCont(id){if(confirm('حذف؟')){data.contracts=data.contracts.filter(c=>c.id!==id);save();loadConts();updateDash();notif('حذف شد');}}
+// قراردادها
+function resetForm(){
+    document.getElementById('custName').value=document.getElementById('custPhone').value=document.getElementById('custAddr').value='';
+    document.getElementById('delDate').value=document.getElementById('prePay').value='0';
+    // محصولات و چک‌ها پاک نمی‌شوند!
+    calcAll();
+}
 
-// چک‌های جدید
-function saveNewCheck(){
-    const cust=document.getElementById('newCheckCustomer').value;
-    const num=document.getElementById('newCheckNumber').value;
-    const amt=document.getElementById('newCheckAmount').value;
-    const due=document.getElementById('newCheckDue').value;
-    const status=document.getElementById('newCheckStatus').value;
-    
-    if(!cust || !num || !amt) return notif('همه فیلدها الزامی','error');
-    
-    data.checks.push({
+function addProd(){
+    const id=pCount++;
+    document.getElementById('prodCont').innerHTML+=`
+        <div class="product-row">
+            <select id="t${id}" onchange="calcAll()">
+                <option>یونولیت</option><option>ورق</option><option>پانل</option>
+            </select>
+            <input id="n${id}" placeholder="نام محصول">
+            <input id="q${id}" type="number" placeholder="مقدار" oninput="calcAll()">
+            <input id="p${id}" type="number" placeholder="قیمت" oninput="calcAll()">
+            <button class="btn-danger btn-sm" onclick="this.parentNode.remove();calcAll()">حذف</button>
+        </div>`;
+}
+
+function addChk(){
+    const id=cCount++;
+    document.getElementById('chkCont').innerHTML+=`
+        <div class="check-row">
+            <input id="cn${id}" placeholder="شماره چک">
+            <input id="ca${id}" type="number" placeholder="مبلغ" oninput="calcAll()">
+            <input id="cd${id}" class="date-picker" onclick="showDatePicker('cd${id}')">
+            <button class="btn-danger btn-sm" onclick="this.parentNode.remove();calcAll()">حذف</button>
+        </div>`;
+}
+
+function calcAll(){
+    let pt=0,ct=0,ad=parseInt(document.getElementById('prePay').value)||0;
+    for(let i=0;i<50;i++){
+        const q=document.getElementById(`q${i}`),p=document.getElementById(`p${i}`);
+        if(q?.value&&p?.value)pt+=parseInt(q.value)*parseInt(p.value);
+        const ca=document.getElementById(`ca${i}`);
+        if(ca?.value)ct+=parseInt(ca.value);
+    }
+    document.getElementById('prodTot').textContent=fmt(pt);
+    document.getElementById('advTot').textContent=fmt(ad);
+    document.getElementById('chkTot').textContent=fmt(ct);
+    document.getElementById('balTot').textContent=fmt(pt-ad-ct);
+}
+
+function saveCont(){
+    const cust=document.getElementById('custName').value;
+    if(!cust)return notif('نام مشتری الزامی است','error');
+    const cont={
         id: Date.now(),
+        number: `CF${String(data.contracts.length+1).padStart(3,'0')}`,
         customer: cust,
-        number: num,
-        amount: parseInt(amt),
-        due: due,
-        status: status
-    });
+        phone: document.getElementById('custPhone').value,
+        address: document.getElementById('custAddr').value,
+        date: document.getElementById('contDate').value,
+        delivery: document.getElementById('delDate').value,
+        products: [], checks: [],
+        advance: parseInt(document.getElementById('prePay').value)||0
+    };
+    for(let i=0;i<50;i++){
+        const t=document.getElementById(`t${i}`),n=document.getElementById(`n${i}`),
+              q=document.getElementById(`q${i}`),p=document.getElementById(`p${i}`);
+        if(t?.value&&n?.value&&q?.value&&p?.value){
+            cont.products.push({
+                type: t.value, name: n.value,
+                qty: parseInt(q.value), price: parseInt(p.value)
+            });
+        }
+        const cn=document.getElementById(`cn${i}`),ca=document.getElementById(`ca${i}`),
+              cd=document.getElementById(`cd${i}`);
+        if(cn?.value&&ca?.value){
+            cont.checks.push({
+                number: cn.value, amount: parseInt(ca.value), due: cd?.value||''
+            });
+        }
+    }
+    data.contracts.push(cont);
     save();
-    loadChks();
-    document.getElementById('newCheckCustomer').value = document.getElementById('newCheckNumber').value = 
-    document.getElementById('newCheckAmount').value = document.getElementById('newCheckDue').value = '';
-    notif('چک ثبت شد ✅');
+    notif('✅ قرارداد ثبت شد');
+    loadConts();
+    resetForm();
+    updateDash();
 }
 
-function loadChks(){
-    document.getElementById('chkTab').innerHTML='<tr><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>سررسید</th><th>وضعیت</th><th>عملیات</th></tr>'+data.checks.map(c=>{
-        const statusClass = c.status=='در جریان' ? 'status-daraj' : c.status=='وصول شد' ? 'status-vasol' : 'status-bargashti';
-        return `<tr><td>${c.number}</td><td>${c.customer}</td><td>${fmt(c.amount)}</td><td>${c.due}</td><td><span class="status-badge ${statusClass}">${c.status}</span></td><td><button onclick="delChk(${c.id})" style="background:#ef4444;color:white;border:none;padding:8px;border-radius:5px;cursor:pointer;">حذف</button></td></tr>`;
+function loadConts(){
+    document.getElementById('contTable').innerHTML='<tr><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>تاریخ</th><th>عملیات</th></tr>'+
+    data.contracts.map(c=>{
+        const total=c.products.reduce((s,p)=>s+p.qty*p.price,0);
+        return `<tr>
+            <td>${c.number}</td>
+            <td>${c.customer}</td>
+            <td>${fmt(total)}</td>
+            <td>${c.date}</td>
+            <td>
+                <button class="btn-warning btn-sm" onclick="editCont(${c.id})">ویرایش</button>
+                <button class="btn-danger btn-sm" onclick="delCont(${c.id})">حذف</button>
+            </td>
+        </tr>`;
     }).join('');
 }
 
-function delChk(id){if(confirm('حذف؟')){data.checks=data.checks.filter(c=>c.id!==id);save();loadChks();updateDash();notif('چک حذف شد');}}
+function delCont(id){
+    if(confirm('آیا مطمئن هستید؟')){
+        data.contracts=data.contracts.filter(c=>c.id!==id);
+        save();loadConts();updateDash();notif('قرارداد حذف شد');
+    }
+}
+
+// چک‌ها
+function saveNewCheck(){
+    const cust=document.getElementById('newCheckCustomer').value,
+          num=document.getElementById('newCheckNumber').value,
+          amt=document.getElementById('newCheckAmount').value,
+          due=document.getElementById('newCheckDue').value,
+          status=document.getElementById('newCheckStatus').value;
+    if(!cust||!num||!amt)return notif('فیلدهای اصلی الزامی','error');
+    data.checks.push({id:Date.now(),customer:cust,number:num,amount:parseInt(amt),due:due,status:status});
+    save();loadChks();clearCheckForm();notif('✅ چک ثبت شد');
+}
+
+function clearCheckForm(){
+    document.getElementById('newCheckCustomer').value=document.getElementById('newCheckNumber').value=
+    document.getElementById('newCheckAmount').value=document.getElementById('newCheckDue').value='';
+}
+
+function loadChks(){
+    document.getElementById('chkTab').innerHTML='<tr><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>سررسید</th><th>وضعیت</th><th>عملیات</th></tr>'+
+    data.checks.map(c=>{
+        const statusClass=c.status=='در جریان'?'status-daraj':c.status=='وصول شد'?'status-vasol':'status-bargashti';
+        return `<tr>
+            <td>${c.number}</td><td>${c.customer}</td><td>${fmt(c.amount)}</td><td>${c.due}</td>
+            <td><span class="status-badge ${statusClass}">${c.status}</span></td>
+            <td>
+                <button class="btn-warning btn-sm" onclick="editCheck(${c.id})">ویرایش</button>
+                <button class="btn-danger btn-sm" onclick="delChk(${c.id})">حذف</button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function delChk(id){
+    if(confirm('آیا مطمئن هستید؟')){
+        data.checks=data.checks.filter(c=>c.id!==id);
+        save();loadChks();updateDash();notif('چک حذف شد');
+    }
+}
 
 // مشتریان
-function toggleCustForm(){document.getElementById('custForm').style.display=document.getElementById('custForm').style.display=='none'?'block':'none';}
-function saveCust(){const n=document.getElementById('newName').value,ph=document.getElementById('newPhone').value;if(!n||!ph)return notif('نام و تلفن الزامی','error');data.customers.push({id:Date.now(),name:n,phone:ph,address:document.getElementById('newAddr').value,type:document.getElementById('custType').value});save();loadCusts();toggleCustForm();notif('مشتری ثبت شد');}
-function loadCusts(){document.getElementById('custList').innerHTML=data.customers.map(c=>`<option>${c.name}</option>`).join('');document.getElementById('custTab').innerHTML='<tr><th>نام</th><th>تلفن</th><th>آدرس</th><th>نوع</th><th>عملیات</th></tr>'+data.customers.map(c=>`<tr><td>${c.name}</td><td>${c.phone}</td><td>${c.address}</td><td style="color:${c.type=='عادی'?'green':c.type=='پیش خرید'?'orange':'purple'}">${c.type}</td><td><button onclick="delCust(${c.id})" style="background:#ef4444;color:white;border:none;padding:5px 10px;border-radius:5px;">حذف</button></td></tr>`).join('');}
-function delCust(id){data.customers=data.customers.filter(c=>c.id!==id);save();loadCusts();}
+function toggleCustForm(){
+    const form=document.getElementById('custForm');
+    editingId=null;
+    form.style.display=form.style.display=='none'?'block':'none';
+    if(form.style.display=='block'){
+        document.getElementById('newName').value=document.getElementById('newPhone').value='';
+    }
+}
+
+function saveCust(){
+    const name=document.getElementById('newName').value, phone=document.getElementById('newPhone').value;
+    if(!name||!phone)return notif('نام و تلفن الزامی','error');
+    const customer={
+        name:name, phone:phone,
+        address:document.getElementById('newAddr').value,
+        type:document.getElementById('custType').value
+    };
+    if(editingId){
+        const idx=data.customers.findIndex(c=>c.id==editingId);
+        data.customers[idx]={...data.customers[idx],...customer};
+        notif('مشتری ویرایش شد');
+    }else{
+        customer.id=Date.now();
+        data.customers.push(customer);
+        notif('مشتری جدید ثبت شد');
+    }
+    save();loadCusts();toggleCustForm();updateDash();
+}
+
+function loadCusts(){
+    document.getElementById('custList').innerHTML=data.customers.map(c=>`<option value="${c.name}">`).join('');
+    document.getElementById('custTab').innerHTML='<tr><th>نام</th><th>تلفن</th><th>آدرس</th><th>نوع</th><th>عملیات</th></tr>'+
+    data.customers.map(c=>`<tr>
+        <td>${c.name}</td><td>${c.phone}</td><td>${c.address||'-'}</td>
+        <td style="color:${c.type=='عادی'?'green':c.type=='پیش خرید'?'orange':'purple'}">${c.type}</td>
+        <td>
+            <button class="btn-warning btn-sm" onclick="editCust(${c.id})">ویرایش</button>
+            <button class="btn-danger btn-sm" onclick="delCust(${c.id})">حذف</button>
+        </td>
+    </tr>`).join('');
+}
+
+function editCust(id){
+    const cust=data.customers.find(c=>c.id==id);
+    if(cust){
+        editingId=id;
+        document.getElementById('newName').value=cust.name;
+        document.getElementById('newPhone').value=cust.phone;
+        document.getElementById('newAddr').value=cust.address||'';
+        document.getElementById('custType').value=cust.type;
+        document.getElementById('custForm').style.display='block';
+    }
+}
+
+function delCust(id){
+    if(confirm('آیا مطمئن هستید؟')){
+        data.customers=data.customers.filter(c=>c.id!==id);
+        save();loadCusts();updateDash();notif('مشتری حذف شد');
+    }
+}
+
+// هزینه‌ها
+function saveExpense(){
+    const desc=document.getElementById('expDesc').value,
+          amount=document.getElementById('expAmount').value,
+          date=document.getElementById('expDate').value,
+          cat=document.getElementById('expCategory').value;
+    if(!desc||!amount)return notif('شرح و مبلغ الزامی','error');
+    data.expenses.push({
+        id: Date.now(),
+        desc: desc,
+        amount: parseInt(amount),
+        date: date,
+        category: cat
+    });
+    save();loadExpenses();clearExpenseForm();notif('✅ هزینه ثبت شد');
+}
+
+function clearExpenseForm(){
+    document.getElementById('expDesc').value=document.getElementById('expAmount').value='';
+}
+
+function loadExpenses(){
+    document.getElementById('expTab').innerHTML='<tr><th>شرح</th><th>مبلغ</th><th>تاریخ</th><th>دسته</th><th>عملیات</th></tr>'+
+    data.expenses.map(e=>`<tr>
+        <td>${e.desc}</td><td>${fmt(e.amount)}</td><td>${e.date}</td><td>${e.category}</td>
+        <td>
+            <button class="btn-danger btn-sm" onclick="delExpense(${e.id})">حذف</button>
+        </td>
+    </tr>`).join('');
+}
+
+function delExpense(id){
+    if(confirm('آیا مطمئن هستید؟')){
+        data.expenses=data.expenses.filter(e=>e.id!==id);
+        save();loadExpenses();updateDash();notif('هزینه حذف شد');
+    }
+}
 
 // پشتیبان
 function backupData(){
-    const dataStr = JSON.stringify(data, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'backup-kaleshi16-'+pd()+'.json';
-    a.click();
-    notif('پشتیبان دانلود شد');
+    const dataStr=JSON.stringify(data,null,2);
+    const blob=new Blob([dataStr],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=`kaleshi17-${pd()}.json`;a.click();
+    notif('✅ پشتیبان دانلود شد');
 }
 
-function restoreData(event){
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                data = JSON.parse(e.target.result);
+function restoreData(e){
+    const file=e.target.files[0];
+    if(file){
+        const reader=new FileReader();
+        reader.onload=function(ev){
+            try{
+                data=JSON.parse(ev.target.result);
                 save();
-                notif('پشتیبان بازیابی شد');
-                updateDash();
-                loadCusts();
-                loadChks();
-                loadConts();
-            } catch {
-                notif('خطا در بازیابی','error');
-            }
+                notif('✅ پشتیبان بازیابی شد');
+                updateDash();loadCusts();loadChks();loadConts();loadExpenses();
+            }catch{notif('خطا در فایل پشتیبان','error');}
         };
         reader.readAsText(file);
     }
 }
 
-document.addEventListener('keydown',e=>e.key=='Enter'&&document.getElementById('loginBox').style.display!='none'?loginNow():null);
+// Event Listeners
+document.addEventListener('keydown',e=>{
+    if(e.key=='Enter'&&document.getElementById('loginBox').style.display!='none') loginNow();
+});
+document.querySelectorAll('.date-picker').forEach(el=>el.onclick=function(){showDatePicker(this.id);});
+
+// راه‌اندازی اولیه
 addProd();addChk();calcAll();
 </script>
 </body>
