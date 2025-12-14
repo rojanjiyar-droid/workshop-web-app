@@ -3,429 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سیستم حسابداری کلشی‌فوم - نسخه نهایی</title>
+    <title>سیستم حسابداری کلشی‌فوم</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Tahoma, Arial; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); 
+            min-height: 100vh; direction: rtl; padding: 20px;
         }
-        body {
-            font-family: 'Tahoma', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            min-height: 100vh;
-            direction: rtl;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .btn {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-        }
-        .btn-success { background: #10b981; }
-        .btn-success:hover { background: #059669; }
-        .btn-danger { background: #ef4444; }
-        .btn-danger:hover { background: #dc2626; }
-        .btn-warning { background: #f59e0b; }
-        .btn-warning:hover { background: #d97706; }
-        .btn-sm { padding: 8px 16px; font-size: 13px; }
-        .w100 { width: 100%; }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #333;
-        }
-        .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 15px;
-            font-family: inherit;
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
-        }
-        
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        .card-header {
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            padding: 20px;
-        }
-        .stat-card {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-            padding: 24px;
-            border-radius: 12px;
+        .login-box {
+            max-width: 400px; margin: 50px auto; background: white; 
+            padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             text-align: center;
         }
-        .stat-value {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 8px;
+        .logo { 
+            width: 80px; height: 80px; margin: 0 auto 20px; 
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6); 
+            border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; color: white; font-size: 28px; font-weight: bold;
         }
-        
-        .table {
-            width: 100%;
-            border-collapse: collapse;
+        input { 
+            width: 100%; padding: 15px; margin: 15px 0; border: 2px solid #ddd; 
+            border-radius: 10px; font-size: 16px; box-sizing: border-box;
         }
-        .table th {
-            background: #1e3a8a;
-            color: white;
-            padding: 15px;
-            text-align: right;
+        input:focus { border-color: #3b82f6; outline: none; }
+        button { 
+            width: 100%; padding: 15px; background: #3b82f6; color: white; 
+            border: none; border-radius: 10px; font-size: 16px; font-weight: bold;
+            cursor: pointer; margin-top: 10px;
         }
-        .table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            text-align: right;
+        button:hover { background: #1d4ed8; }
+        .main-app { display: none; }
+        .nav { 
+            background: #1e3a8a; padding: 0; display: flex; overflow-x: auto; 
+            border-radius: 10px; margin-bottom: 20px;
         }
-        .table tr:hover {
-            background: #f8fafc;
+        .nav button { 
+            background: none; color: white; border: none; padding: 15px 25px; 
+            cursor: pointer; white-space: nowrap; font-weight: bold;
         }
-        
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
+        .nav button.active { background: #3b82f6; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .stats { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 20px; margin: 20px 0;
         }
-        .login-card {
-            background: white;
-            border-radius: 20px;
-            padding: 48px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-            text-align: center;
+        .stat { 
+            background: white; padding: 25px; border-radius: 15px; text-align: center; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        .login-logo {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 30px;
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 32px;
-            font-weight: bold;
-        }
-        
-        .main-nav {
-            background: #0f172a;
-            display: flex;
-            overflow-x: auto;
-            padding: 0;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            scrollbar-width: none;
-        }
-        .main-nav::-webkit-scrollbar {
-            display: none;
-        }
-        .nav-btn {
-            background: none;
-            border: none;
-            color: rgba(255,255,255,0.9);
-            padding: 18px 24px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.3s;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .nav-btn:hover, .nav-btn.active {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .page {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-        .page.active {
-            display: block;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        .product-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr auto;
-            gap: 12px;
-            padding: 20px;
-            background: #f8fafc;
-            border-radius: 12px;
-            margin-bottom: 15px;
+        .stat-value { font-size: 28px; font-weight: bold; color: #3b82f6; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid #eee; }
+        th { background: #1e3a8a; color: white; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .product-row { 
+            background: #f8f9fa; padding: 20px; border-radius: 10px; 
+            margin-bottom: 15px; display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px;
             align-items: center;
         }
-        .totals-box {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            padding: 30px;
-            border-radius: 12px;
-            margin: 30px 0;
-        }
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-        .total-row:last-child {
-            font-size: 22px;
-            font-weight: bold;
-            border-top: 2px solid rgba(255,255,255,0.3);
-            padding-top: 15px;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 16px 20px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            z-index: 10000;
-            border-right: 5px solid #10b981;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            max-width: 400px;
-        }
-        
-        @media (max-width: 768px) {
-            .form-row, .product-row { grid-template-columns: 1fr; }
-            .main-nav { flex-direction: column; }
-        }
+        select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; }
     </style>
 </head>
 <body>
-    <!-- اعلانات -->
-    <div id="notifications"></div>
 
-    <!-- صفحه ورود -->
-    <div id="loginPage" class="login-container" style="display: block;">
-        <div class="login-card">
-            <div class="login-logo">CF</div>
-            <h2 style="margin-bottom: 30px; color: #1e3a8a; font-size: 24px;">سیستم حسابداری کلشی‌فوم</h2>
-            
-            <div class="form-group">
-                <label class="form-label">نام کاربری</label>
-                <input type="text" id="username" class="form-control" value="admin" placeholder="admin">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">رمز عبور</label>
-                <input type="password" id="password" class="form-control" value="1234" placeholder="1234">
-            </div>
-            
-            <button class="btn w100" onclick="doLogin()" style="margin-top: 20px; font-size: 16px;">
-                ورود به سیستم
-            </button>
-            
-            <div style="margin-top: 20px; font-size: 14px; color: #666; padding-top: 20px; border-top: 1px solid #eee;">
-                <strong>تست: admin / 1234</strong>
-            </div>
-        </div>
+<div id="loginBox" class="login-box">
+    <div class="logo">CF</div>
+    <h2>سیستم حسابداری کلشی‌فوم</h2>
+    <input type="text" id="userInput" placeholder="نام کاربری: admin" value="admin">
+    <input type="password" id="passInput" placeholder="رمز: 1234" value="1234">
+    <button onclick="loginFunction()">ورود</button>
+    <p style="margin-top: 20px; color: #666; font-size: 14px;">
+        تست: <strong>admin / 1234</strong>
+    </p>
+</div>
+
+<div id="mainApp" class="main-app">
+    <div class="nav" id="navButtons">
+        <button class="active" onclick="showPage('dashboard')">📊 داشبورد</button>
+        <button onclick="showPage('contracts')">📝 قراردادها</button>
+        <button onclick="showPage('customers')">👥 مشتریان</button>
+        <button onclick="showPage('checks')">🏦 چک‌ها</button>
     </div>
 
-    <!-- برنامه اصلی -->
-    <div id="mainApp" style="display: none;">
-        <header style="background: #0f172a; color: white; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 20px;">
-                <div style="width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #3b82f6; font-weight: bold; font-size: 22px;">CF</div>
-                <div>
-                    <h2 style="margin: 0; font-size: 20px;">کارخانه یونولیت کلشی‌فوم</h2>
-                    <div id="currentDate" style="font-size: 14px; opacity: 0.9;"></div>
-                </div>
+    <div class="container">
+        <!-- داشبورد -->
+        <div id="dashboard" class="page active">
+            <div class="stats" id="dashboardStats">
+                <!-- آمار اینجا -->
             </div>
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <span id="welcomeUser" style="font-weight: 500;"></span>
-                <button class="btn btn-danger btn-sm" onclick="logoutApp()">خروج</button>
+        </div>
+
+        <!-- قراردادها -->
+        <div id="contracts" class="page">
+            <div class="form-row">
+                <div><label>مشتری</label><input id="custName" list="custList"></div>
+                <div><label>تلفن</label><input id="custPhone" type="tel"></div>
+                <div><label>آدرس</label><input id="custAddr"></div>
+                <div><label>تاریخ</label><input id="contDate" readonly></div>
+                <div><label>تحویل</label><input id="delivDate"></div>
             </div>
-        </header>
-
-        <nav class="main-nav" id="mainNav">
-            <button class="nav-btn active" data-page="dashboard">📊 داشبورد</button>
-            <button class="nav-btn" data-page="contracts">📝 قراردادها</button>
-            <button class="nav-btn" data-page="customers">👥 مشتریان</button>
-            <button class="nav-btn" data-page="checks">🏦 چک‌ها</button>
-        </nav>
-
-        <div class="container">
-            <!-- داشبورد -->
-            <div id="dashboard" class="page active">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>📊 آمار کامل سیستم</h3>
-                        <button class="btn btn-success btn-sm" onclick="updateDashboardStats()">🔄 بروزرسانی</button>
-                    </div>
-                    <div class="stats-grid" id="statsContainer">
-                        <!-- آمار در اینجا لود می‌شود -->
-                    </div>
-                </div>
+            
+            <h3>محصولات:</h3>
+            <div id="prodContainer"></div>
+            <button class="btn" onclick="addProductRow()">➕ محصول</button>
+            
+            <div><label>پیش‌پرداخت</label><input id="advanceAmt" type="number" value="0" oninput="calcTotals()"></div>
+            
+            <h3>چک‌ها:</h3>
+            <div id="checkContainer"></div>
+            <button class="btn" onclick="addCheckRow()">➕ چک</button>
+            
+            <div style="background: #10b981; color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <div>جمع محصولات: <span id="prodTotal">0 تومان</span></div>
+                <div>پیش‌پرداخت: <span id="advTotal">0 تومان</span></div>
+                <div>چک‌ها: <span id="chkTotal">0 تومان</span></div>
+                <div style="font-size: 20px; margin-top: 10px;">مانده: <span id="balance">0 تومان</span></div>
             </div>
+            
+            <button class="btn" onclick="saveContract()" style="background: #10b981;">ثبت قرارداد</button>
+            
+            <h3 style="margin-top: 40px;">قراردادها:</h3>
+            <table id="contractTable">
+                <tr><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>تاریخ</th><th>حذف</th></tr>
+            </table>
+        </div>
 
-            <!-- قراردادها -->
-            <div id="contracts" class="page">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>📝 ثبت قرارداد جدید</h3>
-                        <button class="btn btn-warning btn-sm" onclick="resetContractForm()">🔄 پاک کردن</button>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>نام مشتری *</label>
-                            <input type="text" id="contractCustomer" class="form-control" list="customerList">
-                        </div>
-                        <div class="form-group">
-                            <label>تلفن</label>
-                            <input type="tel" id="contractPhone" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>آدرس</label>
-                            <input type="text" id="contractAddress" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label>تاریخ قرارداد</label>
-                            <input type="text" id="contractDate" class="form-control" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>تاریخ تحویل</label>
-                            <input type="text" id="deliveryDate" class="form-control">
-                        </div>
-                    </div>
-
-                    <h4 style="margin: 25px 0 15px 0; color: #1e3a8a; font-size: 18px;">📦 محصولات</h4>
-                    <div id="productsList"></div>
-                    <button class="btn btn-info btn-sm" onclick="addNewProduct()">➕ محصول جدید</button>
-
-                    <div class="form-group" style="margin-top: 25px;">
-                        <label>مبلغ پیش‌پرداخت</label>
-                        <input type="number" id="prePayment" class="form-control" value="0" oninput="updateContractTotals()">
-                    </div>
-
-                    <h4 style="margin: 25px 0 15px 0; color: #1e3a8a; font-size: 18px;">🏦 چک‌ها</h4>
-                    <div id="checksList"></div>
-                    <button class="btn btn-info btn-sm" onclick="addNewCheck()">➕ چک جدید</button>
-
-                    <div class="totals-box">
-                        <div class="total-row">
-                            <span>جمع کل محصولات:</span>
-                            <strong id="productsTotal">۰ تومان</strong>
-                        </div>
-                        <div class="total-row">
-                            <span>پیش‌پرداخت:</span>
-                            <strong id="advanceTotal">۰ تومان</strong>
-                        </div>
-                        <div class="total-row">
-                            <span>مجموع چک‌ها:</span>
-                            <strong id="checksTotal">۰ تومان</strong>
-                        </div>
-                        <div class="total-row">
-                            <span style="color: #ffd700; font-weight: bold;">🟢 مانده حساب:</span>
-                            <strong id="balanceTotal" style="color: #ffd700;">۰ تومان</strong>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; gap: 15px; margin-top: 30px;">
-                        <button class="btn btn-success" onclick="saveNewContract()">✅ ثبت قرارداد</button>
-                        <button class="btn btn-primary" onclick="printCurrentContract()">🖨️ چاپ</button>
+        <!-- مشتریان -->
+        <div id="customers" class="page">
+            <button class="btn" onclick="toggleCustForm()">➕ مشتری جدید</button>
+            <div id="custForm" style="display:none; background:#f8f9fa; padding:20px; margin:20px 0; border-radius:10px;">
+                <div class="form-row">
+                    <div><label>نام</label><input id="newCustName"></div>
+                    <div><label>تلفن</label><input id="newCustPhone" type="tel"></div>
+                    <div><label>آدرس</label><input id="newCustAddr"></div>
+                    <div><label>نوع</label>
+                        <select id="newCustType">
+                            <option>عادی</option><option>پیش خرید</option><option>عامل</option>
+                        </select>
                     </div>
                 </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3>📋 لیست قراردادها</h3>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>شماره</th>
-                                    <th>مشتری</th>
-                                    <th>مبلغ کل</th>
-                                    <th>تاریخ</th>
-                                    <th>عملیات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contractsList"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <button class="btn" onclick="saveCust()">ذخیره</button>
             </div>
+            <table id="custTable">
+                <tr><th>نام</th><th>تلفن</th><th>آدرس</th><th>نوع</th><th>عملیات</th></tr>
+            </table>
+        </div>
 
-            <!-- مشتریان -->
-            <div id="customers" class="page">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>👥 مدیریت مشتریان</h3>
-                        <button class="btn btn-success btn-sm" onclick="showCustomerForm()">➕ مشتری جدید</button>
-                    </div>
-                    <div id="customerForm" style="display: none; background: #f8fafc; padding: 25px; border-radius: 12px; margin-bottom: 25px;">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>نام کامل *</label>
-                                <input type="text" id="customerName" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label>شماره تماس *</label>
-                                <input type="tel" id="customerPhone" class="form-control">
-                            </div>
-                            <div class="form
+        <!-- چک‌ها -->
+        <div id="checks" class="page">
+            <table id="checkTable">
+                <tr><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>سررسید</th><th>وضعیت</th><th>عملیات</th></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<datalist id="custList"></datalist>
+
+<script>
+let data = JSON.parse(localStorage.getItem('kaleshiData')) || {
+    customers: [
+        {id:1,name:'علی محمدی',phone:'09121234567',address:'ارومیه',type:'عادی'},
+        {id:2,name:'رضا احمدی',phone:'09129876543',address:'ارومیه',type:'عامل'}
+    ],
+    contracts: [],
+    checks: []
+};
+let prodCount = 0, checkCount = 0;
+let currentPage = 'dashboard';
+
+function persianDate() {
+    const d = new Date();
+    const pd = '۰۱۲۳۴۵۶۷۸۹';
+    return d.toLocaleDateString('fa-IR').replace(/\d/g,c=>pd[c]);
+}
+
+function formatNum(n) {
+    return n.toLocaleString('fa-IR') + ' تومان';
+}
+
+function showMsg(msg, type='success') {
+    const div = document.createElement('div');
+    div.style.cssText = 'position:fixed;top:20px;right:20px;background:white;padding:15px 20px;border-radius:10px;box-shadow:0 5px 20px rgba(0,0,0,0.2);z-index:999;border-right:5px solid '+ (type=='success'?'#10b981':'#ef4444');
+    div.innerHTML = (type=='success'?'✅':'❌') + msg + '<button onclick="this.parentNode.remove()" style="float:left;background:none;border:none;font-size:20px;cursor:pointer;">×</button>';
+    document.body.appendChild(div);
+    setTimeout(()=>div.remove(), 4000);
+}
+
+function doLogin() {
+    const user = document.getElementById('userInput').value;
+    const pass = document.getElementById('passInput').value;
+    
+    if(user === 'admin' && pass === '1234') {
+        document.getElementById('loginBox').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('contDate').value = persianDate();
+        updateAll();
+        showMsg('ورود موفق!');
+    } else {
+        showMsg('اشتباه!', 'error');
+    }
+}
+
+function loginFunction() { doLogin(); }
+
+document.addEventListener('keydown', function(e) {
+    if(e.key === 'Enter') doLogin();
+});
+
+function logoutApp() {
+    if(confirm('خروج؟')) location.reload();
+}
+
+function showPage(page) {
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+    document.getElementById(page).classList.add('active');
+    event.target.classList.add('active');
+    currentPage = page;
+    if(page === 'dashboard') updateDashboardStats();
+    if(page === 'contracts') loadContracts();
+    if(page === 'customers') loadCustomers();
+    if(page === 'checks') loadChecks();
+}
+
+function updateAll() {
+    updateDashboardStats();
+    loadCustomers();
+    loadContracts();
+    loadChecks();
+}
+
+function updateDashboardStats() {
+    const totalCont = data.contracts.length;
+    const totalRev = data.contracts.reduce((s,c)=>s+c.products.reduce((p,pr)=>p+pr.qty*pr.price,0),0);
+    const yun = data.contracts.reduce((s,c)=>s+c.products.filter(p=>p.type=='یونولیت').reduce((p,pr)=>p+pr.qty*pr.price,0),0);
+    const vor = data.contracts.reduce((s,c)=>s+c.products.filter(p=>p.type=='ورق').reduce((p,pr)=>p+pr.qty*pr.price,0),0);
+    const pnl = data.contracts.reduce((s,c)=>s+c.products.filter(p=>p.type=='پانل').reduce((p,pr)=>p+pr.qty*pr.price,0),0);
+    
+    document.getElementById('dashboardStats').innerHTML = `
+        <div class="stat"><div class="stat-value">${totalCont}</div>قراردادها</div>
+        <div class="stat"><div class="stat-value">${formatNum(totalRev)}</div>درآمد کل</div>
+        <div class="stat"><div class="stat-value">${data.customers.length}</div>مشتریان</div>
+        <div class="stat"><div class="stat-value">${data.checks.filter(c=>c.status!='وصول').length}</div>چک‌ها</div>
+        <div class="stat"><div class="stat-value">${formatNum(yun)}</div>یونولیت</div>
+        <div class="stat"><div class="stat-value">${formatNum(vor)}</div>ورق</div>
+        <div class="stat"><div class="stat-value">${formatNum(pnl)}</div>پانل</div>
+    `;
+}
+
+function saveLocal() {
+    localStorage.setItem('kaleshiData', JSON.stringify(data));
+}
+
+function addProductRow() {
+    const id = prodCount++;
+    document.getElementById('prodContainer').innerHTML += `
+        <div class="product-row">
+            <select id="prodType${id}">
+                <option>یونولیت</option><option>ورق</option><option>پانل</option>
+            </select>
+            <input id="prodName${id}" placeholder="نام محصول">
+            <input id="prodQty${id}" type="number" placeholder="مقدار" oninput="calcTotals()">
+            <input id="prodPrice${id}" type="number" placeholder="قیمت" oninput="calcTotals()">
+            <button onclick="this.parentNode.remove();calcTotals()" style="background:#ef4444;padding:8px 12px;">حذف</button>
+        </div>`;
+}
+
+function addCheckRow() {
+    const id = checkCount++;
+    document.getElementById('checkContainer').innerHTML += `
+        <div class="product-row">
+            <input id="chkNum${id}" placeholder="شماره چک">
+            <input id="chkAmt${id}" type="number" placeholder="مبلغ" oninput="calcTotals()">
+            <input id="chkDate${id}" placeholder="سررسید">
+            <button onclick="this.parentNode.remove();calcTotals()" style="background:#ef4444;padding:8px 12px;">حذف</button>
+        </div>`;
+}
+
+function calcTotals() {
+    let prodTotal = 0, checkTotal = 0, advance = parseInt(document.getElementById('advanceAmt')?.value||0);
+    
+    for(let i=0; i<50; i++) {
+        const qty = document.getElementById(`prodQty${i}`), price = document.getElementById(`prodPrice${i}`);
+        if(qty?.value && price?.value) prodTotal += parseInt(qty.value) * parseInt(price.value);
+        
+        const chk = document.getElementById(`chkAmt${i}`);
+        if(chk?.value) checkTotal += parseInt(chk.value);
+    }
+    
+    document.getElementById('prodTotal').textContent = formatNum(prodTotal);
+    document.getElementById('advTotal').textContent = formatNum(advance);
+    document.getElementById('chkTotal').textContent = formatNum(checkTotal);
+    document.getElementById('balance').textContent = formatNum(prodTotal - advance - checkTotal);
+}
+
+function saveContract() {
+    const customer = document.getElementById('custName').value;
+    if(!customer) return showMsg('نام مشتری الزامی است', 'error');
+    
+    const contract = {
+        id: Date.now(),
+        number: 'CF'+(data.contracts.length+1),
+        customer, phone: document.getElementById('custPhone').value,
+        address: document.getElementById('custAddr').value,
+        date: document.getElementById('contDate').value,
+        delivery: document.getElementById('delivDate').value,
+        products: [], checks: [], advance: parseInt(document.getElementById('advanceAmt').value||0)
+    };
+    
+    for(let i=0; i<50; i++) {
+        const type = document.getElementById(`prodType${i}`), name = document.getElementById(`prodName${i}`),
+              qty = document.getElementById(`prodQty${i}`), price = document.getElementById(`prodPrice${i}`);
+        if(type?.value && name?.value && qty?.value && price?.value) {
+            contract.products.push({
+                type:type.value, name:name.value, qty:parseInt(qty.value), price:parseInt(price.value)
+            });
+        }
+        const cnum = document.getElementById(`chkNum${i}`), camt = document.getElementById(`chkAmt${i}`),
+              cdate = document.getElementById(`chkDate${i}`);
+        if(cnum?.value && camt?.value) {
+            contract.checks.push({number:cnum.value, amount:parseInt(camt.value), due:cdate?.value||''});
+            data.checks.push({
+                id:Date.now()+i, number:cnum.value, customer, amount:parseInt(camt.value),
+                due:cdate?.value||'', status:'درجریان'
+            });
+        }
+    }
+    
+    data.contracts.push(contract);
+    saveLocal();
+    showMsg('قرارداد ثبت شد!');
+    resetContractForm();
+    loadContracts();
+}
+
+function resetContractForm() {
+    document.getElementById('custName').value = document.getElementById('custPhone').value = 
+    document.getElementById('custAddr').value = document.getElementById('delivDate').value = 
+    document.getElementById('advanceAmt').value = '0';
+    document.getElementById('prodContainer').innerHTML = '';
+    document.getElementById('checkContainer').innerHTML = '';
+    prodCount = checkCount = 0;
+    addProductRow(); addCheckRow(); calcTotals();
+}
+
+function loadContracts() {
+    document.getElementById('contractTable').innerHTML += data.contracts.map(c=>{
+        const total = c.products.reduce((s,p)=>s+p.qty*p.price,0);
+        return `<tr><td>${c.number}</td><td>${c.customer}</td><td>${formatNum(total)}</td><td>${c.date}</td>
+                <td><button onclick="deleteContract(${c.id})" style="background:#ef4444;color:white;border:none;padding:5px 10px;border-radius:5px;cursor:pointer;">حذف</button></td></tr>`;
+    }).join('');
+}
+
+function deleteContract(id) {
+    if(confirm('حذف؟')) {
+        data.contracts = data.contracts.filter(c=>c.id!==id);
+        saveLocal();
+        loadContracts();
+        updateDashboardStats();
+    }
+}
+
+function loadCustomers() {
+    document.getElementById('custList').innerHTML = data.customers.map(c=>`<option>${c.name}</option>`).join('');
+    document.getElementById('custTable').innerHTML = data.customers.map(c=>`
+        <tr><td>${c.name}</td><td>${c.phone}</td><td>${c.address}</td>
+        <td style="color:${c.type=='عادی'?'green':c.type=='پیش خرید'?'orange':'purple'}">${c.type}</td>
+        <td><button onclick="deleteCustomer(${c.id})" style="background:#ef4444;color:white;border:none;padding:5px 10px;border-radius:5px;">حذف</button></td></tr>
+    `).join('');
+}
+
+function toggleCustForm() {
+    const form = document.getElementById('custForm');
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+function saveCust() {
+    const name = document.getElementById('newCustName').value;
+    const phone = document.getElementById('newCustPhone').value;
+    if(!name || !phone) return showMsg('نام و تلفن الزامی', 'error');
+    
+    data.customers.push({
+        id: Date.now(),
+        name, phone, address: document.getElementById('newCustAddr').value,
+        type: document.getElementById('newCustType').value
+    });
+    saveLocal();
+    loadCustomers();
+    toggleCustForm();
+    showMsg('مشتری ثبت شد');
+}
+
+function deleteCustomer(id) {
+    data.customers = data.customers.filter(c=>c.id!==id);
+    saveLocal();
+    loadCustomers();
+}
+
+function loadChecks() {
+    document.getElementById('checkTable').innerHTML = data.checks.map(c=>`
+        <tr><td>${c.number}</td><td>${c.customer}</td><td>${formatNum(c.amount)}</td>
+        <td>${c.due}</td><td>${c.status}</td>
+        <td><button onclick="deleteCheck(${c.id})" style="background:#ef4444;color:white;border:none;padding:5px 10px;">حذف</button></td></tr>
+    `).join('');
+}
+
+function deleteCheck(id) {
+    data.checks = data.checks.filter(c=>c.id!==id);
+    saveLocal();
+    loadChecks();
+}
+
+// راه‌اندازی اولیه
+addProductRow();
+addCheckRow();
+calcTotals();
+document.getElementById('contDate').value = persianDate();
+</script>
+</body>
+</html>
