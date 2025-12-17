@@ -389,6 +389,55 @@
             margin: 20px 0;
         }
 
+        /* منوی کشویی */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            background: var(--dark);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: var(--dark);
+            z-index: 1000;
+            transition: right 0.3s;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .side-menu.active {
+            right: 0;
+        }
+        .side-menu .nav-btn {
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+            text-align: right;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+        .overlay.active {
+            display: block;
+        }
+
         @media (max-width: 768px) { 
             .form-row, .product-row, .check-row, .customer-row, .expense-row, .invoice-row, .worker-row { grid-template-columns: 1fr; } 
             .main-nav { flex-direction: column; } 
@@ -396,6 +445,7 @@
             .report-buttons { grid-template-columns: 1fr; }
             .action-buttons { flex-direction: column; }
             .invoice-triple-copy { grid-template-columns: 1fr; }
+            .side-menu { width: 250px; }
         }
 
         @media print {
@@ -437,6 +487,28 @@
     <!-- Notifications -->
     <div id="notifications"></div>
 
+    <!-- Menu Toggle -->
+    <button class="menu-toggle no-print" onclick="toggleSideMenu()">☰</button>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="color: white; margin: 0;">منو</h3>
+            <button class="modal-close" onclick="toggleSideMenu()" style="color: white;">×</button>
+        </div>
+        <button class="nav-btn active" onclick="showPage('dashboard'); toggleSideMenu();">📊 داشبورد</button>
+        <button class="nav-btn" onclick="showPage('contracts'); toggleSideMenu();">📝 قراردادها</button>
+        <button class="nav-btn" onclick="showPage('customers'); toggleSideMenu();">👥 مشتریان</button>
+        <button class="nav-btn" onclick="showPage('checks'); toggleSideMenu();">🏦 چک‌ها</button>
+        <button class="nav-btn" onclick="showPage('finance'); toggleSideMenu();">💰 مالی</button>
+        <button class="nav-btn" onclick="showPage('workers'); toggleSideMenu();">👷 کارکنان</button>
+        <button class="nav-btn" onclick="showPage('invoice'); toggleSideMenu();">📄 صدور فاکتور</button>
+        <button class="nav-btn" onclick="showPage('settings'); toggleSideMenu();">⚙️ تنظیمات</button>
+        <button class="nav-btn" onclick="showPage('reports'); toggleSideMenu();">📈 گزارش‌ها</button>
+        <button class="nav-btn" onclick="showPage('backup'); toggleSideMenu();">💾 پشتیبان</button>
+    </div>
+    <div class="overlay" id="overlay" onclick="toggleSideMenu()"></div>
+
     <!-- Login Page -->
     <div id="loginPage" class="login-container">
         <div class="login-card">
@@ -477,20 +549,6 @@
                 <button class="btn btn-danger btn-sm" onclick="logout()">خروج</button>
             </div>
         </header>
-
-        <!-- Navigation -->
-        <nav class="main-nav" id="nav">
-            <button class="nav-btn active" onclick="showPage('dashboard')">📊 داشبورد</button>
-            <button class="nav-btn" onclick="showPage('contracts')">📝 قراردادها</button>
-            <button class="nav-btn" onclick="showPage('customers')">👥 مشتریان</button>
-            <button class="nav-btn" onclick="showPage('checks')">🏦 چک‌ها</button>
-            <button class="nav-btn" onclick="showPage('finance')">💰 مالی</button>
-            <button class="nav-btn" onclick="showPage('workers')">👷 کارکنان</button>
-            <button class="nav-btn" onclick="showPage('invoice')">📄 صدور فاکتور</button>
-            <button class="nav-btn" onclick="showPage('settings')">⚙️ تنظیمات</button>
-            <button class="nav-btn" onclick="showPage('reports')">📈 گزارش‌ها</button>
-            <button class="nav-btn" onclick="showPage('backup')">💾 پشتیبان</button>
-        </nav>
 
         <!-- Content -->
         <main class="container">
@@ -574,17 +632,6 @@
                     <div style="display: flex; gap: 12px; margin-top: 24px;">
                         <button class="btn btn-success" onclick="saveContract()">✅ ثبت قرارداد</button>
                         <button class="btn btn-primary" onclick="previewContract()">👁️ پیش‌نمایش PDF</button>
-                    </div>
-
-                    <!-- پیش‌نمایش قرارداد با PDF -->
-                    <div id="contractPreview" class="print-preview" style="display: none;">
-                        <div class="action-buttons no-print">
-                            <button class="btn btn-primary" onclick="downloadContractPDF()">📥 دانلود PDF</button>
-                            <button class="btn btn-success" onclick="shareContract('whatsapp')">📱 واتس‌اپ</button>
-                            <button class="btn btn-info" onclick="shareContract('telegram')">✈️ تلگرام</button>
-                            <button class="btn btn-warning" onclick="closeContractPreview()">بستن</button>
-                        </div>
-                        <iframe id="pdfViewerContract" class="pdf-viewer"></iframe>
                     </div>
                 </div>
 
@@ -813,17 +860,6 @@
                         <button class="btn btn-success" onclick="saveInvoice()">✅ ثبت فاکتور</button>
                         <button class="btn btn-primary" onclick="previewInvoice()">👁️ پیش‌نمایش PDF</button>
                         <button class="btn btn-info" onclick="downloadInvoicePDF()">📥 دانلود PDF</button>
-                    </div>
-
-                    <!-- پیش‌نمایش فاکتور با PDF -->
-                    <div id="invoicePreview" class="print-preview" style="display: none;">
-                        <div class="action-buttons no-print">
-                            <button class="btn btn-primary" onclick="printInvoiceTripleCopy()">🖨️ چاپ سه نسخه‌ای</button>
-                            <button class="btn btn-success" onclick="downloadInvoicePDF()">📥 دانلود PDF</button>
-                            <button class="btn btn-info" onclick="shareInvoice('whatsapp')">📱 واتس‌اپ</button>
-                            <button class="btn btn-secondary" onclick="closeInvoicePreview()">بستن</button>
-                        </div>
-                        <iframe id="pdfViewerInvoice" class="pdf-viewer"></iframe>
                     </div>
                 </div>
 
@@ -1370,6 +1406,8 @@
         let currentProductCategory = 'یونولیت';
         let charts = {};
         let validationListenersAdded = false;
+        let currentContractPDF = null;
+        let currentInvoicePDF = null;
 
         // ===== UTILITY FUNCTIONS =====
         function showNotification(message, type = 'success') {
@@ -1411,6 +1449,13 @@
 
         function showModal(modalId) {
             document.getElementById(modalId).classList.add('active');
+        }
+
+        function toggleSideMenu() {
+            const sideMenu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('overlay');
+            sideMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
         }
 
         // ===== DATE FUNCTIONS =====
@@ -1518,18 +1563,7 @@
                 altFormat: 'Y/m/d',
                 defaultDate: 'today',
                 minDate: '1398/01/01',
-                maxDate: '1420/12/29',
-                locale: {
-                    firstDayOfWeek: 6,
-                    weekdays: {
-                        shorthand: ['ی', 'د', 'س', 'چ', 'پ', 'ج', 'ش'],
-                        longhand: ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه']
-                    },
-                    months: {
-                        shorthand: ['فر', 'ار', 'خر', 'تب', 'مرد', 'شه', 'مه', 'آب', 'آذ', 'دی', 'به', 'اس'],
-                        longhand: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند']
-                    }
-                }
+                maxDate: '1420/12/29'
             });
         }
 
@@ -1579,20 +1613,6 @@
             input.classList.remove('error');
             const errorDiv = input.parentElement.querySelector('.validation-error');
             if (errorDiv) errorDiv.remove();
-        }
-
-        // ===== DUPLICATE CHECK FUNCTIONS =====
-        function isDuplicateCustomer(name, phone, nationalCode, address) {
-            return appData.customers.some(c => 
-                c.name === name || 
-                c.phone === phone || 
-                (nationalCode && c.nationalCode === nationalCode) ||
-                (address && c.address === address)
-            );
-        }
-
-        function isDuplicateCheck(number) {
-            return appData.checks.some(c => c.number === number);
         }
 
         // ===== CONTRACTS PAGE =====
@@ -1787,6 +1807,7 @@
         function previewContract() {
             const customer = document.getElementById('contractCustomer').value.trim();
             const phone = document.getElementById('contractPhone').value.trim();
+            
             if (!customer) {
                 showValidationError(document.getElementById('contractCustomer'), 'نام مشتری الزامی است');
                 return;
@@ -1840,20 +1861,124 @@
             
             generateContractPDF(contractNumber, customer, phone, products, checks, totalProducts, advance, totalChecks, balance);
             
-            const blob = currentContractPDF.output('blob');
-            const url = URL.createObjectURL(blob);
-            document.getElementById('pdfViewerContract').src = url;
-            document.getElementById('contractPreview').style.display = 'block';
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(generateContractHTML(contractNumber, customer, phone, products, checks, totalProducts, advance, totalChecks, balance));
+            printWindow.document.close();
+            printWindow.print();
         }
 
-        function closeContractPreview() {
-            document.getElementById('contractPreview').style.display = 'none';
-            const iframe = document.getElementById('pdfViewerContract');
-            iframe.src = '';
-            currentContractPDF = null;
+        function generateContractHTML(contractNumber, customer, phone, products, checks, totalProducts, advance, totalChecks, balance) {
+            const companyName = appData.settings.companyName;
+            const companyPhone = appData.settings.companyPhone;
+            const companyAddress = appData.settings.companyAddress;
+            const contractDate = toShamsi(document.getElementById('contractDate').value) || toShamsi(new Date().toISOString());
+            
+            return `
+                <html>
+                <head>
+                    <title>قرارداد - ${contractNumber}</title>
+                    <style>
+                        body { font-family: 'Vazirmatn', Tahoma; direction: rtl; padding: 20px; margin: 0; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1e3a8a; padding-bottom: 20px; }
+                        .logo { width: 80px; height: 80px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 24px; margin: 0 auto 20px; }
+                        .content { line-height: 2; }
+                        .info-row { margin-bottom: 15px; display: flex; justify-content: space-between; }
+                        .label { font-weight: bold; color: #1e3a8a; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                        th { background: #f8fafc; font-weight: 600; }
+                        .totals { background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                        .signature { margin-top: 40px; display: flex; justify-content: space-between; }
+                        .signature div { text-align: center; }
+                        @media print { body { background: white !important; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="logo">CF</div>
+                        <h1>${companyName}</h1>
+                        <h2>قرارداد فروش شماره: ${contractNumber}</h2>
+                    </div>
+                    
+                    <div class="content">
+                        <div class="info-row">
+                            <span class="label">مشتری:</span>
+                            <span>${customer}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">تلفن:</span>
+                            <span>${phone}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">تاریخ قرارداد:</span>
+                            <span>${contractDate}</span>
+                        </div>
+                        
+                        <h4>محصولات:</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ردیف</th>
+                                    <th>محصول</th>
+                                    <th>مقدار</th>
+                                    <th>قیمت واحد (تومان)</th>
+                                    <th>جمع (تومان)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${products.map((p, i) => `
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td>${p.category}</td>
+                                        <td>${p.qty}</td>
+                                        <td>${p.price.toLocaleString('fa-IR')}</td>
+                                        <td>${p.total.toLocaleString('fa-IR')}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        
+                        <div class="totals">
+                            <div class="info-row">
+                                <span class="label">جمع کل محصولات:</span>
+                                <span>${totalProducts.toLocaleString('fa-IR')} تومان</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">پیش‌پرداخت نقدی:</span>
+                                <span>${advance.toLocaleString('fa-IR')} تومان</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">مجموع چک‌ها:</span>
+                                <span>${totalChecks.toLocaleString('fa-IR')} تومان</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">مانده پرداخت:</span>
+                                <span style="color: ${balance > 0 ? 'green' : 'red'}">${balance.toLocaleString('fa-IR')} تومان</span>
+                            </div>
+                        </div>
+                        
+                        <div class="signature">
+                            <div>
+                                <p>امضاء مشتری</p>
+                                <p style="border-top: 1px solid #333; width: 150px; margin: 20px auto 0;">......................</p>
+                            </div>
+                            <div>
+                                <p>امضاء فروشنده</p>
+                                <p style="border-top: 1px solid #333; width: 150px; margin: 20px auto 0;">......................</p>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #666;">
+                            <p>${companyName}</p>
+                            <p>تلفن: ${companyPhone}</p>
+                            <p>آدرس: ${companyAddress}</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
         }
 
-        let currentContractPDF = null;
         function generateContractPDF(contractNumber, customer, phone, products, checks, totalProducts, advance, totalChecks, balance) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -1917,25 +2042,6 @@
             currentContractPDF = doc;
         }
 
-        function downloadContractPDF() {
-            if (!currentContractPDF) {
-                showNotification('ابتدا پیش‌نمایش را ببینید', 'error');
-                return;
-            }
-            const contractNumber = document.getElementById('previewContractNumber')?.textContent || 'contract';
-            currentContractPDF.save(`قرارداد_${contractNumber}.pdf`);
-            showNotification('PDF دانلود شد', 'success');
-        }
-
-        function shareContract(platform) {
-            const text = `قرارداد جدید در کارخانه یونولیت کلشی‌فوم ثبت شد.`;
-            if (platform === 'whatsapp') {
-                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-            } else if (platform === 'telegram') {
-                window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`, '_blank');
-            }
-        }
-
         function printContract() {
             const customer = document.getElementById('contractCustomer').value.trim();
             if (!customer) {
@@ -1943,12 +2049,6 @@
                 return;
             }
             previewContract();
-            setTimeout(() => {
-                if (currentContractPDF) {
-                    currentContractPDF.autoPrint();
-                    window.open(currentContractPDF.output('bloburl'), '_blank');
-                }
-            }, 500);
         }
 
         // ===== CUSTOMERS PAGE =====
@@ -3128,20 +3228,122 @@
             
             generateInvoicePDF(invoiceNumber, customer, items, subtotal, discount, tax, shipping, total, driverName, plate);
             
-            const blob = currentInvoicePDF.output('blob');
-            const url = URL.createObjectURL(blob);
-            document.getElementById('pdfViewerInvoice').src = url;
-            document.getElementById('invoicePreview').style.display = 'block';
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(generateInvoiceHTML(invoiceNumber, customer, items, subtotal, discount, tax, shipping, total, driverName, plate));
+            printWindow.document.close();
+            printWindow.print();
         }
 
-        function closeInvoicePreview() {
-            document.getElementById('invoicePreview').style.display = 'none';
-            const iframe = document.getElementById('pdfViewerInvoice');
-            iframe.src = '';
-            currentInvoicePDF = null;
+        function generateInvoiceHTML(invoiceNumber, customer, items, subtotal, discount, tax, shipping, total, driverName, plate) {
+            const companyName = appData.settings.companyName;
+            const companyPhone = appData.settings.companyPhone;
+            const companyAddress = appData.settings.companyAddress;
+            const invoiceDate = toShamsi(document.getElementById('invoiceDate').value) || toShamsi(new Date().toISOString());
+            const invoiceType = document.getElementById('invoiceType').value;
+            
+            return `
+                <html>
+                <head>
+                    <title>فاکتور - ${invoiceNumber}</title>
+                    <style>
+                        body { font-family: 'Vazirmatn', Tahoma; direction: rtl; padding: 20px; margin: 0; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1e3a8a; padding-bottom: 20px; }
+                        .logo { width: 80px; height: 80px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 24px; margin: 0 auto 20px; }
+                        .content { line-height: 2; }
+                        .info-row { margin-bottom: 15px; display: flex; justify-content: space-between; }
+                        .label { font-weight: bold; color: #1e3a8a; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                        th { background: #f8fafc; font-weight: 600; }
+                        .totals { background: #e8f5e8; padding: 15px; border-radius: 8px; margin: 20px 0; }
+                        .signature { margin-top: 40px; display: flex; justify-content: space-between; }
+                        .signature div { text-align: center; }
+                        @media print { body { background: white !important; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="logo">CF</div>
+                        <h1>${companyName}</h1>
+                        <h2>فاکتور فروش شماره: ${invoiceNumber}</h2>
+                    </div>
+                    
+                    <div class="content">
+                        <div class="info-row">
+                            <span class="label">مشتری:</span>
+                            <span>${customer}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">تاریخ فاکتور:</span>
+                            <span>${invoiceDate}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">نوع فاکتور:</span>
+                            <span>${invoiceType}</span>
+                        </div>
+                        ${driverName ? `<div class="info-row"><span class="label">راننده:</span><span>${driverName}</span></div>` : ''}
+                        ${plate ? `<div class="info-row"><span class="label">پلاک خودرو:</span><span>${plate}</span></div>` : ''}
+                        
+                        <h4>اقلام فاکتور:</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ردیف</th>
+                                    <th>شرح کالا/خدمت</th>
+                                    <th>تعداد</th>
+                                    <th>قیمت واحد (تومان)</th>
+                                    <th>جمع (تومان)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${items.map((item, i) => `
+                                    <tr>
+                                        <td>${i + 1}</td>
+                                        <td>${item.description}</td>
+                                        <td>${item.quantity}</td>
+                                        <td>${item.price.toLocaleString('fa-IR')}</td>
+                                        <td>${item.total.toLocaleString('fa-IR')}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        
+                        <div class="totals">
+                            <div class="info-row">
+                                <span class="label">جمع اقلام:</span>
+                                <span>${subtotal.toLocaleString('fa-IR')} تومان</span>
+                            </div>
+                            ${discount > 0 ? `<div class="info-row"><span class="label">تخفیف:</span><span>-${discount.toLocaleString('fa-IR')} تومان</span></div>` : ''}
+                            ${tax > 0 ? `<div class="info-row"><span class="label">مالیات (${appData.settings.taxRate}%):</span><span>${tax.toLocaleString('fa-IR')} تومان</span></div>` : ''}
+                            ${shipping > 0 ? `<div class="info-row"><span class="label">حمل و نقل:</span><span>${shipping.toLocaleString('fa-IR')} تومان</span></div>` : ''}
+                            <div class="info-row">
+                                <span class="label">جمع کل:</span>
+                                <span><strong>${total.toLocaleString('fa-IR')} تومان</strong></span>
+                            </div>
+                        </div>
+                        
+                        <div class="signature">
+                            <div>
+                                <p>امضاء مشتری</p>
+                                <p style="border-top: 1px solid #333; width: 150px; margin: 20px auto 0;">......................</p>
+                            </div>
+                            <div>
+                                <p>امضاء فروشنده</p>
+                                <p style="border-top: 1px solid #333; width: 150px; margin: 20px auto 0;">......................</p>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #666;">
+                            <p>${companyName}</p>
+                            <p>تلفن: ${companyPhone}</p>
+                            <p>آدرس: ${companyAddress}</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
         }
 
-        let currentInvoicePDF = null;
         function generateInvoicePDF(invoiceNumber, customer, items, subtotal, discount, tax, shipping, total, driverName, plate) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -3157,14 +3359,11 @@
             doc.text('مشخصات فاکتور:', 190, 50);
             doc.text(`مشتری: ${customer}`, 190, 60);
             doc.text(`تاریخ: ${toShamsi(document.getElementById('invoiceDate').value) || toShamsi(new Date().toISOString())}`, 190, 70);
-            if (driverName) {
-                doc.text(`راننده: ${driverName}`, 190, 80);
-            }
-            if (plate) {
-                doc.text(`پلاک: ${plate}`, 190, 90);
-            }
+            doc.text(`نوع: ${document.getElementById('invoiceType').value}`, 190, 80);
+            if (driverName) doc.text(`راننده: ${driverName}`, 190, 90);
+            if (plate) doc.text(`پلاک: ${plate}`, 190, 100);
             
-            let yPosition = 110;
+            let yPosition = 120;
             doc.text('اقلام فاکتور:', 190, yPosition);
             yPosition += 10;
             
@@ -3203,7 +3402,7 @@
             yPosition += 10;
             doc.text('جمع‌بندی مالی:', 190, yPosition);
             yPosition += 10;
-            doc.text(`جمع کل اقلام: ${subtotal.toLocaleString('fa-IR')} تومان`, 190, yPosition);
+            doc.text(`جمع اقلام: ${subtotal.toLocaleString('fa-IR')} تومان`, 190, yPosition);
             if (discount > 0) {
                 yPosition += 10;
                 doc.text(`تخفیف: ${discount.toLocaleString('fa-IR')} تومان`, 190, yPosition);
@@ -3217,27 +3416,9 @@
                 doc.text(`حمل و نقل: ${shipping.toLocaleString('fa-IR')} تومان`, 190, yPosition);
             }
             yPosition += 10;
-            doc.text(`قابل پرداخت: ${total.toLocaleString('fa-IR')} تومان`, 190, yPosition);
+            doc.text(`جمع کل: ${total.toLocaleString('fa-IR')} تومان`, 190, yPosition);
             
             currentInvoicePDF = doc;
-        }
-
-        function printInvoiceTripleCopy() {
-            if (!currentInvoicePDF) {
-                showNotification('ابتدا پیش‌نمایش را ببینید', 'error');
-                return;
-            }
-            currentInvoicePDF.autoPrint();
-            window.open(currentInvoicePDF.output('bloburl'), '_blank');
-        }
-
-        function shareInvoice(platform) {
-            const text = `فاکتور جدید در کارخانه یونولیت کلشی‌فوم صادر شد.`;
-            if (platform === 'whatsapp') {
-                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-            } else if (platform === 'telegram') {
-                window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`, '_blank');
-            }
         }
 
         function printInvoice() {
@@ -3247,9 +3428,6 @@
                 return;
             }
             previewInvoice();
-            setTimeout(() => {
-                printInvoiceTripleCopy();
-            }, 500);
         }
 
         function downloadInvoicePDF() {
@@ -4411,7 +4589,7 @@
                             .label { font-weight: bold; color: #1e3a8a; }
                             table { width: 100%; border-collapse: collapse; margin: 20px 0; }
                             th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-                            th { background: #f8fafc; }
+                            th { background: #f8fafc; font-weight: 600; }
                         </style>
                     </head>
                     <body>
@@ -4521,6 +4699,20 @@
             document.getElementById('modalExpenseCategory').addEventListener('change', handleExpenseCategoryChange);
         }
 
+        // ===== DUPLICATE CHECK FUNCTIONS =====
+        function isDuplicateCustomer(name, phone, nationalCode, address) {
+            return appData.customers.some(c => 
+                c.name === name || 
+                c.phone === phone || 
+                (nationalCode && c.nationalCode === nationalCode) ||
+                (address && c.address === address)
+            );
+        }
+
+        function isDuplicateCheck(number) {
+            return appData.checks.some(c => c.number === number);
+        }
+
         // ===== INITIALIZATION =====
         function initializeSystem() {
             if (!localStorage.getItem('kaleshiFoamDataCleaned')) {
@@ -4607,4 +4799,4 @@
         });
     </script>
 </body>
-    </html>
+                                    </html>
