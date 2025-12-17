@@ -380,6 +380,15 @@
             color: #666;
         }
 
+        .pdf-viewer {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            margin: 20px 0;
+        }
+
         @media (max-width: 768px) { 
             .form-row, .product-row, .check-row, .customer-row, .expense-row, .invoice-row, .worker-row { grid-template-columns: 1fr; } 
             .main-nav { flex-direction: column; } 
@@ -416,16 +425,6 @@
         .badge-warning { background: #f59e0b; color: white; }
         .badge-info { background: #06b6d4; color: white; }
         .badge-secondary { background: #64748b; color: white; }
-
-        /* استایل PDF Viewer */
-        .pdf-viewer {
-            width: 100%;
-            height: 600px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: white;
-            margin: 20px 0;
-        }
     </style>
 </head>
 <body>
@@ -479,7 +478,7 @@
             </div>
         </header>
 
-        <!-- Navigation - چیدمان افقی جدید -->
+        <!-- Navigation -->
         <nav class="main-nav" id="nav">
             <button class="nav-btn active" onclick="showPage('dashboard')">📊 داشبورد</button>
             <button class="nav-btn" onclick="showPage('contracts')">📝 قراردادها</button>
@@ -585,7 +584,7 @@
                             <button class="btn btn-info" onclick="shareContract('telegram')">✈️ تلگرام</button>
                             <button class="btn btn-warning" onclick="closeContractPreview()">بستن</button>
                         </div>
-                        <div id="pdfViewerContract" class="pdf-viewer"></div>
+                        <iframe id="pdfViewerContract" class="pdf-viewer"></iframe>
                     </div>
                 </div>
 
@@ -824,7 +823,7 @@
                             <button class="btn btn-info" onclick="shareInvoice('whatsapp')">📱 واتس‌اپ</button>
                             <button class="btn btn-secondary" onclick="closeInvoicePreview()">بستن</button>
                         </div>
-                        <div id="pdfViewerInvoice" class="pdf-viewer"></div>
+                        <iframe id="pdfViewerInvoice" class="pdf-viewer"></iframe>
                     </div>
                 </div>
 
@@ -1370,9 +1369,7 @@
         let invoiceItemCount = 0;
         let currentProductCategory = 'یونولیت';
         let charts = {};
-        let validationListenersAdded = false; // پرچم برای جلوگیری از تکرار
-        let currentContractPDF = null;
-        let currentInvoicePDF = null;
+        let validationListenersAdded = false;
 
         // ===== UTILITY FUNCTIONS =====
         function showNotification(message, type = 'success') {
@@ -1514,31 +1511,7 @@
 
         // ===== PERSIAN CALENDAR =====
         function initializePersianCalendar() {
-            flatpickr('.check-due-date', {
-                locale: 'fa',
-                dateFormat: 'Y/m/d',
-                altInput: true,
-                altFormat: 'Y/m/d',
-                defaultDate: 'today',
-                minDate: '1398/01/01',
-                maxDate: '1420/12/29',
-                locale: {
-                    firstDayOfWeek: 6,
-                    weekdays: {
-                        shorthand: ['ی', 'د', 'س', 'چ', 'پ', 'ج', 'ش'],
-                        longhand: ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنج‌شنبه', 'جمعه', 'شنبه']
-                    },
-                    months: {
-                        shorthand: ['فر', 'ار', 'خر', 'تب', 'مرد', 'شه', 'مه', 'آب', 'آذ', 'دی', 'به', 'اس'],
-                        longhand: ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند']
-                    }
-                },
-                onChange: function(selectedDates, dateStr) {
-                    calculateContractTotals();
-                }
-            });
-
-            flatpickr('.date-picker:not(.check-due-date)', {
+            flatpickr('.date-picker, .check-due-date', {
                 locale: 'fa',
                 dateFormat: 'Y/m/d',
                 altInput: true,
@@ -1568,23 +1541,17 @@
 
         function validateNationalCode(code) {
             if (!code || code.length !== 10) return false;
-            
             if (!/^\d{10}$/.test(code)) return false;
-            
             const uniqueDigits = new Set(code.split(''));
             if (uniqueDigits.size === 1) return false;
-            
             const digits = code.split('').map(Number);
             const lastDigit = digits[9];
             let sum = 0;
-            
             for (let i = 0; i < 9; i++) {
                 sum += digits[i] * (10 - i);
             }
-            
             const remainder = sum % 11;
             const controlDigit = remainder < 2 ? remainder : 11 - remainder;
-            
             return controlDigit === lastDigit;
         }
 
@@ -1595,18 +1562,13 @@
 
         function showValidationError(input, message) {
             input.classList.add('error');
-            
             const errorDiv = document.createElement('div');
             errorDiv.className = 'validation-error';
             errorDiv.textContent = message;
-            
             const parent = input.parentElement;
             const existingError = parent.querySelector('.validation-error');
-            if (existingError) {
-                existingError.remove();
-            }
+            if (existingError) existingError.remove();
             parent.appendChild(errorDiv);
-            
             setTimeout(() => {
                 input.classList.remove('error');
                 errorDiv.remove();
@@ -1616,9 +1578,7 @@
         function clearValidationError(input) {
             input.classList.remove('error');
             const errorDiv = input.parentElement.querySelector('.validation-error');
-            if (errorDiv) {
-                errorDiv.remove();
-            }
+            if (errorDiv) errorDiv.remove();
         }
 
         // ===== DUPLICATE CHECK FUNCTIONS =====
@@ -1687,7 +1647,6 @@
 
         function calculateContractTotals() {
             let totalProducts = 0;
-            
             document.querySelectorAll('.product-row').forEach(row => {
                 const qty = parseFloat(row.querySelector('.product-qty').value) || 0;
                 const price = parseFloat(row.querySelector('.product-price').value) || 0;
@@ -1714,23 +1673,18 @@
             const customer = document.getElementById('contractCustomer').value.trim();
             const phone = document.getElementById('contractPhone').value.trim();
             
-            // اعتبارسنجی
             if (!customer) {
                 showValidationError(document.getElementById('contractCustomer'), 'نام مشتری الزامی است');
                 return;
             }
-            
             if (!phone) {
                 showValidationError(document.getElementById('contractPhone'), 'تلفن الزامی است');
                 return;
             }
-            
             if (!validateMobilePhone(phone)) {
                 showValidationError(document.getElementById('contractPhone'), 'شماره تلفن همراه معتبر نیست');
                 return;
             }
-            
-            // بررسی حروف فارسی برای نام
             if (!validatePersianText(customer)) {
                 showValidationError(document.getElementById('contractCustomer'), 'نام باید فقط حروف فارسی باشد');
                 return;
@@ -1741,7 +1695,6 @@
                 const category = row.querySelector('.product-category').value;
                 const qty = parseFloat(row.querySelector('.product-qty').value) || 0;
                 const price = parseFloat(row.querySelector('.product-price').value) || 0;
-                
                 if (qty > 0 && price > 0) {
                     products.push({ category, qty, price, total: qty * price });
                 }
@@ -1757,7 +1710,6 @@
                 const number = row.querySelector('.check-number').value;
                 const amount = parseFloat(row.querySelector('.check-amount').value) || 0;
                 const dueDate = row.querySelector('.check-due-date').value;
-                
                 if (number && amount > 0 && dueDate) {
                     checks.push({ number, amount, dueDate });
                 }
@@ -1790,14 +1742,11 @@
             
             if (editingId) {
                 const index = appData.contracts.findIndex(c => c.id === editingId);
-                if (index !== -1) {
-                    appData.contracts[index] = contract;
-                }
+                if (index !== -1) appData.contracts[index] = contract;
             } else {
                 appData.contracts.push(contract);
             }
             
-            // ذخیره چک‌ها در بخش چک‌ها
             checks.forEach(check => {
                 appData.checks.push({
                     id: Date.now() + Math.random(),
@@ -1825,41 +1774,31 @@
             document.getElementById('contractPhone').value = '';
             document.getElementById('contractAddress').value = '';
             document.getElementById('advancePayment').value = '0';
-            
             productRowCount = 0;
             checkRowCount = 0;
-            
             document.getElementById('productsContainer').innerHTML = '';
             document.getElementById('checksContainer').innerHTML = '';
-            
             addProductRow();
             addCheckRow();
             calculateContractTotals();
-            
             editingId = null;
         }
 
         function previewContract() {
             const customer = document.getElementById('contractCustomer').value.trim();
             const phone = document.getElementById('contractPhone').value.trim();
-            
-            // اعتبارسنجی
             if (!customer) {
                 showValidationError(document.getElementById('contractCustomer'), 'نام مشتری الزامی است');
                 return;
             }
-            
             if (!phone) {
                 showValidationError(document.getElementById('contractPhone'), 'تلفن الزامی است');
                 return;
             }
-            
             if (!validateMobilePhone(phone)) {
                 showValidationError(document.getElementById('contractPhone'), 'شماره تلفن همراه معتبر نیست');
                 return;
             }
-            
-            // بررسی حروف فارسی برای نام
             if (!validatePersianText(customer)) {
                 showValidationError(document.getElementById('contractCustomer'), 'نام باید فقط حروف فارسی باشد');
                 return;
@@ -1870,7 +1809,6 @@
                 const category = row.querySelector('.product-category').value;
                 const qty = parseFloat(row.querySelector('.product-qty').value) || 0;
                 const price = parseFloat(row.querySelector('.product-price').value) || 0;
-                
                 if (qty > 0 && price > 0) {
                     products.push({ category, qty, price, total: qty * price });
                 }
@@ -1886,7 +1824,6 @@
                 const number = row.querySelector('.check-number').value;
                 const amount = parseFloat(row.querySelector('.check-amount').value) || 0;
                 const dueDate = row.querySelector('.check-due-date').value;
-                
                 if (number && amount > 0 && dueDate) {
                     checks.push({ number, amount, dueDate });
                 }
@@ -1901,46 +1838,43 @@
             const seq = (appData.contracts.length + 1).toString().padStart(4, '0');
             const contractNumber = `${year}-${seq}`;
             
-            // ایجاد PDF
             generateContractPDF(contractNumber, customer, phone, products, checks, totalProducts, advance, totalChecks, balance);
             
-            // نمایش PDF
+            const blob = currentContractPDF.output('blob');
+            const url = URL.createObjectURL(blob);
+            document.getElementById('pdfViewerContract').src = url;
             document.getElementById('contractPreview').style.display = 'block';
         }
 
         function closeContractPreview() {
             document.getElementById('contractPreview').style.display = 'none';
+            const iframe = document.getElementById('pdfViewerContract');
+            iframe.src = '';
             currentContractPDF = null;
         }
 
+        let currentContractPDF = null;
         function generateContractPDF(contractNumber, customer, phone, products, checks, totalProducts, advance, totalChecks, balance) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
-            // تنظیمات فارسی
             doc.setFont('Vazirmatn');
             doc.setFontSize(12);
             doc.setR2L(true);
             
-            // عنوان
             doc.setFontSize(16);
             doc.text('قرارداد فروش کارخانه یونولیت کلشی‌فوم', 105, 20, { align: 'center' });
-            
             doc.setFontSize(12);
             doc.text(`شماره قرارداد: ${contractNumber}`, 105, 30, { align: 'center' });
             
-            // اطلاعات مشتری
             doc.text('مشخصات مشتری:', 190, 50);
             doc.text(`نام: ${customer}`, 190, 60);
             doc.text(`تلفن: ${phone}`, 190, 70);
             doc.text(`تاریخ: ${toShamsi(document.getElementById('contractDate').value) || toShamsi(new Date().toISOString())}`, 190, 80);
             
-            // جدول محصولات
             let yPosition = 100;
             doc.text('محصولات:', 190, yPosition);
             yPosition += 10;
             
-            // هدر جدول
             doc.rect(140, yPosition, 50, 8);
             doc.rect(100, yPosition, 40, 8);
             doc.rect(60, yPosition, 40, 8);
@@ -1954,7 +1888,6 @@
             
             yPosition += 8;
             
-            // محصولات
             products.forEach((product, index) => {
                 doc.rect(140, yPosition, 50, 8);
                 doc.rect(100, yPosition, 40, 8);
@@ -1970,7 +1903,6 @@
                 yPosition += 8;
             });
             
-            // جمع‌بندی مالی
             yPosition += 10;
             doc.text('جمع‌بندی مالی:', 190, yPosition);
             yPosition += 10;
@@ -1990,7 +1922,6 @@
                 showNotification('ابتدا پیش‌نمایش را ببینید', 'error');
                 return;
             }
-            
             const contractNumber = document.getElementById('previewContractNumber')?.textContent || 'contract';
             currentContractPDF.save(`قرارداد_${contractNumber}.pdf`);
             showNotification('PDF دانلود شد', 'success');
@@ -1998,11 +1929,10 @@
 
         function shareContract(platform) {
             const text = `قرارداد جدید در کارخانه یونولیت کلشی‌فوم ثبت شد.`;
-            
             if (platform === 'whatsapp') {
-                window.open(`https://wa.me/?text=      ${encodeURIComponent(text)}`, '_blank');
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
             } else if (platform === 'telegram') {
-                window.open(`https://t.me/share/url?url=      ${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`, '_blank');
+                window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`, '_blank');
             }
         }
 
@@ -2012,7 +1942,6 @@
                 showNotification('لطفاً ابتدا اطلاعات قرارداد را وارد کنید', 'error');
                 return;
             }
-            
             previewContract();
             setTimeout(() => {
                 if (currentContractPDF) {
@@ -2070,23 +1999,18 @@
             const name = document.getElementById('modalCustomerName').value.trim();
             const phone = document.getElementById('modalCustomerPhone').value.trim();
             
-            // اعتبارسنجی
             if (!name) {
                 showValidationError(document.getElementById('modalCustomerName'), 'نام مشتری الزامی است');
                 return;
             }
-            
             if (!phone) {
                 showValidationError(document.getElementById('modalCustomerPhone'), 'تلفن الزامی است');
                 return;
             }
-            
             if (!validateMobilePhone(phone)) {
                 showValidationError(document.getElementById('modalCustomerPhone'), 'شماره تلفن همراه معتبر نیست');
                 return;
             }
-            
-            // بررسی حروف فارسی برای نام
             if (!validatePersianText(name)) {
                 showValidationError(document.getElementById('modalCustomerName'), 'نام باید فقط حروف فارسی باشد');
                 return;
@@ -2098,14 +2022,12 @@
                 return;
             }
             
-            // بررسی حروف فارسی برای آدرس
             const address = document.getElementById('modalCustomerAddress').value.trim();
             if (address && !validatePersianText(address)) {
                 showValidationError(document.getElementById('modalCustomerAddress'), 'آدرس باید فقط حروف فارسی باشد');
                 return;
             }
             
-            // بررسی تکراری بودن
             if (isDuplicateCustomer(name, phone, nationalCode, address)) {
                 showNotification('مشتری با این اطلاعات قبلاً ثبت شده است', 'error');
                 return;
@@ -2144,7 +2066,6 @@
                 const newPhone = prompt('تلفن جدید:', customer.phone);
                 
                 if (newName && newPhone) {
-                    // بررسی تکراری بودن
                     if (isDuplicateCustomer(newName, newPhone, customer.nationalCode, customer.address)) {
                         showNotification('مشتری با این اطلاعات قبلاً ثبت شده است', 'error');
                         return;
@@ -2270,34 +2191,26 @@
             const bank = document.getElementById('modalCheckBank').value;
             const dueDate = document.getElementById('modalCheckDueDate').value;
             
-            // اعتبارسنجی
             if (!number) {
                 showValidationError(document.getElementById('modalCheckNumber'), 'شماره چک الزامی است');
                 return;
             }
-            
-            // بررسی که شماره چک فقط عدد باشد
             if (!/^\d+$/.test(number)) {
                 showValidationError(document.getElementById('modalCheckNumber'), 'شماره چک باید فقط عدد باشد');
                 return;
             }
-            
             if (!customer) {
                 showValidationError(document.getElementById('modalCheckCustomer'), 'نام مشتری الزامی است');
                 return;
             }
-            
             if (amount <= 0) {
                 showValidationError(document.getElementById('modalCheckAmount'), 'مبلغ چک باید بیشتر از 0 باشد');
                 return;
             }
-            
             if (!dueDate) {
                 showValidationError(document.getElementById('modalCheckDueDate'), 'تاریخ سررسید الزامی است');
                 return;
             }
-            
-            // بررسی تکراری بودن شماره چک
             if (isDuplicateCheck(number)) {
                 showValidationError(document.getElementById('modalCheckNumber'), 'این شماره چک قبلاً ثبت شده است');
                 return;
@@ -2467,17 +2380,14 @@
             const paymentMethod = document.getElementById('modalIncomePaymentMethod').value;
             const description = document.getElementById('modalIncomeDescription').value.trim();
             
-            // اعتبارسنجی
             if (!date) {
                 showValidationError(document.getElementById('modalIncomeDate'), 'تاریخ الزامی است');
                 return;
             }
-            
             if (amount <= 0) {
                 showValidationError(document.getElementById('modalIncomeAmount'), 'مبلغ باید بیشتر از 0 باشد');
                 return;
             }
-            
             if (!description) {
                 showValidationError(document.getElementById('modalIncomeDescription'), 'شرح الزامی است');
                 return;
@@ -2497,7 +2407,7 @@
             };
             
             appData.transactions.push(transaction);
-            saveData(); // ذخیره در حافظه
+            saveData();
             loadTransactionsList();
             updateFinancialSummary();
             closeModal('incomeModal');
@@ -2511,8 +2421,6 @@
             document.getElementById('modalExpenseAmount').value = '';
             document.getElementById('modalExpensePaymentMethod').value = 'نقدی';
             document.getElementById('modalExpenseDescription').value = '';
-            
-            // بارگذاری لیست رانندگان و کارگران
             loadDriverWorkerSelectOptions();
         }
 
@@ -2520,13 +2428,11 @@
             const driverSelect = document.getElementById('expenseDriver');
             driverSelect.innerHTML = '<option value="">-- انتخاب کنید --</option>';
             
-            // اضافه کردن گزینه سایر
             const otherOption = document.createElement('option');
             otherOption.value = 'other';
             otherOption.textContent = 'سایر';
             driverSelect.appendChild(otherOption);
             
-            // اضافه کردن راننده‌ها
             appData.workers
                 .filter(w => w.position === 'راننده' && w.status === 'فعال')
                 .forEach(worker => {
@@ -2536,7 +2442,6 @@
                     driverSelect.appendChild(option);
                 });
             
-            // اضافه کردن کارگران
             appData.workers
                 .filter(w => (w.position === 'کارگر ساده' || w.position === 'کارگر ماهر' || w.position === 'سرکارگر') && w.status === 'فعال')
                 .forEach(worker => {
@@ -2566,23 +2471,19 @@
             const paymentMethod = document.getElementById('modalExpensePaymentMethod').value;
             const description = document.getElementById('modalExpenseDescription').value.trim();
             
-            // اعتبارسنجی
             if (!date) {
                 showValidationError(document.getElementById('modalExpenseDate'), 'تاریخ الزامی است');
                 return;
             }
-            
             if (amount <= 0) {
                 showValidationError(document.getElementById('modalExpenseAmount'), 'مبلغ باید بیشتر از 0 باشد');
                 return;
             }
-            
             if (!description) {
                 showValidationError(document.getElementById('modalExpenseDescription'), 'شرح الزامی است');
                 return;
             }
             
-            // اگر دسته‌بندی حقوق راننده یا کارگران باشد، راننده انتخاب شده را بررسی کن
             let driverId = null;
             let workerName = '';
             if (category === 'حقوق راننده' || category === 'حقوق کارگران') {
@@ -2613,7 +2514,7 @@
             };
             
             appData.transactions.push(transaction);
-            saveData(); // ذخیره در حافظه
+            saveData();
             loadTransactionsList();
             updateFinancialSummary();
             closeModal('expenseModal');
@@ -2775,29 +2676,23 @@
             const name = document.getElementById('modalWorkerName').value.trim();
             const nationalCode = document.getElementById('modalWorkerNationalCode').value.trim();
             
-            // اعتبارسنجی
             if (!name) {
                 showValidationError(document.getElementById('modalWorkerName'), 'نام کارمند الزامی است');
                 return;
             }
-            
-            // بررسی حروف فارسی برای نام
             if (!validatePersianText(name)) {
                 showValidationError(document.getElementById('modalWorkerName'), 'نام باید فقط حروف فارسی باشد');
                 return;
             }
-            
             if (!nationalCode) {
                 showValidationError(document.getElementById('modalWorkerNationalCode'), 'کد ملی الزامی است');
                 return;
             }
-            
             if (!validateNationalCode(nationalCode)) {
                 showValidationError(document.getElementById('modalWorkerNationalCode'), 'کد ملی معتبر نیست');
                 return;
             }
             
-            // بررسی حروف فارسی برای آدرس
             const address = document.getElementById('modalWorkerAddress').value.trim();
             if (address && !validatePersianText(address)) {
                 showValidationError(document.getElementById('modalWorkerAddress'), 'آدرس باید فقط حروف فارسی باشد');
@@ -2978,7 +2873,6 @@
             saveData();
             showNotification('حقوق با موفقیت ثبت شد', 'success');
             
-            // Add to transactions as expense
             const worker = appData.workers.find(w => w.id === workerId);
             appData.transactions.push({
                 id: Date.now(),
@@ -3072,7 +2966,6 @@
             addInvoiceItem();
             calculateInvoiceTotals();
             
-            // Generate invoice number
             const year = new Date().toLocaleDateString('fa-IR').split('/')[0];
             const seq = (appData.invoices.length + 1).toString().padStart(5, '0');
             document.getElementById('invoiceNumber').value = `INV-${year}-${seq}`;
@@ -3107,7 +3000,6 @@
 
         function calculateInvoiceTotals() {
             let subtotal = 0;
-            
             document.querySelectorAll('.invoice-row').forEach(row => {
                 const qty = parseFloat(row.querySelector('.invoice-quantity').value) || 0;
                 const price = parseFloat(row.querySelector('.invoice-price').value) || 0;
@@ -3136,12 +3028,10 @@
             const driverId = document.getElementById('invoiceDriver').value;
             const plate = document.getElementById('invoicePlate').value.trim();
             
-            // اعتبارسنجی
             if (!customer) {
                 showValidationError(document.getElementById('invoiceCustomer'), 'نام مشتری الزامی است');
                 return;
             }
-            
             if (!invoiceNumber) {
                 showNotification('شماره فاکتور الزامی است', 'error');
                 return;
@@ -3236,30 +3126,34 @@
             const driverName = driverId ? appData.workers.find(w => w.id === driverId)?.name : '';
             const plate = document.getElementById('invoicePlate').value;
             
-            // ایجاد PDF
             generateInvoicePDF(invoiceNumber, customer, items, subtotal, discount, tax, shipping, total, driverName, plate);
             
-            // نمایش PDF
+            const blob = currentInvoicePDF.output('blob');
+            const url = URL.createObjectURL(blob);
+            document.getElementById('pdfViewerInvoice').src = url;
             document.getElementById('invoicePreview').style.display = 'block';
         }
 
+        function closeInvoicePreview() {
+            document.getElementById('invoicePreview').style.display = 'none';
+            const iframe = document.getElementById('pdfViewerInvoice');
+            iframe.src = '';
+            currentInvoicePDF = null;
+        }
+
+        let currentInvoicePDF = null;
         function generateInvoicePDF(invoiceNumber, customer, items, subtotal, discount, tax, shipping, total, driverName, plate) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
-            // تنظیمات فارسی
             doc.setFont('Vazirmatn');
             doc.setFontSize(12);
             doc.setR2L(true);
             
-            // عنوان
             doc.setFontSize(16);
             doc.text('فاکتور فروش کارخانه یونولیت کلشی‌فوم', 105, 20, { align: 'center' });
-            
             doc.setFontSize(12);
             doc.text(`شماره فاکتور: ${invoiceNumber}`, 105, 30, { align: 'center' });
             
-            // اطلاعات مشتری
             doc.text('مشخصات فاکتور:', 190, 50);
             doc.text(`مشتری: ${customer}`, 190, 60);
             doc.text(`تاریخ: ${toShamsi(document.getElementById('invoiceDate').value) || toShamsi(new Date().toISOString())}`, 190, 70);
@@ -3270,12 +3164,10 @@
                 doc.text(`پلاک: ${plate}`, 190, 90);
             }
             
-            // جدول اقلام
             let yPosition = 110;
             doc.text('اقلام فاکتور:', 190, yPosition);
             yPosition += 10;
             
-            // هدر جدول
             doc.rect(150, yPosition, 40, 8);
             doc.rect(110, yPosition, 40, 8);
             doc.rect(70, yPosition, 40, 8);
@@ -3291,7 +3183,6 @@
             
             yPosition += 8;
             
-            // اقلام
             items.forEach((item, index) => {
                 doc.rect(150, yPosition, 40, 8);
                 doc.rect(110, yPosition, 40, 8);
@@ -3309,7 +3200,6 @@
                 yPosition += 8;
             });
             
-            // جمع‌بندی مالی
             yPosition += 10;
             doc.text('جمع‌بندی مالی:', 190, yPosition);
             yPosition += 10;
@@ -3337,23 +3227,16 @@
                 showNotification('ابتدا پیش‌نمایش را ببینید', 'error');
                 return;
             }
-            
             currentInvoicePDF.autoPrint();
             window.open(currentInvoicePDF.output('bloburl'), '_blank');
         }
 
-        function closeInvoicePreview() {
-            document.getElementById('invoicePreview').style.display = 'none';
-            currentInvoicePDF = null;
-        }
-
         function shareInvoice(platform) {
             const text = `فاکتور جدید در کارخانه یونولیت کلشی‌فوم صادر شد.`;
-            
             if (platform === 'whatsapp') {
-                window.open(`https://wa.me/?text=      ${encodeURIComponent(text)}`, '_blank');
+                window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
             } else if (platform === 'telegram') {
-                window.open(`https://t.me/share/url?url=      ${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`, '_blank');
+                window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`, '_blank');
             }
         }
 
@@ -3363,7 +3246,6 @@
                 showNotification('لطفاً ابتدا اطلاعات فاکتور را وارد کنید', 'error');
                 return;
             }
-            
             previewInvoice();
             setTimeout(() => {
                 printInvoiceTripleCopy();
@@ -3375,7 +3257,6 @@
                 showNotification('ابتدا پیش‌نمایش را ببینید', 'error');
                 return;
             }
-            
             const invoiceNumber = document.getElementById('invoiceNumber').value;
             currentInvoicePDF.save(`فاکتور_${invoiceNumber}.pdf`);
             showNotification('PDF دانلود شد', 'success');
@@ -3464,7 +3345,6 @@
 
         // ===== SETTINGS PAGE =====
         function loadSettingsPage() {
-            // Load current settings
             document.getElementById('companyName').value = appData.settings.companyName;
             document.getElementById('companyPhone').value = appData.settings.companyPhone;
             document.getElementById('companyAddress').value = appData.settings.companyAddress;
@@ -3482,7 +3362,6 @@
             appData.settings.companyName = document.getElementById('companyName').value;
             appData.settings.companyPhone = document.getElementById('companyPhone').value;
             appData.settings.companyAddress = document.getElementById('companyAddress').value;
-            
             saveData();
             showNotification('تنظیمات شرکت ذخیره شد', 'success');
         }
@@ -3495,7 +3374,6 @@
                 showNotification('لطفا رمز عبور جدید را وارد کنید', 'error');
                 return;
             }
-            
             if (newPassword !== confirmPassword) {
                 showNotification('رمز عبور و تکرار آن مطابقت ندارند', 'error');
                 return;
@@ -3513,7 +3391,6 @@
             appData.settings.taxRate = parseFloat(document.getElementById('taxRate').value) || 9;
             appData.settings.minSalary = parseFloat(document.getElementById('minSalary').value) || 45000000;
             appData.settings.overtimeRate = parseFloat(document.getElementById('overtimeRate').value) || 40;
-            
             saveData();
             showNotification('تنظیمات مالی ذخیره شد', 'success');
         }
@@ -3527,22 +3404,16 @@
             appData.settings.secondaryColor = secondaryColor;
             appData.settings.themeMode = themeMode;
             
-            // اعمال رنگ‌ها در سراسر برنامه
             applyThemeColors();
             
-            // اعمال تم تیره/روشن
             if (themeMode === 'dark') {
                 document.body.style.background = 'linear-gradient(135deg, #2d3748 0%, #4a5568 50%, #718096 100%)';
                 document.body.style.color = '#f7fafc';
-                
-                // تغییر رنگ کارت‌ها برای تم تیره
                 const cards = document.querySelectorAll('.card');
                 cards.forEach(card => {
                     card.style.background = '#2d3748';
                     card.style.color = '#f7fafc';
                 });
-                
-                // تغییر رنگ جدول‌ها
                 const tables = document.querySelectorAll('.table');
                 tables.forEach(table => {
                     table.style.color = '#f7fafc';
@@ -3550,15 +3421,11 @@
             } else {
                 document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
                 document.body.style.color = '#0f172a';
-                
-                // بازگشت رنگ کارت‌ها به حالت عادی
                 const cards = document.querySelectorAll('.card');
                 cards.forEach(card => {
                     card.style.background = 'white';
                     card.style.color = '#0f172a';
                 });
-                
-                // بازگشت رنگ جدول‌ها
                 const tables = document.querySelectorAll('.table');
                 tables.forEach(table => {
                     table.style.color = '#0f172a';
@@ -3572,11 +3439,9 @@
             const primary = appData.settings.primaryColor;
             const secondary = appData.settings.secondaryColor;
             
-            // اعمال رنگ‌های اصلی
             document.documentElement.style.setProperty('--primary', primary);
             document.documentElement.style.setProperty('--secondary', secondary);
             
-            // به‌روزرسانی رنگ‌های گرادیان
             const gradients = document.querySelectorAll('.stat-card');
             gradients.forEach(card => {
                 if (card.style.background.includes('var(--secondary)')) {
@@ -3584,14 +3449,12 @@
                 }
             });
             
-            // به‌روزرسانی رنگ‌های دکمه‌ها
             const primaryButtons = document.querySelectorAll('.btn-primary');
             primaryButtons.forEach(btn => {
                 btn.style.background = secondary;
                 btn.style.borderColor = secondary;
             });
             
-            // به‌روزرسانی رنگ‌های هدر
             const cardHeaders = document.querySelectorAll('.card-header');
             cardHeaders.forEach(header => {
                 if (header.style.background.includes('var(--primary)')) {
@@ -3599,13 +3462,11 @@
                 }
             });
             
-            // به‌روزرسانی رنگ‌های ناوبری
             const navButtons = document.querySelectorAll('.nav-btn.active');
             navButtons.forEach(btn => {
                 btn.style.background = secondary;
             });
             
-            // ذخیره رنگ‌ها در CSS سفارشی
             const customStyles = document.createElement('style');
             customStyles.textContent = `
                 .custom-primary { color: ${primary} !important; }
@@ -4051,12 +3912,9 @@
                 return;
             }
             
-            // ذخیره تاریخ‌های انتخاب شده برای استفاده در گزارش‌ها
             window.reportDateFilter = { startDate, endDate };
-            
             showNotification('فیلتر تاریخ اعمال شد', 'success');
             
-            // بازتولید آخرین گزارش با فیلتر جدید
             if (window.lastReportType) {
                 generateReport(window.lastReportType);
             }
@@ -4270,7 +4128,6 @@
             
             showLoading('در حال آماده‌سازی و ارسال پشتیبان...');
             
-            // در نسخه آفلاین، فقط نمایش پیام موفقیت
             setTimeout(() => {
                 hideLoading();
                 showNotification(`پشتیبان به ایمیل ${email} ارسال شد (در نسخه آفلاین، این عمل شبیه‌سازی شده است)`, 'success');
@@ -4309,7 +4166,6 @@
         }
 
         function updateCharts() {
-            // Income Chart
             const incomeCtx = document.getElementById('incomeChart').getContext('2d');
             const monthlyIncome = getMonthlyData('income');
             
@@ -4340,7 +4196,6 @@
                 }
             });
 
-            // Expense Chart
             const expenseCtx = document.getElementById('expenseChart').getContext('2d');
             const monthlyExpense = getMonthlyData('expense');
             
@@ -4499,14 +4354,12 @@
             if (contract) {
                 editingId = id;
                 
-                // Populate form with contract data
                 document.getElementById('contractCustomer').value = contract.customer;
                 document.getElementById('contractPhone').value = contract.phone;
                 document.getElementById('contractAddress').value = contract.address;
                 document.getElementById('contractDate').value = toShamsi(contract.date);
                 document.getElementById('advancePayment').value = contract.advance;
                 
-                // Clear and populate products
                 document.getElementById('productsContainer').innerHTML = '';
                 productRowCount = 0;
                 contract.products.forEach(product => {
@@ -4517,7 +4370,6 @@
                     lastRow.querySelector('.product-price').value = product.price;
                 });
                 
-                // Clear and populate checks
                 document.getElementById('checksContainer').innerHTML = '';
                 checkRowCount = 0;
                 contract.checks.forEach(check => {
@@ -4613,11 +4465,9 @@
 
         // ===== INPUT VALIDATION SETUP =====
         function setupInputValidation() {
-            // جلوگیری از اجرای چندباره
             if (validationListenersAdded) return;
             validationListenersAdded = true;
 
-            // اعتبارسنجی تلفن همراه
             document.querySelectorAll('input[type="tel"]').forEach(input => {
                 input.addEventListener('blur', function() {
                     if (this.value && !validateMobilePhone(this.value)) {
@@ -4635,7 +4485,6 @@
                 });
             });
             
-            // اعتبارسنجی کد ملی
             document.querySelectorAll('input[id*="NationalCode"]').forEach(input => {
                 input.addEventListener('blur', function() {
                     if (this.value && !validateNationalCode(this.value)) {
@@ -4653,12 +4502,10 @@
                 });
             });
             
-            // اعتبارسنجی شماره چک - فقط عدد
             document.getElementById('modalCheckNumber').addEventListener('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
             });
             
-            // اعتبارسنجی حروف فارسی برای نام و آدرس
             document.querySelectorAll('input[type="text"], textarea').forEach(input => {
                 if (input.id.includes('Name') || input.id.includes('Address') || input.id.includes('description')) {
                     input.addEventListener('blur', function() {
@@ -4671,13 +4518,11 @@
                 }
             });
             
-            // نمایش/مخفی کردن انتخاب راننده در هزینه‌ها
             document.getElementById('modalExpenseCategory').addEventListener('change', handleExpenseCategoryChange);
         }
 
         // ===== INITIALIZATION =====
         function initializeSystem() {
-            // پاک کردن داده‌های قبلی در اولین اجرا
             if (!localStorage.getItem('kaleshiFoamDataCleaned')) {
                 localStorage.removeItem('kaleshiFoamData');
                 localStorage.setItem('kaleshiFoamDataCleaned', 'true');
@@ -4711,21 +4556,14 @@
                 saveData();
             }
             
-            // Initialize flatpickr for all date inputs
             initializePersianCalendar();
-            
-            // Initialize forms
             resetContractForm();
             resetInvoiceForm();
-            
-            // Set current date
             document.getElementById('currentDate').textContent = toShamsi(new Date().toISOString());
             
-            // Add search functionality
             document.getElementById('searchContracts')?.addEventListener('input', loadContractsList);
             document.getElementById('searchInvoices')?.addEventListener('input', loadInvoicesList);
             
-            // Load initial data
             updateDashboard();
             updateCharts();
             loadCustomersList();
@@ -4734,10 +4572,8 @@
             loadWorkersList();
             loadInvoicesList();
             
-            // Apply saved theme
             applyThemeColors();
             
-            // Setup auto backup if enabled
             if (appData.settings.autoBackupInterval > 0) {
                 const intervalMs = appData.settings.autoBackupInterval * 24 * 60 * 60 * 1000;
                 setInterval(() => {
@@ -4747,13 +4583,11 @@
                 }, intervalMs);
             }
             
-            // اضافه کردن اعتبارسنجی به ورودی‌ها
             setupInputValidation();
         }
 
         // ===== EVENT LISTENERS =====
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is already logged in
             if (appData.currentUser) {
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
@@ -4761,18 +4595,16 @@
                 initializeSystem();
             }
             
-            // Add enter key support for login
             document.getElementById('password').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
                     login();
                 }
             });
             
-            // Apply saved theme
             if (appData.settings.themeMode === 'dark') {
                 document.body.style.background = 'linear-gradient(135deg, #2d3748 0%, #4a5568 50%, #718096 100%)';
             }
         });
     </script>
 </body>
-</html>
+    </html>
