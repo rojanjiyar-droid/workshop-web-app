@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>سیستم حسابداری کارخانه - آفلاین</title>
+  <title>سیستم حسابداری کارخانه - آفلاین (نسخه اصلاح‌شده)</title>
 
   <!-- UI -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
@@ -24,6 +24,7 @@
       --bg: #f8f9fa;
     }
     body { font-family: 'Vazir', Tahoma, system-ui; background: var(--bg); }
+    .nav-link { cursor: pointer; }
     .nav-link.active { background: var(--secondary); color: #fff !important; border-radius: 8px; }
     .card { border-radius: 12px; }
     .section-title { font-weight: 700; color: var(--primary); }
@@ -33,8 +34,6 @@
     .stat { background: linear-gradient(135deg, var(--secondary), #1d4ed8); color: #fff; border-radius: 12px; padding: 16px; text-align: center; }
     .stat .val { font-size: 20px; font-weight: 800; }
     .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); }
-    .sticky-footer { position: sticky; bottom: 0; background: #fff; padding: 8px; border-top: 1px solid #eee; }
-    .form-inline > * { margin-inline-end: 8px; }
   </style>
 </head>
 
@@ -58,13 +57,13 @@
 
     <!-- Nav -->
     <ul class="nav nav-pills mb-3" id="mainTabs">
-      <li class="nav-item"><a class="nav-link active" data-target="dashboard" href="#">داشبورد</a></li>
-      <li class="nav-item"><a class="nav-link" data-target="contracts" href="#">قراردادها</a></li>
-      <li class="nav-item"><a class="nav-link" data-target="checks" href="#">چک‌ها</a></li>
-      <li class="nav-item"><a class="nav-link" data-target="income" href="#">درآمدها</a></li>
-      <li class="nav-item"><a class="nav-link" data-target="customers" href="#">مشتریان</a></li>
-      <li class="nav-item"><a class="nav-link" data-target="reports" href="#">گزارش‌ها</a></li>
-      <li class="nav-item"><a class="nav-link" data-target="settings" href="#">تنظیمات</a></li>
+      <li class="nav-item"><a class="nav-link active" data-target="dashboard">داشبورد</a></li>
+      <li class="nav-item"><a class="nav-link" data-target="contracts">قراردادها</a></li>
+      <li class="nav-item"><a class="nav-link" data-target="checks">چک‌ها</a></li>
+      <li class="nav-item"><a class="nav-link" data-target="income">درآمدها</a></li>
+      <li class="nav-item"><a class="nav-link" data-target="customers">مشتریان</a></li>
+      <li class="nav-item"><a class="nav-link" data-target="reports">گزارش‌ها</a></li>
+      <li class="nav-item"><a class="nav-link" data-target="settings">تنظیمات</a></li>
     </ul>
 
     <!-- Pages -->
@@ -349,10 +348,10 @@
     // Utils
     const toISO = (sh) => {
       if (!sh) return new Date().toISOString();
-      const m = moment(sh, 'jYYYY/jMM/jDD'); // Jalali parse
+      const m = moment(sh, 'YYYY/MM/DD'); // Jalali parse
       return m.isValid() ? m.toDate().toISOString() : new Date().toISOString();
     };
-    const toShamsi = (iso) => moment(iso).format('jYYYY/jMM/jDD');
+    const toShamsi = (iso) => moment(iso).format('YYYY/MM/DD');
     const fmt = (n) => Number(n||0).toLocaleString('fa-IR');
 
     // Storage
@@ -364,347 +363,4 @@
           if (parsed.version) Object.assign(App, parsed);
         } catch (e) {}
       }
-      renderAll();
-    }
-    function save() { localStorage.setItem(KEY, JSON.stringify(App)); }
-
-    // Navigation
-    document.querySelectorAll('#mainTabs .nav-link').forEach(a=>{
-      a.addEventListener('click', (e)=>{
-        e.preventDefault();
-        const target = a.getAttribute('data-target');
-        document.querySelectorAll('#mainTabs .nav-link').forEach(x=>x.classList.remove('active'));
-        a.classList.add('active');
-        document.querySelectorAll('.page').forEach(p=>p.style.display='none');
-        document.getElementById(target).style.display = '';
-      });
-    });
-
-    // Header actions
-    document.getElementById('appDate').textContent = toShamsi(new Date().toISOString());
-    document.getElementById('btnExport').addEventListener('click', ()=>{
-      const blob = new Blob([JSON.stringify(App,null,2)], {type:'application/json'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `backup_${toShamsi(new Date().toISOString()).replace(/\//g,'-')}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-    document.getElementById('importFile').addEventListener('change', (e)=>{
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ()=>{
-        try {
-          const data = JSON.parse(reader.result);
-          if (!confirm('اطلاعات فعلی جایگزین شوند؟')) return;
-          Object.assign(App, data);
-          save();
-          renderAll();
-          alert('بازیابی انجام شد.');
-        } catch(err) { alert('فایل نامعتبر است.'); }
-      };
-      reader.readAsText(file);
-    });
-    document.getElementById('btnClear').addEventListener('click', ()=>{
-      if (!confirm('کل داده‌ها پاک شوند؟')) return;
-      localStorage.removeItem(KEY);
-      App.customers = []; App.contracts = []; App.checks = []; App.incomes = [];
-      save(); renderAll();
-    });
-
-    // Customers CRUD
-    document.getElementById('btnAddCustomer').addEventListener('click', ()=>{
-      const name = document.getElementById('uName').value.trim();
-      const phone = document.getElementById('uPhone').value.trim();
-      const date = document.getElementById('uDate').value.trim();
-      if (!name || !phone) return alert('نام و تلفن لازم است.');
-      App.customers.push({id: Date.now(), name, phone, date: toISO(date)});
-      save(); renderCustomers();
-      document.getElementById('uName').value='';
-      document.getElementById('uPhone').value='';
-      document.getElementById('uDate').value='';
-    });
-    function renderCustomers() {
-      const term = (document.getElementById('uSearch').value||'').toLowerCase();
-      const tb = document.getElementById('uTbody'); tb.innerHTML='';
-      App.customers
-        .filter(u=>u.name.toLowerCase().includes(term) || u.phone.includes(term))
-        .forEach((u,i)=>{
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${i+1}</td>
-            <td>${u.name}</td>
-            <td>${u.phone}</td>
-            <td>${toShamsi(u.date)}</td>
-            <td>
-              <button class="btn btn-sm btn-warning">ویرایش</button>
-              <button class="btn btn-sm btn-danger">حذف</button>
-            </td>`;
-          tr.querySelector('.btn-warning').onclick = ()=>{
-            const name = prompt('نام:', u.name);
-            const phone = prompt('تلفن:', u.phone);
-            const date = prompt('تاریخ (مثلاً 1404/01/01):', toShamsi(u.date));
-            if (name && phone && date) { u.name=name; u.phone=phone; u.date=toISO(date); save(); renderCustomers(); renderDatalist(); }
-          };
-          tr.querySelector('.btn-danger').onclick = ()=>{
-            if (confirm('حذف مشتری؟')) { App.customers = App.customers.filter(x=>x.id!==u.id); save(); renderCustomers(); renderDatalist(); }
-          };
-          tb.appendChild(tr);
-        });
-      renderDatalist();
-    }
-    document.getElementById('uSearch').addEventListener('input', renderCustomers);
-    function renderDatalist(){
-      const dl = document.getElementById('dlCustomers'); dl.innerHTML='';
-      App.customers.forEach(u=>{
-        const opt = document.createElement('option');
-        opt.value = u.name; dl.appendChild(opt);
-      });
-    }
-
-    // Contracts CRUD
-    document.getElementById('btnAddContract').addEventListener('click', ()=>{
-      const customer = document.getElementById('cCustomer').value.trim();
-      const amount = parseInt(document.getElementById('cAmount').value||'0',10);
-      const date = document.getElementById('cDate').value.trim();
-      if (!customer || !amount) return alert('مشتری و مبلغ لازم است.');
-      App.contracts.push({id:Date.now(), customer, amount, date: toISO(date)});
-      save(); renderContracts(); renderDashboard();
-      document.getElementById('cCustomer').value='';
-      document.getElementById('cAmount').value='';
-      document.getElementById('cDate').value='';
-    });
-    function renderContracts(){
-      const term = (document.getElementById('cSearch').value||'').toLowerCase();
-      const tb = document.getElementById('cTbody'); tb.innerHTML='';
-      App.contracts
-        .filter(c=>c.customer.toLowerCase().includes(term) || String(c.amount).includes(term))
-        .forEach((c,i)=>{
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${i+1}</td>
-            <td>${c.customer}</td>
-            <td>${fmt(c.amount)} تومان</td>
-            <td>${toShamsi(c.date)}</td>
-            <td>
-              <button class="btn btn-sm btn-warning">ویرایش</button>
-              <button class="btn btn-sm btn-danger">حذف</button>
-            </td>`;
-          tr.querySelector('.btn-warning').onclick = ()=>{
-            const customer = prompt('مشتری:', c.customer);
-            const amount = prompt('مبلغ:', c.amount);
-            const date = prompt('تاریخ (1404/01/01):', toShamsi(c.date));
-            if (customer && amount && date) { c.customer=customer; c.amount=parseInt(amount,10)||0; c.date=toISO(date); save(); renderContracts(); renderDashboard(); }
-          };
-          tr.querySelector('.btn-danger').onclick = ()=>{
-            if (confirm('حذف قرارداد؟')) { App.contracts = App.contracts.filter(x=>x.id!==c.id); save(); renderContracts(); renderDashboard(); }
-          };
-          tb.appendChild(tr);
-        });
-    }
-    document.getElementById('cSearch').addEventListener('input', renderContracts);
-
-    // Checks CRUD
-    document.getElementById('btnAddCheck').addEventListener('click', ()=>{
-      const number = document.getElementById('kNumber').value.trim();
-      const customer = document.getElementById('kCustomer').value.trim();
-      const amount = parseInt(document.getElementById('kAmount').value||'0',10);
-      const dueDate = document.getElementById('kDueDate').value.trim();
-      if (!number || !customer || !amount || !dueDate) return alert('همه فیلدها لازم است.');
-      App.checks.push({id:Date.now(), number, customer, amount, dueDate: toISO(dueDate), status:'در جریان'});
-      save(); renderChecks(); renderDashboard();
-      document.getElementById('kNumber').value='';
-      document.getElementById('kCustomer').value='';
-      document.getElementById('kAmount').value='';
-      document.getElementById('kDueDate').value='';
-    });
-    function renderChecks(){
-      const term = (document.getElementById('kSearch').value||'').toLowerCase();
-      const tb = document.getElementById('kTbody'); tb.innerHTML='';
-      const today = new Date();
-      App.checks
-        .filter(k=>k.number.includes(term) || k.customer.toLowerCase().includes(term))
-        .forEach((k,i)=>{
-          const dDue = new Date(k.dueDate);
-          const diffDays = Math.ceil((dDue.getTime()-today.getTime())/(1000*60*60*24));
-          const badge = k.status==='در جریان'?'badge-warning':k.status==='وصول شده'?'badge-success':'badge-danger';
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${i+1}</td>
-            <td>${k.number}</td>
-            <td>${k.customer}</td>
-            <td>${fmt(k.amount)} تومان</td>
-            <td>${toShamsi(k.dueDate)}</td>
-            <td><span class="badge ${diffDays<0?'bg-danger':'bg-info'}">${diffDays} روز</span></td>
-            <td><span class="badge ${badge}">${k.status}</span></td>
-            <td class="d-flex gap-1 flex-wrap">
-              <button class="btn btn-sm btn-success">وصول</button>
-              <button class="btn btn-sm btn-outline-danger">برگشت</button>
-              <button class="btn btn-sm btn-warning">ویرایش</button>
-              <button class="btn btn-sm btn-danger">حذف</button>
-            </td>`;
-          tr.querySelector('.btn-success').onclick = ()=>{ k.status='وصول شده'; save(); renderChecks(); };
-          tr.querySelector('.btn-outline-danger').onclick = ()=>{ k.status='برگشت خورده'; save(); renderChecks(); };
-          tr.querySelector('.btn-warning').onclick = ()=>{
-            const number = prompt('شماره چک:', k.number);
-            const customer = prompt('مشتری:', k.customer);
-            const amount = prompt('مبلغ:', k.amount);
-            const due = prompt('سررسید (1404/01/01):', toShamsi(k.dueDate));
-            if (number && customer && amount && due) {
-              k.number=number; k.customer=customer; k.amount=parseInt(amount,10)||0; k.dueDate=toISO(due);
-              save(); renderChecks(); renderDashboard();
-            }
-          };
-          tr.querySelector('.btn-danger').onclick = ()=>{
-            if (confirm('حذف چک؟')) { App.checks = App.checks.filter(x=>x.id!==k.id); save(); renderChecks(); renderDashboard(); }
-          };
-          tb.appendChild(tr);
-        });
-    }
-    document.getElementById('kSearch').addEventListener('input', renderChecks);
-
-    // Income CRUD
-    document.getElementById('btnAddIncome').addEventListener('click', ()=>{
-      const category = document.getElementById('iCategory').value;
-      const amount = parseInt(document.getElementById('iAmount').value||'0',10);
-      const date = document.getElementById('iDate').value.trim();
-      const desc = document.getElementById('iDesc').value.trim();
-      if (!amount || !date) return alert('مبلغ و تاریخ لازم است.');
-      App.incomes.push({id:Date.now(), category, amount, date: toISO(date), desc});
-      save(); renderIncomes(); renderDashboard();
-      document.getElementById('iAmount').value='';
-      document.getElementById('iDate').value='';
-      document.getElementById('iDesc').value='';
-    });
-    function renderIncomes(){
-      const term = (document.getElementById('iSearch').value||'').toLowerCase();
-      const tb = document.getElementById('iTbody'); tb.innerHTML='';
-      App.incomes
-        .filter(i=>i.category.toLowerCase().includes(term) || i.desc.toLowerCase().includes(term))
-        .forEach((i,idx)=>{
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${idx+1}</td>
-            <td>${i.category}</td>
-            <td>${i.desc||'-'}</td>
-            <td>${fmt(i.amount)} تومان</td>
-            <td>${toShamsi(i.date)}</td>
-            <td>
-              <button class="btn btn-sm btn-warning">ویرایش</button>
-              <button class="btn btn-sm btn-danger">حذف</button>
-            </td>`;
-          tr.querySelector('.btn-warning').onclick = ()=>{
-            const cat = prompt('دسته‌بندی:', i.category);
-            const amount = prompt('مبلغ:', i.amount);
-            const date = prompt('تاریخ (1404/01/01):', toShamsi(i.date));
-            const desc = prompt('شرح:', i.desc||'');
-            if (cat && amount && date) {
-              i.category=cat; i.amount=parseInt(amount,10)||0; i.date=toISO(date); i.desc=desc||'';
-              save(); renderIncomes(); renderDashboard();
-            }
-          };
-          tr.querySelector('.btn-danger').onclick = ()=>{
-            if (confirm('حذف درآمد؟')) { App.incomes = App.incomes.filter(x=>x.id!==i.id); save(); renderIncomes(); renderDashboard(); }
-          };
-          tb.appendChild(tr);
-        });
-    }
-    document.getElementById('iSearch').addEventListener('input', renderIncomes);
-
-    // Reports
-    document.getElementById('btnGenerateReport').addEventListener('click', ()=>{
-      const start = document.getElementById('rStart').value.trim();
-      const end = document.getElementById('rEnd').value.trim();
-      const s = start ? new Date(toISO(start)) : new Date('1970-01-01');
-      const e = end ? new Date(toISO(end)) : new Date('2999-01-01');
-
-      function inRange(d){ const x=new Date(d); return x>=s && x<=e; }
-
-      const contracts = App.contracts.filter(c=>inRange(c.date));
-      const checks = App.checks.filter(k=>inRange(k.dueDate));
-      const incomes = App.incomes.filter(i=>inRange(i.date));
-
-      const sumContracts = contracts.reduce((a,b)=>a+b.amount,0);
-      const sumIncomes = incomes.reduce((a,b)=>a+b.amount,0);
-      const sumChecks = checks.reduce((a,b)=>a+b.amount,0);
-
-      const html = `
-        <div class="grid mb-3">
-          <div class="stat"><div>تعداد قرارداد</div><div class="val">${fmt(contracts.length)}</div></div>
-          <div class="stat"><div>جمع قرارداد</div><div class="val">${fmt(sumContracts)} تومان</div></div>
-          <div class="stat"><div>تعداد چک</div><div class="val">${fmt(checks.length)}</div></div>
-          <div class="stat"><div>جمع چک</div><div class="val">${fmt(sumChecks)} تومان</div></div>
-          <div class="stat" style="background:linear-gradient(135deg,#10b981,#059669)"><div>جمع درآمد</div><div class="val">${fmt(sumIncomes)} تومان</div></div>
-        </div>
-
-        <h6 class="section-title mt-3">قراردادها</h6>
-        <div class="table-responsive"><table class="table table-sm"><thead><tr><th>#</th><th>مشتری</th><th>مبلغ</th><th>تاریخ</th></tr></thead><tbody>
-          ${contracts.map((c,i)=>`<tr><td>${i+1}</td><td>${c.customer}</td><td>${fmt(c.amount)} تومان</td><td>${toShamsi(c.date)}</td></tr>`).join('')}
-        </tbody></table></div>
-
-        <h6 class="section-title mt-3">چک‌ها</h6>
-        <div class="table-responsive"><table class="table table-sm"><thead><tr><th>#</th><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>سررسید</th><th>وضعیت</th></tr></thead><tbody>
-          ${checks.map((k,i)=>`<tr><td>${i+1}</td><td>${k.number}</td><td>${k.customer}</td><td>${fmt(k.amount)} تومان</td><td>${toShamsi(k.dueDate)}</td><td>${k.status}</td></tr>`).join('')}
-        </tbody></table></div>
-
-        <h6 class="section-title mt-3">درآمدها</h6>
-        <div class="table-responsive"><table class="table table-sm"><thead><tr><th>#</th><th>دسته‌بندی</th><th>شرح</th><th>مبلغ</th><th>تاریخ</th></tr></thead><tbody>
-          ${incomes.map((i,idx)=>`<tr><td>${idx+1}</td><td>${i.category}</td><td>${i.desc||'-'}</td><td>${fmt(i.amount)} تومان</td><td>${toShamsi(i.date)}</td></tr>`).join('')}
-        </tbody></table></div>
-      `;
-      document.getElementById('reportResults').innerHTML = html;
-    });
-
-    // Dashboard
-    function renderDashboard(){
-      document.getElementById('statContracts').textContent = App.contracts.length;
-      document.getElementById('statChecks').textContent = App.checks.length;
-      document.getElementById('statIncome').textContent = App.incomes.length;
-      document.getElementById('statCustomers').textContent = App.customers.length;
-      document.getElementById('statIncomeSum').textContent = fmt(App.incomes.reduce((a,b)=>a+b.amount,0))+' تومان';
-
-      const currentYear = moment().format('YYYY');
-      const currentMonth = moment().format('MM');
-      const monthContracts = App.contracts.filter(c=>{
-        const [y,m] = toShamsi(c.date).split('/'); return y===currentYear && m===currentMonth;
-      });
-
-      const labels = monthContracts.map(c=>c.customer);
-      const data = monthContracts.map(c=>c.amount);
-      const ctx = document.getElementById('contractsChart').getContext('2d');
-      if (window.contractsChart) window.contractsChart.destroy();
-      window.contractsChart = new Chart(ctx, {
-        type:'bar',
-        data:{ labels, datasets:[{ label:'مبلغ قرارداد', data, backgroundColor:'#3b82f6' }] },
-        options:{ responsive:true, plugins:{ legend:{display:false} } }
-      });
-    }
-
-    // Render all
-    function renderAll(){
-      renderCustomers();
-      renderContracts();
-      renderChecks();
-      renderIncomes();
-      renderDashboard();
-    }
-
-    // Settings
-    document.getElementById('btnSaveSettings').addEventListener('click', ()=>{
-      App.company = document.getElementById('sCompany').value.trim() || App.company;
-      App.version = document.getElementById('sVersion').value.trim() || App.version;
-      save(); alert('تنظیمات ذخیره شد.');
-    });
-
-    // Defaults
-    document.getElementById('uDate').value = moment().format('YYYY/MM/DD');
-    document.getElementById('cDate').value = moment().format('YYYY/MM/DD');
-    document.getElementById('kDueDate').value = moment().add(7,'day').format('YYYY/MM/DD');
-    document.getElementById('iDate').value = moment().format('YYYY/MM/DD');
-
-    // Start
-    load();
-  </script>
-</body>
-</html>
+      render
