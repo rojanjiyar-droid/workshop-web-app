@@ -1,75 +1,687 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <title>سیستم حسابداری کارخانه</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-  <style>
-    body { font-family: Tahoma, sans-serif; background:#f8f9fa; }
-    .nav-link { cursor:pointer; }
-    .nav-link.active { background:#0d6efd; color:#fff !important; border-radius:8px; }
-    .page { display:none; }
-    .page.active { display:block; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حسابداری شخصی کلشی‌فوم</title>
+
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet">
+<style>
+:root{
+  --primary:#1e3a8a;
+  --secondary:#3b82f6;
+  --bg:#f1f5f9;
+  --card:#ffffff;
+  --text:#0f172a;
+  --danger:#ef4444;
+}
+body.dark{
+  --bg:#0f172a;
+  --card:#1e293b;
+  --text:#e5e7eb;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Vazir,Tahoma;
+  background:var(--bg);
+  color:var(--text);
+}
+header{
+  background:var(--primary);
+  color:#fff;
+  padding:14px;
+  text-align:center;
+  font-weight:700;
+}
+nav{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  display:flex;
+  background:#fff;
+  border-top:1px solid #ddd;
+}
+nav button{
+  flex:1;
+  border:none;
+  background:none;
+  padding:8px 0;
+  font-size:11px;
+}
+nav button.active{
+  color:var(--secondary);
+  font-weight:700;
+}
+.page{
+  display:none;
+  padding:15px;
+  padding-bottom:90px;
+}
+.page.active{display:block}
+.card{
+  background:var(--card);
+  border-radius:14px;
+  padding:15px;
+  margin-bottom:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+.btn{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:var(--secondary);
+  color:#fff;
+  font-weight:600;
+  margin-top:10px;
+}
+.btn-danger{background:var(--danger)}
+input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  margin-top:6px;
+  font-family:Vazir;
+}
+.small{font-size:12px;opacity:.7}
+.list-item{
+  border-bottom:1px solid #eee;
+  padding:10px 0;
+}
+.actions{display:flex;gap:6px;margin-top:6px}
+.actions button{flex:1;font-size:12px;padding:8px}
+</style>
 </head>
 <body>
-<div class="container py-3">
-  <h3 class="mb-3">📊 سیستم حسابداری کارخانه</h3>
 
-  <!-- منو -->
-  <ul class="nav nav-pills mb-3" id="mainTabs">
-    <li class="nav-item"><a class="nav-link active" onclick="showPage('dashboard', this)">داشبورد</a></li>
-    <li class="nav-item"><a class="nav-link" onclick="showPage('contracts', this)">قراردادها</a></li>
-    <li class="nav-item"><a class="nav-link" onclick="showPage('checks', this)">چک‌ها</a></li>
-    <li class="nav-item"><a class="nav-link" onclick="showPage('income', this)">درآمدها</a></li>
-    <li class="nav-item"><a class="nav-link" onclick="showPage('customers', this)">مشتریان</a></li>
-    <li class="nav-item"><a class="nav-link" onclick="showPage('reports', this)">گزارش‌ها</a></li>
-    <li class="nav-item"><a class="nav-link" onclick="showPage('settings', this)">تنظیمات</a></li>
-  </ul>
+<header>حسابداری شخصی کلشی‌فوم</header>
 
-  <!-- صفحات -->
-  <div id="pages">
-    <section id="dashboard" class="page active">
-      <div class="card"><div class="card-body">📊 اینجا داشبورد است</div></div>
-    </section>
-
-    <section id="contracts" class="page">
-      <div class="card"><div class="card-body">📝 اینجا قراردادهاست</div></div>
-    </section>
-
-    <section id="checks" class="page">
-      <div class="card"><div class="card-body">🏦 اینجا چک‌هاست</div></div>
-    </section>
-
-    <section id="income" class="page">
-      <div class="card"><div class="card-body">💰 اینجا درآمدهاست</div></div>
-    </section>
-
-    <section id="customers" class="page">
-      <div class="card"><div class="card-body">👥 اینجا مشتریان است</div></div>
-    </section>
-
-    <section id="reports" class="page">
-      <div class="card"><div class="card-body">📈 اینجا گزارش‌هاست</div></div>
-    </section>
-
-    <section id="settings" class="page">
-      <div class="card"><div class="card-body">⚙️ اینجا تنظیمات است</div></div>
-    </section>
+<!-- داشبورد -->
+<div id="dashboard" class="page active">
+  <div class="card">
+    <h3>📊 خلاصه</h3>
+    <div id="summary"></div>
   </div>
 </div>
 
+<!-- مشتریان -->
+<div id="customers" class="page">
+  <div class="card">
+    <h3>👥 مشتریان</h3>
+
+    <input placeholder="جستجو..." oninput="renderCustomers(this.value)">
+
+    <div id="customerList"></div>
+
+    <hr>
+    <h4>➕ مشتری جدید</h4>
+    <input id="cName" placeholder="نام مشتری">
+    <input id="cPhone" placeholder="شماره تماس">
+    <button class="btn" onclick="addCustomer()">ثبت مشتری</button>
+  </div>
+</div>
+
+<!-- مالی -->
+<div id="finance" class="page">
+  <div class="card">
+    <h3>💰 مالی</h3>
+    <p class="small">بعداً اضافه می‌شود</p>
+  </div>
+</div>
+
+<!-- تنظیمات -->
+<div id="settings" class="page">
+  <div class="card">
+    <h3>⚙️ تنظیمات</h3>
+    <button class="btn" onclick="toggleTheme()">تغییر تم</button>
+  </div>
+</div>
+
+<nav>
+  <button class="active" onclick="show('dashboard',this)">🏠</button>
+  <button onclick="show('customers',this)">👥</button>
+  <button onclick="show('finance',this)">💰</button>
+  <button onclick="show('settings',this)">⚙️</button>
+</nav>
 <script>
-function showPage(pageId, el){
-  // مخفی کردن همه صفحات
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  // نمایش صفحه انتخاب‌شده
-  document.getElementById(pageId).classList.add('active');
-  // تغییر وضعیت منو
-  document.querySelectorAll('#mainTabs .nav-link').forEach(x => x.classList.remove('active'));
-  el.classList.add('active');
+/* ====== DATA ====== */
+const DB_VERSION = 1;
+let db = {
+  version: DB_VERSION,
+  customers:[],
+  contracts:[],
+  checks:[],
+  transactions:[],
+  workers:[],
+  invoices:[],
+  settings:{ theme:'light' }
+};
+
+/* ====== STORAGE ====== */
+function saveDB(){
+  localStorage.setItem('kalshiDB', JSON.stringify(db));
 }
+function loadDB(){
+  const d = localStorage.getItem('kalshiDB');
+  if(d) db = JSON.parse(d);
+  else saveDB();
+}
+loadDB();
+function show(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function applyTheme(){
+  document.body.classList.toggle('dark', db.settings.theme==='dark');
+}
+function toggleTheme(){
+  db.settings.theme = db.settings.theme==='dark'?'light':'dark';
+  saveDB(); applyTheme();
+}
+applyTheme();
+function renderSummary(){
+  summary.innerHTML = `
+    <p>👥 مشتریان: ${db.customers.length}</p>
+    <p>📝 قراردادها: ${db.contracts.length}</p>
+    <p>💰 تراکنش‌ها: ${db.transactions.length}</p>
+  `;
+}
+renderSummary();
+
+/* ====== CUSTOMERS ====== */
+function addCustomer(){
+  const name = cName.value.trim();
+  const phone = cPhone.value.trim();
+  if(!name) return alert('نام را وارد کنید');
+
+  db.customers.push({
+    id:Date.now(),
+    name,phone,
+    created:new Date().toISOString()
+  });
+  cName.value=''; cPhone.value='';
+  saveDB();
+  renderCustomers();
+  renderSummary();
+}
+
+function deleteCustomer(id){
+  if(!confirm('حذف مشتری؟')) return;
+  db.customers = db.customers.filter(c=>c.id!==id);
+  saveDB();
+  renderCustomers();
+  renderSummary();
+}
+
+function editCustomer(id){
+  const c = db.customers.find(x=>x.id===id);
+  const n = prompt('نام جدید', c.name);
+  if(n!==null){
+    c.name=n;
+    saveDB();
+    renderCustomers();
+  }
+}
+
+function renderCustomers(q=''){
+  customerList.innerHTML='';
+  db.customers
+    .filter(c=>c.name.includes(q))
+    .forEach(c=>{
+      customerList.innerHTML+=`
+      <div class="list-item">
+        <strong>${c.name}</strong><br>
+        <span class="small">${c.phone||''}</span>
+        <div class="actions">
+          <button onclick="editCustomer(${c.id})">✏️</button>
+          <button class="btn-danger" onclick="deleteCustomer(${c.id})">🗑️</button>
+        </div>
+      </div>`;
+    });
+}
+renderCustomers();
 </script>
+
 </body>
 </html>
+<!-- قراردادها -->
+<div id="contracts" class="page">
+  <div class="card">
+    <h3>📝 قراردادها</h3>
+
+    <input placeholder="جستجو قرارداد..." oninput="renderContracts(this.value)">
+
+    <div id="contractList"></div>
+
+    <hr>
+    <h4>➕ قرارداد جدید</h4>
+
+    <select id="contractCustomer"></select>
+    <input id="contractTitle" placeholder="عنوان قرارداد">
+    <input id="contractAmount" type="number" placeholder="مبلغ قرارداد (تومان)">
+    <input id="contractAdvance" type="number" placeholder="پیش‌پرداخت">
+    <input id="contractDate" type="date">
+
+    <button class="btn" onclick="addContract()">ثبت قرارداد</button>
+  </div>
+</div>
+<button onclick="show('contracts',this)">📝</button>
+select{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  margin-top:6px;
+  font-family:Vazir;
+  background:#fff;
+}
+body.dark select{background:#1e293b;color:#fff}
+/* ====== CONTRACTS ====== */
+
+function loadContractCustomers(){
+  contractCustomer.innerHTML = '<option value="">انتخاب مشتری</option>';
+  db.customers.forEach(c=>{
+    contractCustomer.innerHTML +=
+      `<option value="${c.id}">${c.name}</option>`;
+  });
+}
+
+function addContract(){
+  const customerId = contractCustomer.value;
+  const title = contractTitle.value.trim();
+  const amount = +contractAmount.value;
+  const advance = +contractAdvance.value || 0;
+  const date = contractDate.value;
+
+  if(!customerId || !title || !amount){
+    alert('اطلاعات قرارداد ناقص است');
+    return;
+  }
+
+  db.contracts.push({
+    id:Date.now(),
+    customerId,
+    title,
+    amount,
+    advance,
+    date,
+    created:new Date().toISOString()
+  });
+
+  contractTitle.value='';
+  contractAmount.value='';
+  contractAdvance.value='';
+  contractDate.value='';
+
+  saveDB();
+  renderContracts();
+  renderSummary();
+}
+
+function deleteContract(id){
+  if(!confirm('حذف قرارداد؟')) return;
+  db.contracts = db.contracts.filter(c=>c.id!==id);
+  saveDB();
+  renderContracts();
+  renderSummary();
+}
+
+function renderContracts(q=''){
+  contractList.innerHTML='';
+  db.contracts
+    .filter(c=>c.title.includes(q))
+    .forEach(c=>{
+      const customer = db.customers.find(x=>x.id==c.customerId);
+      contractList.innerHTML += `
+        <div class="list-item">
+          <strong>${c.title}</strong><br>
+          <span class="small">
+            👤 ${customer?customer.name:'—'} |
+            💰 ${c.amount.toLocaleString()} تومان
+          </span>
+          <div class="actions">
+            <button class="btn-danger"
+              onclick="deleteContract(${c.id})">🗑️</button>
+          </div>
+        </div>
+      `;
+    });
+}
+
+/* بارگذاری اولیه */
+loadContractCustomers();
+renderContracts();
+loadContractCustomers();
+loadContractCustomers();
+<nav>
+  <button class="active" onclick="show('dashboard',this)">🏠</button>
+  <button onclick="show('customers',this)">👥</button>
+  <button onclick="show('contracts',this)">📝</button>
+  <button onclick="show('finance',this)">💰</button>
+  <button onclick="show('settings',this)">⚙️</button>
+</nav>
+<div id="customers" class="page">
+  <div class="card">
+    <h3>👥 مشتریان</h3>
+
+    <input placeholder="جستجو..." oninput="renderCustomers(this.value)">
+
+    <div id="customerList"></div>
+
+    <hr>
+    <h4>➕ مشتری جدید</h4>
+    <input id="cName" placeholder="نام مشتری">
+    <input id="cPhone" placeholder="شماره تماس">
+    <button class="btn" onclick="addCustomer()">ثبت مشتری</button>
+  </div>
+</div>
+function renderSummary(){
+  summary.innerHTML = `
+    <p>👥 مشتریان: ${db.customers.length}</p>
+    <p>📝 قراردادها: ${db.contracts.length}</p>
+    <p>💰 تراکنش‌ها: ${db.transactions.length}</p>
+  `;
+}
+<!-- مالی -->
+<div id="finance" class="page">
+  <div class="card">
+    <h3>💰 مالی</h3>
+
+    <select id="financeType">
+      <option value="income">درآمد</option>
+      <option value="expense">هزینه</option>
+    </select>
+
+    <select id="financeContract">
+      <option value="">— بدون قرارداد —</option>
+    </select>
+
+    <input id="financeTitle" placeholder="عنوان">
+    <input id="financeAmount" type="number" placeholder="مبلغ (تومان)">
+    <input id="financeDate" type="date">
+
+    <button class="btn" onclick="addTransaction()">ثبت</button>
+  </div>
+
+  <div class="card">
+    <h4>📒 لیست تراکنش‌ها</h4>
+    <div id="financeList"></div>
+  </div>
+</div>
+function loadFinanceContracts(){
+  financeContract.innerHTML =
+    '<option value="">— بدون قرارداد —</option>';
+  db.contracts.forEach(c=>{
+    financeContract.innerHTML +=
+      `<option value="${c.id}">${c.title}</option>`;
+  });
+}
+function addTransaction(){
+  const type = financeType.value;
+  const contractId = financeContract.value || null;
+  const title = financeTitle.value.trim();
+  const amount = +financeAmount.value;
+  const date = financeDate.value;
+
+  if(!title || !amount){
+    alert('اطلاعات ناقص است');
+    return;
+  }
+
+  db.transactions.push({
+    id:Date.now(),
+    type,
+    contractId,
+    title,
+    amount,
+    date,
+    created:new Date().toISOString()
+  });
+
+  financeTitle.value='';
+  financeAmount.value='';
+  financeDate.value='';
+
+  saveDB();
+  renderFinance();
+  renderSummary();
+}
+function deleteTransaction(id){
+  if(!confirm('حذف تراکنش؟')) return;
+  db.transactions = db.transactions.filter(t=>t.id!==id);
+  saveDB();
+  renderFinance();
+  renderSummary();
+}
+
+function renderFinance(){
+  financeList.innerHTML='';
+  db.transactions.forEach(t=>{
+    financeList.innerHTML += `
+      <div class="list-item">
+        <strong>
+          ${t.type==='income'?'➕':'➖'}
+          ${t.amount.toLocaleString()} تومان
+        </strong><br>
+        <span class="small">
+          ${t.title}
+        </span>
+        <div class="actions">
+          <button class="btn-danger"
+            onclick="deleteTransaction(${t.id})">🗑️</button>
+        </div>
+      </div>
+    `;
+  });
+}
+loadFinanceContracts();
+loadFinanceContracts();
+loadFinanceContracts();
+renderFinance();
+function contractBalance(contractId){
+  let total = 0;
+  db.transactions
+    .filter(t=>t.contractId==contractId)
+    .forEach(t=>{
+      total += (t.type==='income'?t.amount:-t.amount);
+    });
+  return total;
+}
+<!-- فاکتور -->
+<div id="invoices" class="page">
+  <div class="card">
+    <h3>📄 فاکتور</h3>
+
+    <select id="invoiceCustomer"></select>
+    <input id="invoiceTitle" placeholder="عنوان فاکتور">
+    <input id="invoiceAmount" type="number" placeholder="مبلغ (تومان)">
+    <input id="invoiceDate" type="date">
+
+    <button class="btn" onclick="addInvoice()">ثبت فاکتور</button>
+  </div>
+
+  <div class="card">
+    <h4>📑 لیست فاکتورها</h4>
+    <div id="invoiceList"></div>
+  </div>
+</div>
+<button onclick="show('invoices',this)">📄</button>
+function loadInvoiceCustomers(){
+  invoiceCustomer.innerHTML = '<option value="">انتخاب مشتری</option>';
+  db.customers.forEach(c=>{
+    invoiceCustomer.innerHTML +=
+      `<option value="${c.id}">${c.name}</option>`;
+  });
+}
+function addInvoice(){
+  const customerId = invoiceCustomer.value;
+  const title = invoiceTitle.value.trim();
+  const amount = +invoiceAmount.value;
+  const date = invoiceDate.value;
+
+  if(!customerId || !title || !amount){
+    alert('اطلاعات فاکتور ناقص است');
+    return;
+  }
+
+  db.invoices.push({
+    id:Date.now(),
+    customerId,
+    title,
+    amount,
+    date,
+    created:new Date().toISOString()
+  });
+
+  invoiceTitle.value='';
+  invoiceAmount.value='';
+  invoiceDate.value='';
+
+  saveDB();
+  renderInvoices();
+}
+function deleteInvoice(id){
+  if(!confirm('حذف فاکتور؟')) return;
+  db.invoices = db.invoices.filter(i=>i.id!==id);
+  saveDB();
+  renderInvoices();
+}
+
+function renderInvoices(){
+  invoiceList.innerHTML='';
+  db.invoices.forEach(i=>{
+    const customer = db.customers.find(c=>c.id==i.customerId);
+    invoiceList.innerHTML += `
+      <div class="list-item">
+        <strong>${i.title}</strong><br>
+        <span class="small">
+          👤 ${customer?customer.name:'—'} |
+          💰 ${i.amount.toLocaleString()} تومان
+        </span>
+        <div class="actions">
+          <button class="btn-danger"
+            onclick="deleteInvoice(${i.id})">🗑️</button>
+        </div>
+      </div>
+    `;
+  });
+}
+loadInvoiceCustomers();
+loadInvoiceCustomers();
+loadInvoiceCustomers();
+renderInvoices();
+db.transactions.push({
+  id:Date.now()+1,
+  type:'income',
+  contractId:null,
+  title:'فاکتور: '+title,
+  amount,
+  date,
+  created:new Date().toISOString()
+});
+<!-- چک‌ها -->
+<div id="checks" class="page">
+  <div class="card">
+    <h3>🏦 چک‌ها</h3>
+
+    <select id="checkType">
+      <option value="received">دریافتی</option>
+      <option value="paid">پرداختی</option>
+    </select>
+
+    <input id="checkNumber" placeholder="شماره چک">
+    <input id="checkAmount" type="number" placeholder="مبلغ (تومان)">
+    <input id="checkDate" type="date">
+    <input id="checkOwner" placeholder="صاحب چک / بانک">
+
+    <button class="btn" onclick="addCheck()">ثبت چک</button>
+  </div>
+
+  <div class="card">
+    <h4>📋 لیست چک‌ها</h4>
+    <div id="checkList"></div>
+  </div>
+</div>
+<button onclick="show('checks',this)">🏦</button>
+function addCheck(){
+  const type = checkType.value;
+  const number = checkNumber.value.trim();
+  const amount = +checkAmount.value;
+  const date = checkDate.value;
+  const owner = checkOwner.value.trim();
+
+  if(!number || !amount || !date){
+    alert('اطلاعات چک ناقص است');
+    return;
+  }
+
+  db.checks.push({
+    id:Date.now(),
+    type,
+    number,
+    amount,
+    date,
+    owner,
+    status:'pending',
+    created:new Date().toISOString()
+  });
+
+  checkNumber.value='';
+  checkAmount.value='';
+  checkDate.value='';
+  checkOwner.value='';
+
+  saveDB();
+  renderChecks();
+}
+function deleteCheck(id){
+  if(!confirm('حذف چک؟')) return;
+  db.checks = db.checks.filter(c=>c.id!==id);
+  saveDB();
+  renderChecks();
+}
+
+function renderChecks(){
+  checkList.innerHTML='';
+  db.checks.forEach(c=>{
+    checkList.innerHTML += `
+      <div class="list-item">
+        <strong>
+          ${c.type==='received'?'➕':'➖'}
+          ${c.amount.toLocaleString()} تومان
+        </strong><br>
+        <span class="small">
+          🧾 ${c.number} |
+          📅 ${c.date} |
+          ${c.owner||''}
+        </span>
+        <div class="actions">
+          <button class="btn-danger"
+            onclick="deleteCheck(${c.id})">🗑️</button>
+        </div>
+      </div>
+    `;
+  });
+}
+function checkAlerts(){
+  const today = new Date().toISOString().slice(0,10);
+  const due = db.checks.filter(c=>c.date<=today && c.status==='pending');
+  if(due.length){
+    alert(`⚠️ ${due.length} چک سررسید شده یا امروز سررسید دارد`);
+  }
+}
+checkAlerts();
+db.transactions.push({
+  id:Date.now()+2,
+  type: type==='received'?'income':'expense',
+  contractId:null,
+  title:'چک '+number,
+  amount,
+  date,
+  created:new Date().toISOString()
+});
